@@ -1,0 +1,24 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: markdownlint
+        run: |
+          npx --yes markdownlint-cli2 \
+            "README.md" "CHANGELOG.md" "CONTRIBUTING.md" "docs/**/*.md" "core/**/*.md" \
+            "adapters/**/*.md" "AGENTS.md" \
+            "#**/awesome-design-md/**" "#**/hallmark/references/**" "#**/skills/**/SKILL.md" || true
+      # Soft lint for v0.1 — do not fail the whole tree of vendored skills yet
+      - name: note
+        run: echo "Docs lint completed (vendored skills excluded)."

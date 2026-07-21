@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coding Team"
+  short_description: "Sprint → Batch → Task orchestration with role delegates"
+  default_prompt: "Use $coding-team as Lead: classify nature, assign tiers from model-pool.map.md, delegate roles with WIP≤2, run TE→Gatekeeper sequentially, and ask the human on incomplete or non-APPROVE results."
