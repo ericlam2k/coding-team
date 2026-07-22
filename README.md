@@ -4,7 +4,7 @@
 
 > **v1 priority:** [OpenAI Codex](https://chatgpt.com/codex). Cursor and Cline adapters are stubs.
 
-[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
 
 ---
 
@@ -80,6 +80,21 @@ Details: [docs/roles.md](docs/roles.md) · cards in [`core/roles/`](core/roles/)
 - **Design:** **Hallmark** + **awesome-design-md** (paired), plus frontend-design, aesthetic, ui-ux-pro-max
 
 See [docs/skills.md](docs/skills.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Optional addons (default OFF)
+
+Standalone packs — **not** injected into core. Toggle with install:
+
+```bash
+./install.sh --platform codex --global --enable caveman,ponytail
+```
+
+| Addon | What |
+|---|---|
+| **caveman** | Full Caveman skillset (compressed talk, commit/review/compress/stats/…) |
+| **ponytail** | Full Ponytail skillset (YAGNI ladder, root-cause fixes, `ponytail:` shortcuts) |
+
+Details: [docs/addons.md](docs/addons.md) · [addons/README.md](addons/README.md).
 
 ## Repository layout
 

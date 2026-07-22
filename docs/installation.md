@@ -106,6 +106,15 @@ rm -f ~/.codex/skills/coding-team
 
 See [adapters.md](adapters.md).
 
+## 5. Optional addons (default OFF)
+
+Caveman and ponytail are **standalone** — not part of core. See [addons.md](addons.md).
+
+```bash
+./install.sh --platform codex --global --enable caveman,ponytail
+./install.sh --platform codex --global --disable caveman
+```
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -114,3 +123,4 @@ See [adapters.md](adapters.md).
 | Symlink broken after move | Re-run install from the new clone path |
 | Wrong models mapped | Edit preferences only via re-detect; do not hardcode slugs into `core/model-routing.md` |
 | Skill not visible | Confirm path `~/.codex/skills/coding-team/SKILL.md` exists |
+| Addon not loading | Confirm `addons/toggles.json` has `"enabled": true` and Codex skill symlink exists |

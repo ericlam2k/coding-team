@@ -34,7 +34,9 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
 - **Lead cost discipline:** emit judgment and briefs — not implementation code; defects return as corrected briefs; apply the **spec-readiness test** before dispatch
 - Human gates for commit, push, Production deploy, destructive ops, new dependencies
 - Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
+- Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
 - Skills start at `none`; honor **skill overrides** in `core/orchestration.md` (`context-engineering` only on packet/investigation/synthesis trigger)
+- **Addons default OFF:** do **not** load `caveman` or `ponytail` unless the human enabled them (`addons/toggles.json` / `./install.sh --enable`) or explicitly asks in-session. They are standalone packs under `$CODING_TEAM_ROOT/addons/` — never inject into core briefs.
 
 ## Cheap-utility defaults (Codex)
 
