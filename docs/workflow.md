@@ -13,6 +13,8 @@ Human goal
 
 Incomplete or non-`APPROVE` output → **stop and ask the human**. Do not auto-chain.
 
+Lead applies **cost discipline** and the **spec-readiness test** before dispatch ([orchestration.md](../core/orchestration.md)).
+
 ## Sprint
 
 One measurable outcome, governing specs, non-goals, gates, ordered batches. Template: [`core/templates/sprint-brief.md`](../core/templates/sprint-brief.md). Cap: **600 words**.

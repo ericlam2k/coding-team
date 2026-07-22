@@ -16,13 +16,13 @@ Core policy never hardcodes vendor slugs. Install detects the **host model pool*
 
 When the Codex pool is available, the mapper prefers:
 
-| Tier | Preferred slug | Effort hint |
-|---|---|---|
-| 0 | `gpt-5.6-luna` (alt `gpt-5.4-mini`) | low |
-| 1 build | `gpt-5.6-terra` | medium |
-| 1 validate | `gpt-5.6-terra` | high |
-| 2 | `gpt-5.6-sol` | high |
-| 3 | `gpt-5.6-sol` | xhigh / max |
+| Tier | Preferred slug | Effort hint | Typical roles |
+|---|---|---|---|
+| 0 | `gpt-5.6-luna` (alt `gpt-5.4-mini`) | low/medium | Investigator; low-risk Frontend Builder; support cells |
+| 1 build | `gpt-5.6-terra` | medium | Complex UI / post-plan implement |
+| 1 validate | `gpt-5.6-terra` | high | Test Engineer |
+| 2 | `gpt-5.6-sol` | high | Lead plan; PM; Backend; UX Lead; Adv/Con; Gatekeeper |
+| 3 | `gpt-5.6-sol` | xhigh / max | N5 / Adv↔Con deadlock |
 
 If a preferred slug is missing, pick the closest remaining model by role in the pool (fast → 0, everyday → 1 build, deeper → 1 validate, frontier → 2/3). **Fail loud:** write `planned → actual | not available` in the map and in task handoffs.
 

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-07-22
+
+### Added
+
+- Lead cost discipline (judgment not volume; spec-readiness test)
+- Cheap-utility / Luna-class Tier 0 role defaults + escalation rules
+- Skill overrides (`context-engineering`, `sequential-thinking`, `problem-solving`)
+- Alias normalization table; Lean/Agile vocabulary nest
+- Mid-batch incomplete → stop-for-human; Production vs preview gate note
+- Role capacity hints on Investigator and Frontend Builder
+
+### Changed
+
+- Codex adapter SKILL and docs (installation, definitions, model-pool mapping) aligned to new policy
+
 ## [0.1.0] — 2026-07-21
 
 ### Added

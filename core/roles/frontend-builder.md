@@ -2,6 +2,8 @@
 
 **Purpose:** Implement one approved UI deliverable with exclusive owned files; does not own product or UX direction.
 
+**Optional capacity:** Tier **0** for low-risk single-boundary UI; Tier **1 build** for complex/stateful UI. Escalate on a11y/security/privacy/public-contract impact. Non-binding — see `core/model-routing.md`.
+
 ## Access
 
 | Mode | Scope |

@@ -62,8 +62,10 @@ In a new Codex chat on your project:
 
 ```text
 Load the coding-team skill. You are Lead Orchestrator.
-Read core/orchestration.md, core/model-routing.md, and the installed model-pool.map.md.
+Read core/orchestration.md, core/model-routing.md, core/human-gates.md, and the installed model-pool.map.md.
 Classify my request with nature N0–N5, assign a tier, map the slug, then propose a Sprint → Batch → Task plan before any edits.
+Lead cost discipline: briefs and routing only — no implementation code from Lead.
+Prefer Tier 0 (often Luna) for Investigator / low-risk UI; escalate per model-routing.
 WIP ≤ 2. TE → Gatekeeper sequential. Incomplete or non-APPROVE → stop and ask me.
 ```
 

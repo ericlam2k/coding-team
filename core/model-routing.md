@@ -20,6 +20,19 @@ Premium models decide. Eco models build. Cheap models search and document. Human
 
 Prefer a **different model family** for Contradictor vs Advisor, and Gatekeeper vs implementer, when the pool has multiple families. On a single-family pool, differentiate with **effort + independent subagent** and record that substitution.
 
+## Role capacity defaults (non-binding)
+
+Map via `model-pool.map.md` after install — these are intents, not host slugs:
+
+| Role / cell | Prefer tier | Notes |
+|---|---|---|
+| Investigator; low-risk Frontend Builder; eligible support cells | **0** | Cheap utility (often Luna-class on Codex) |
+| Frontend Builder (complex UI); Test Engineer | **1 build** / **1 validate** | Everyday implement / careful validate |
+| Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
+| N5 judgment; Adv↔Con deadlock | **3** | Max-risk only |
+
+Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity, validation failure, or a11y/security/privacy/public-contract impact appears. Escalate to Tier 2/3 only under the recorded triggers below.
+
 ## Nature → route
 
 | Nature | Delegate | Tier | Advisor | Contradictor | Gatekeeper |

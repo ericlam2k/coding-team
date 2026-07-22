@@ -55,8 +55,12 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **Contradictor** | Pre-build: why might this be wrong? Serial debate with Advisor when required. |
 | **Gatekeeper** | Post-build: `APPROVE` / `APPROVE_WITH_NOTES` / `REVISE` / `BLOCK` after Test Engineer evidence. |
 | **Human gate** | Explicit human approval for irreversible or ambiguous risk. Silence is never approval. |
+| **Lead cost discipline** | Lead emits judgment/briefs only — no implementation typing lane; defects return as corrected briefs; spec-readiness before dispatch. |
+| **Spec-readiness** | A ≤250-word run prompt with objective, files, interfaces, constraints, and verification — if you cannot finish it, do not delegate yet. |
+| **Cheap-utility / Luna-class** | Pool **Tier 0** after install (often `gpt-5.6-luna` on Codex). For Investigator, low-risk FE Builder, eligible support cells — not for Lead/PM/Backend/UX/TE/Docs/Gatekeeper defaults. |
 | **PARTIAL** | Timed/incomplete work with evidence + next bounded step — not success. |
 | **FAILED_TRANSIENT** | Transport/runtime failure; shrink or retry per policy — do not invent success. |
+| **Alias normalization** | Map Explorer/Inspector/Reviewer labels to canonical roles — never invent a new role. |
 
 ## Scope & validation levels
 
@@ -74,9 +78,21 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **Hallmark** | Anti-AI-slop design skill; primary design authority for greenfield / redesign when assigned. |
 | **awesome-design-md** | Named `DESIGN.md` reference library. Read via [skills/design/design-md-index.md](../skills/design/design-md-index.md): at most one primary + one comparison; principles only — never clone branding. |
 
+## Lead cost discipline
+
+Lead output is classification, briefs, routing, and short verdicts — **not** implementation volume. A run prompt that cannot state objective, files, interfaces, constraints, and verification fails the **spec-readiness test** and must not be delegated to a cheaper tier.
+
+## Cheap-utility / Luna-class tier
+
+Host Tier **0** (often GPT Luna on Codex) is for Investigator, low-risk Frontend Builder, and eligible support cells. It is not the accountable default for Lead, PM, Backend, Frontend/UX Lead, Test Engineer synthesis, Docs Steward, or Gatekeeper.
+
+## Skill overrides
+
+Upstream skill “When to Activate” language does not auto-load inside coding-team. `context-engineering` only on packet/investigation/synthesis triggers; `problem-solving` never replaces `debugging` for concrete failures.
+
 ## What coding-team is not
 
 - Not a product backlog tool or Jira replacement
 - Not automatic permission to commit, push, deploy, or rotate secrets
 - Not a guarantee of a specific model brand — only tier intent + pool map
-- Not Career Intelligence–specific policy (this framework is generic)
+- Not product-specific policy for any one application

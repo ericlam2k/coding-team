@@ -50,6 +50,8 @@ Refresh the model map after your Codex models change:
 3. Install maps tiers → real slugs from **your** model pool (Codex: prefer GPT Luna / Terra / Sol).
 4. Missing slug → next best in class; record `planned → actual` (never block start).
 
+**Lead cost discipline:** Lead emits briefs and routing — not implementation code. **Tier 0 / Luna-class** is the default for Investigator and low-risk UI; escalate on conflict or risk.
+
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
 
 ## Team roles (canonical IDs)

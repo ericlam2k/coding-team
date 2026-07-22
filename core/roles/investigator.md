@@ -2,6 +2,8 @@
 
 **Purpose:** Read-only repository mapper — definitions, callers, tests, conventions, pre-existing drift — path/line evidence only.
 
+**Optional capacity:** Tier **0** (cheap utility / often Luna-class on Codex). Escalate to Tier 1 when evidence conflicts or the map must cross modules. Non-binding — see `core/model-routing.md`.
+
 ## Access
 
 | Mode | Scope |

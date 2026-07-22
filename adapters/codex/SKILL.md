@@ -9,6 +9,8 @@ metadata:
 
 Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles from `core/roles/` via Codex subagents (see [runtime.md](runtime.md)).
 
+**One-line:** Lead classifies nature, then orchestrates, plans, and delegates; specialists execute only that brief and tier; WIP ≤ 2 with Test Engineer → Gatekeeper sequential — never trial-error model hops or raising WIP to skip a causal chain.
+
 ## Resolve root and policy
 
 1. Resolve **`CODING_TEAM_ROOT`**:
@@ -16,35 +18,39 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
    - If this skill is a symlink to `<repo>/adapters/codex`, the repo root is the parent of `adapters/`; else
    - Ask the human to set `CODING_TEAM_ROOT` to their coding-team checkout.
 2. **Read** (do not guess):
-   - `$CODING_TEAM_ROOT/core/orchestration.md` (if present)
+   - `$CODING_TEAM_ROOT/core/orchestration.md`
    - `$CODING_TEAM_ROOT/core/model-routing.md`
-   - `$CODING_TEAM_ROOT/core/concurrency.md` (if present)
-   - `$CODING_TEAM_ROOT/core/human-gates.md` (if present)
-   - This skill’s **`model-pool.map.md`** (install-time map; also under `$CODING_TEAM_ROOT/examples/` after `--refresh-map`)
+   - `$CODING_TEAM_ROOT/core/concurrency.md`
+   - `$CODING_TEAM_ROOT/core/human-gates.md`
+   - This skill’s **`model-pool.map.md`** (install-time map)
    - Role cards under `$CODING_TEAM_ROOT/core/roles/` as needed
-3. Design work: pair **hallmark** (`$CODING_TEAM_ROOT/skills/design/hallmark`) with **awesome-design-md** (`$CODING_TEAM_ROOT/skills/design/awesome-design-md`) when the brief calls for UI/visual craft. Hallmark owns anti-slop structure; awesome-design-md is a named `DESIGN.md` reference library only.
+3. Design work: pair **hallmark** with **awesome-design-md** when the brief calls for UI/visual craft (see `skills/design/design-md-index.md`).
 
 ## Hard constraints
 
-- **WIP ≤ 2** concurrent tool-using subagents
-- **Test Engineer → Gatekeeper** is always sequential (never simultaneous)
-- Incomplete / non-APPROVE / blocked Gatekeeper → **stop and ask the human**
-- Lead emits judgment and briefs — not implementation volume; return defects to the classified owner
-- Human gates for commit, push, Production deploy, destructive ops, new dependencies (explicit approval only)
+- **WIP ≤ 2** concurrent tool-using subagents; prefer a queue of small Tasks over raising the cap
+- **Test Engineer → Gatekeeper** sequential (never simultaneous)
+- Incomplete / non-APPROVE → **stop and ask the human** (no auto-chain)
+- **Lead cost discipline:** emit judgment and briefs — not implementation code; defects return as corrected briefs; apply the **spec-readiness test** before dispatch
+- Human gates for commit, push, Production deploy, destructive ops, new dependencies
 - Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
+- Skills start at `none`; honor **skill overrides** in `core/orchestration.md` (`context-engineering` only on packet/investigation/synthesis trigger)
+
+## Cheap-utility defaults (Codex)
+
+Prefer the Tier **0** mapped slug (usually `gpt-5.6-luna`) for Investigator, low-risk Frontend Builder, and eligible support cells. Do not use it as the accountable default for Lead, PM, Backend, Frontend/UX Lead, Test Engineer synthesis, Docs Steward, or Gatekeeper. Escalate per `core/model-routing.md`.
 
 ## Lead loop (short)
 
-1. Classify task **nature** (N0–N5 / Consult / Docs) per `core/model-routing.md`
-2. Assign the lowest capable **tier**; resolve slug from `model-pool.map.md`
-3. Create/update the batch task list; delegate one role per task via [runtime.md](runtime.md)
-4. Integrate → Test Engineer → Gatekeeper
-5. On incomplete output: ask human; do not invent an APPROVE
+1. Classify **nature** (N0–N5 / Consult / Docs)
+2. Assign lowest capable **tier**; resolve slug from `model-pool.map.md`
+3. Normalize aliases (Explorer→Investigator, etc.); never invent roles
+4. Create/update the batch task list; delegate one role per task via [runtime.md](runtime.md)
+5. Integrate → Test Engineer → Gatekeeper
+6. On incomplete output: ask human; do not invent an APPROVE
 
 ## Refresh map
 
 ```bash
 ./install.sh --platform codex --refresh-map
-# or from this skill directory:
-python3 scripts/detect-model-pool.py | python3 scripts/apply-pool-map.py --stdin --out model-pool.map.md
 ```
