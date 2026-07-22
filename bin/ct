@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# coding-team CLI — one command after clone.
+#   ./bin/ct init              # install for Codex (default)
+#   ./bin/ct init --full       # + enable caveman + ponytail
+#   ./bin/ct status
+#   ./bin/ct refresh
+#   ./bin/ct enable caveman
+#   ./bin/ct disable ponytail
+#   ./bin/ct project /path/to/app
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+INSTALL="$ROOT/install.sh"
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
+
+die() { echo "error: $*" >&2; exit 1; }
+[[ -x "$INSTALL" || -f "$INSTALL" ]] || die "missing install.sh at $INSTALL"
+chmod +x "$INSTALL" 2>/dev/null || true
+
+usage() {
+  cat <<'EOF'
+coding-team CLI
+
+After git clone:
+
+  ./bin/ct init           Install for Codex (global skill + model map)
+  ./bin/ct init --full    Same + enable caveman & ponytail addons
+
+Other:
+
+  ./bin/ct status                    Show links + toggle state
+  ./bin/ct refresh                   Refresh model-pool map
+  ./bin/ct enable caveman[,ponytail] Enable addon(s)
+  ./bin/ct disable caveman[,ponytail]
+  ./bin/ct project <path>            Add AGENTS.md pointer to a project
+  ./bin/ct help
+
+That's it. No --platform flags required for normal use.
+EOF
+}
+
+cmd_status() {
+  echo "CODING_TEAM_ROOT (this clone): $ROOT"
+  echo "CODEX_HOME: $CODEX_HOME"
+  echo
+  echo "Skills:"
+  for name in coding-team caveman ponytail caveman-commit caveman-review; do
+    local p="$CODEX_HOME/skills/$name"
+    if [[ -L "$p" ]]; then
+      echo "  $name → $(readlink "$p")"
+    elif [[ -e "$p" ]]; then
+      echo "  $name (present, not symlink)"
+    else
+      echo "  $name (not installed)"
+    fi
+  done
+  echo
+  if [[ -f "$ROOT/addons/toggles.json" ]]; then
+    echo "Addon toggles:"
+    python3 - "$ROOT/addons/toggles.json" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1]))
+for k, v in d.get("addons", {}).items():
+    print(f"  {k}: {'ON' if v.get('enabled') else 'OFF'}")
+PY
+  fi
+  local map="$CODEX_HOME/skills/coding-team/model-pool.map.md"
+  if [[ -f "$map" ]]; then
+    echo
+    echo "Model map: $map"
+  else
+    echo
+    echo "Model map: missing (run: ./bin/ct init)"
+  fi
+}
+
+cmd_init() {
+  local full=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --full|-f) full=1; shift ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "unknown init flag: $1 (try --full)" ;;
+    esac
+  done
+  echo "==> coding-team init (Codex)"
+  if [[ "$full" -eq 1 ]]; then
+    bash "$INSTALL" --platform codex --global --enable caveman,ponytail
+  else
+    bash "$INSTALL" --platform codex --global
+  fi
+  echo
+  echo "Done. In Codex, load the coding-team skill (or say: use coding-team as Lead)."
+  echo "Check: ./bin/ct status"
+}
+
+main() {
+  local cmd="${1:-}"
+  shift || true
+  case "$cmd" in
+    ""|help|-h|--help) usage ;;
+    init|install|setup) cmd_init "$@" ;;
+    status|st) cmd_status ;;
+    refresh|map) bash "$INSTALL" --platform codex --refresh-map ;;
+    enable|on)
+      [[ $# -ge 1 ]] || die "usage: ct enable caveman[,ponytail]"
+      bash "$INSTALL" --platform codex --global --enable "$1"
+      ;;
+    disable|off)
+      [[ $# -ge 1 ]] || die "usage: ct disable caveman[,ponytail]"
+      bash "$INSTALL" --platform codex --global --disable "$1"
+      ;;
+    project)
+      [[ $# -ge 1 ]] || die "usage: ct project /path/to/app"
+      bash "$INSTALL" --platform codex --project "$1"
+      ;;
+    *)
+      die "unknown command: $cmd (try: ./bin/ct help)"
+      ;;
+  esac
+}
+
+main "$@"

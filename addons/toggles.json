@@ -3,12 +3,12 @@
   "description": "Standalone addons. Default OFF \u2014 not part of core coding-team policy. Enable via ./install.sh --enable <name> or edit this file then re-run install.",
   "addons": {
     "caveman": {
-      "enabled": false,
+      "enabled": true,
       "path": "addons/caveman",
       "kind": "skill-pack"
     },
     "ponytail": {
-      "enabled": false,
+      "enabled": true,
       "path": "addons/ponytail",
       "kind": "skill-pack"
     }

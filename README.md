@@ -26,22 +26,19 @@ It is **not** tied to any product codebase. Bring your own stack.
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./install.sh --platform codex --global
+./bin/ct init
 ```
 
-Then in Codex, activate the `coding-team` skill (or paste the activation prompt from [docs/installation.md](docs/installation.md)).
-
-Project install (symlink into a consumer repo):
+That’s the whole install. Optional extras:
 
 ```bash
-./install.sh --platform codex --project /path/to/your-app
+./bin/ct init --full          # also enable caveman + ponytail
+./bin/ct status               # verify links + model map
+./bin/ct enable caveman       # toggle one addon later
+./bin/ct project ~/my-app     # add AGENTS.md pointer
 ```
 
-Refresh the model map after your Codex models change:
-
-```bash
-./install.sh --platform codex --global --refresh-map
-```
+Then in Codex, activate the `coding-team` skill (or paste the prompt in [docs/installation.md](docs/installation.md)).
 
 ## How routing works
 

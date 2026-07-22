@@ -1,126 +1,60 @@
 # Installation
 
-This guide is for **humans** installing coding-team into Codex (v1). Cursor and Cline are not implemented yet.
-
-## Prerequisites
-
-- Git
-- Python 3.9+ (for model-pool scripts)
-- OpenAI Codex / ChatGPT Codex desktop or CLI with a local `~/.codex` home
-- Network not required for install after clone (pool detection reads local Codex cache)
-
-## 1. Clone
+One command after clone:
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
+./bin/ct init
 ```
 
-Or as a submodule inside an existing project:
+| Command | What it does |
+|---|---|
+| `./bin/ct init` | Install coding-team for Codex + write model-pool map |
+| `./bin/ct init --full` | Same + enable caveman & ponytail |
+| `./bin/ct status` | Show skill links and addon ON/OFF |
+| `./bin/ct refresh` | Refresh model-pool map only |
+| `./bin/ct enable caveman,ponytail` | Turn addons on |
+| `./bin/ct disable caveman` | Turn an addon off |
+| `./bin/ct project /path/to/app` | Append AGENTS.md pointer |
 
-```bash
-cd /path/to/your-app
-git submodule add https://github.com/ericlam2k/coding-team.git vendor/coding-team
-cd vendor/coding-team
-```
+`./install.sh` still exists for advanced flags; normal use is **`./bin/ct`**.
 
-## 2. Install (Codex)
+## Prerequisites
 
-### Global (recommended for personal use)
+- Git
+- Python 3.9+ (model-pool scripts)
+- OpenAI Codex with local `~/.codex`
 
-```bash
-./install.sh --platform codex --global
-```
-
-What this does:
-
-1. Resolves `CODEX_HOME` (default `~/.codex`)
-2. Symlinks `adapters/codex` → `$CODEX_HOME/skills/coding-team`
-3. Detects available models from `~/.codex/models_cache.json` (+ config default)
-4. Writes `model-pool.map.md` next to the Codex skill (and refreshes the example under `examples/`)
-5. Prints an activation prompt
-
-### Project-scoped
-
-```bash
-./install.sh --platform codex --project /path/to/your-app
-```
-
-Links the skill for that project workflow and can append a short pointer into the project’s `AGENTS.md` (see installer output).
-
-### Refresh map only
-
-After Codex adds/removes models:
-
-```bash
-./install.sh --platform codex --global --refresh-map
-```
-
-## 3. Activate in Codex
-
-In a new Codex chat on your project:
+## Activate in Codex
 
 ```text
 Load the coding-team skill. You are Lead Orchestrator.
 Read core/orchestration.md, core/model-routing.md, core/human-gates.md, and the installed model-pool.map.md.
 Classify my request with nature N0–N5, assign a tier, map the slug, then propose a Sprint → Batch → Task plan before any edits.
-Lead cost discipline: briefs and routing only — no implementation code from Lead.
-Prefer Tier 0 (often Luna) for Investigator / low-risk UI; escalate per model-routing.
 WIP ≤ 2. TE → Gatekeeper sequential. Incomplete or non-APPROVE → stop and ask me.
 ```
 
-Optional: copy [AGENTS.md](../AGENTS.md) into your consumer repo root (or merge the snippet) so every session picks up the pointer.
-
-## 4. Verify
+## Verify
 
 ```bash
-ls -la ~/.codex/skills/coding-team
-# should point at .../coding-team/adapters/codex
-
-cat ~/.codex/skills/coding-team/model-pool.map.md
-# should list tiers 0 / 1-build / 1-validate / 2 / 3 with real slugs
+./bin/ct status
 ```
 
-## Environment variables
+## Optional addons
 
-| Variable | Meaning |
-|---|---|
-| `CODEX_HOME` | Codex home (default `~/.codex`) |
-| `CODING_TEAM_ROOT` | Absolute path to this repo checkout (adapters resolve core/skills relative to it) |
-
-If you move the clone, re-run `./install.sh` so the symlink stays valid.
-
-## Uninstall
+Default **OFF**. See [addons.md](addons.md).
 
 ```bash
-rm -f ~/.codex/skills/coding-team
-# remove any AGENTS.md pointer you added manually
-```
-
-## Other platforms
-
-```bash
-./install.sh --platform cursor   # exits: not implemented in v1
-./install.sh --platform cline    # exits: not implemented in v1
-```
-
-See [adapters.md](adapters.md).
-
-## 5. Optional addons (default OFF)
-
-Caveman and ponytail are **standalone** — not part of core. See [addons.md](addons.md).
-
-```bash
-./install.sh --platform codex --global --enable caveman,ponytail
-./install.sh --platform codex --global --disable caveman
+./bin/ct init --full
+# or later:
+./bin/ct enable caveman,ponytail
 ```
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| `models_cache.json` missing | Open Codex once so it refreshes models, then `--refresh-map` |
-| Symlink broken after move | Re-run install from the new clone path |
-| Wrong models mapped | Edit preferences only via re-detect; do not hardcode slugs into `core/model-routing.md` |
-| Skill not visible | Confirm path `~/.codex/skills/coding-team/SKILL.md` exists |
-| Addon not loading | Confirm `addons/toggles.json` has `"enabled": true` and Codex skill symlink exists |
+| Skill points at old folder | Re-run `./bin/ct init` **from the clone you want** (rewrites symlink) |
+| `models_cache.json` missing | Open Codex once, then `./bin/ct refresh` |
+| Addon not loading | `./bin/ct enable <name>` then `./bin/ct status` |

@@ -19,14 +19,12 @@ See [toggles.json](toggles.json). Defaults:
 ## Enable / disable (Codex)
 
 ```bash
-# from coding-team repo root
-./install.sh --platform codex --global --enable caveman
-./install.sh --platform codex --global --enable ponytail
-./install.sh --platform codex --global --enable caveman,ponytail
-
-./install.sh --platform codex --global --disable caveman
-./install.sh --platform codex --global --disable ponytail
+./bin/ct enable caveman,ponytail
+./bin/ct disable caveman
+./bin/ct status
 ```
+
+(Advanced: `./install.sh --platform codex --global --enable …` still works.)
 
 When enabled, install symlinks the addon into `$CODEX_HOME/skills/<name>` (or the pack’s primary skill path). When disabled, those symlinks are removed. **Core `coding-team` skill stays unchanged.**
 
