@@ -9,3 +9,5 @@ node_modules/
 *.log
 model-pool.map.md
 .install-state.json
+.cursor-install/
+.cline-install/

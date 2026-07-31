@@ -1,0 +1,20 @@
+---
+name: coding-team
+description: Platform-independent Sprint → Batch → Task coding team for Cline. Lead classifies nature, uses approved model-pool.map.md, delegates to predefined roles only.
+---
+
+# Coding Team (Cline)
+
+Lead teammate orchestrates. Do not invent roles.
+
+## Resolve root
+
+1. Set `CODING_TEAM_ROOT` to this checkout.
+2. Read `$CODING_TEAM_ROOT/core/*.md` and approved `model-pool.map.md`.
+3. Delegate only canonical roles under `$CODING_TEAM_ROOT/core/roles/`.
+
+## Hard constraints
+
+Same as core: WIP ≤ 2, TE → GK sequential, human gates, Lead cost discipline, addons OFF unless enabled.
+
+See `adapters/cline/runtime.md`.

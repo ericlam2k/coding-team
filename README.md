@@ -1,27 +1,17 @@
 # coding-team
 
-**Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, and abstract model tiers that map to your host’s model pool at install time.
-
-> **v1 priority:** [OpenAI Codex](https://chatgpt.com/codex). Cursor and Cline adapters are stubs.
+**Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
 
 [Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
 
 ---
 
-## What this is
+## v2 notes
 
-A reusable **agent operating system** you clone into (or beside) any project:
+- **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
+- **Installation:** `./bin/ct init` **suggests** a model map and **shows it for your approval** before writing. Use `--yes` only when you intentionally skip the prompt.
 
-| Layer | What it does |
-|---|---|
-| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier routing |
-| **Skills** | Bundled engineering, quality, process, and design skills (Hallmark + awesome-design-md) |
-| **Adapters** | Runtime binding (Codex first) |
-| **Install** | Detects the host model pool and writes `model-pool.map.md` |
-
-It is **not** tied to any product codebase. Bring your own stack.
-
-## Quick start (Codex)
+## Quick start
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
@@ -29,83 +19,37 @@ cd coding-team
 ./bin/ct init
 ```
 
-That’s the whole install. Optional extras:
+You will see a suggested tier → slug table, then:
 
-```bash
-./bin/ct init --full          # also enable caveman + ponytail
-./bin/ct status               # verify links + model map
-./bin/ct enable caveman       # toggle one addon later
-./bin/ct project ~/my-app     # add AGENTS.md pointer
+```text
+Approve and write this model map? [Y/n]:
 ```
 
-Then in Codex, activate the `coding-team` skill (or paste the prompt in [docs/installation.md](docs/installation.md)).
+```bash
+./bin/ct init --yes              # auto-approve (CI)
+./bin/ct init --platform cursor
+./bin/ct init --full             # + caveman/ponytail (Codex)
+./bin/ct status
+```
+
+## What this is
+
+| Layer | What it does |
+|---|---|
+| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
+| **Skills** | Bundled engineering / quality / process / design packs |
+| **Adapters** | Codex, Cursor, Cline runtime binding |
+| **Addons** | Caveman + Ponytail — default OFF, toggleable |
 
 ## How routing works
 
-1. Lead classifies work **nature** (N0–N5 / Consult / Docs).
-2. Nature selects an abstract **tier** (0 / 1-build / 1-validate / 2 / 3).
-3. Install maps tiers → real slugs from **your** model pool (Codex: prefer GPT Luna / Terra / Sol).
-4. Missing slug → next best in class; record `planned → actual` (never block start).
-
-**Lead cost discipline:** Lead emits briefs and routing — not implementation code. **Tier 0 / Luna-class** is the default for Investigator and low-risk UI; escalate on conflict or risk.
+1. Lead classifies **nature** (N0–N5 / Consult / Docs).
+2. Nature selects an abstract **tier**.
+3. Lead uses the **approved** `model-pool.map.md` slug for that tier.
+4. Missing slug → next best; record `planned → actual` (never block start).
 
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
 
-## Team roles (canonical IDs)
-
-| ID | Role |
-|---|---|
-| `lead` | Parent orchestrator (never spawn as a subagent) |
-| `product-manager` | Scope / acceptance consult |
-| `advisor` | Pre-build technical verdict |
-| `contradictor` | Pre-build challenge |
-| `investigator` | Read-only repo map |
-| `backend-engineer` | Scoped backend writes |
-| `frontend-ux-lead` | UX contract / design review |
-| `frontend-builder` | Scoped UI writes |
-| `test-engineer` | Independent validation |
-| `docs-steward` | Durable documentation |
-| `gatekeeper` | Post-evidence accept / revise / block |
-
-Details: [docs/roles.md](docs/roles.md) · cards in [`core/roles/`](core/roles/).
-
-## Bundled skills (highlights)
-
-- **Engineering:** backend-development, frontend-development, databases, devops, web-frameworks, ui-styling, react-next-performance
-- **Quality:** debugging, code-review, web-testing, sequential-thinking, problem-solving
-- **Process:** context-engineering, pm-execution, docs-seeker
-- **Design:** **Hallmark** + **awesome-design-md** (paired), plus frontend-design, aesthetic, ui-ux-pro-max
-
-See [docs/skills.md](docs/skills.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-## Optional addons (default OFF)
-
-Standalone packs — **not** injected into core. Toggle with install:
-
-```bash
-./install.sh --platform codex --global --enable caveman,ponytail
-```
-
-| Addon | What |
-|---|---|
-| **caveman** | Full Caveman skillset (compressed talk, commit/review/compress/stats/…) |
-| **ponytail** | Full Ponytail skillset (YAGNI ladder, root-cause fixes, `ponytail:` shortcuts) |
-
-Details: [docs/addons.md](docs/addons.md) · [addons/README.md](addons/README.md).
-
-## Repository layout
-
-```text
-core/           # platform-agnostic policy, roles, templates
-skills/         # bundled skills (engineering / quality / process / design)
-adapters/       # codex (v1) · cursor/cline stubs
-docs/           # user manual
-install.sh      # clone → install → map pool
-AGENTS.md       # optional drop-in pointer for consumer projects
-```
-
 ## License
 
-MIT for framework files we author. Bundled third-party skills keep their own licenses — see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-**Pre-publish note:** Hallmark currently ships without an upstream LICENSE file. Confirm redistribution rights before treating this repo as fully cleared for commercial redistribution of that subtree; fallback is submodule-to-upstream.
+MIT for framework files. Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -1,26 +1,29 @@
-# Adapters
+# Adapters (platform-independent core)
 
-| Adapter | Status | Binding |
+Core policy under `core/` has **no host model slugs**. Adapters bind runtime only.
+
+| Adapter | Status | Install |
 |---|---|---|
-| [Codex](../adapters/codex/) | **v1 implemented** | Parent Lead + subagents; skill under `~/.codex/skills/coding-team` |
-| [Cursor](../adapters/cursor/) | Stub | Future: Task + agent cards; same abstract tiers |
-| [Cline](../adapters/cline/) | Stub | Future: `team_*` tools; same abstract tiers |
+| [Codex](../adapters/codex/) | **v2 supported** | `./bin/ct init --platform codex` |
+| [Cursor](../adapters/cursor/) | **v2 supported** | `./bin/ct init --platform cursor` |
+| [Cline](../adapters/cline/) | **v2 supported** | `./bin/ct init --platform cline` |
 
-Install with an unimplemented platform exits non-zero:
+Auto-detect: `./bin/ct init` (prefers Codex if `~/.codex` exists).
+
+## Shared install behavior (v2)
+
+1. Link/copy the platform adapter skill.
+2. **Detect** host model pool (or known defaults).
+3. **Show a suggested** tier → slug map.
+4. **Ask for approval** (`Y/n`) before writing `model-pool.map.md`.
+5. Pass `--yes` only for CI / non-interactive approve.
 
 ```bash
-./install.sh --platform cursor  # not implemented in v1
+./bin/ct init                 # interactive approve
+./bin/ct init --yes           # auto-approve suggestion
+./bin/ct refresh              # re-propose map + approve again
 ```
 
-## Codex binding (summary)
+## Binding summary
 
-| Intent | Action |
-|---|---|
-| Lead | Parent Codex session |
-| Delegate | Subagent + role path + ≤250-word run prompt + path ranges |
-| Model | Look up `model-pool.map.md` for the assigned tier |
-| Resume | One immediate follow-up; else fresh + persisted brief |
-| Concurrency | ≤2 tool-using subagents; TE → GK sequential |
-| Stop | Incomplete / non-APPROVE → ask human |
-
-Details: [`adapters/codex/runtime.md`](../adapters/codex/runtime.md).
+Same Lead / WIP ≤ 2 / TE→GK / human-gates semantics on every platform; only spawn/resume mechanics differ (see each adapter’s `runtime.md`).

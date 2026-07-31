@@ -1,98 +1,337 @@
 #!/usr/bin/env bash
-# coding-team CLI — one command after clone.
-#   ./bin/ct init              # install for Codex (default)
-#   ./bin/ct init --full       # + enable caveman + ponytail
-#   ./bin/ct status
-#   ./bin/ct refresh
-#   ./bin/ct enable caveman
-#   ./bin/ct disable ponytail
-#   ./bin/ct project /path/to/app
+# coding-team CLI v2 — platform-independent init with model-map approval.
+#
+#   ./bin/ct init                 # auto-detect platform, propose map, ask approve
+#   ./bin/ct init --yes           # non-interactive approve
+#   ./bin/ct init --platform codex|cursor|cline
+#   ./bin/ct init --full          # + enable caveman,ponytail (Codex)
+#   ./bin/ct status | refresh | enable | disable | project | help
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INSTALL="$ROOT/install.sh"
+PROPOSE="$ROOT/scripts/propose-model-map.py"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 
 die() { echo "error: $*" >&2; exit 1; }
-[[ -x "$INSTALL" || -f "$INSTALL" ]] || die "missing install.sh at $INSTALL"
-chmod +x "$INSTALL" 2>/dev/null || true
+[[ -f "$PROPOSE" ]] || die "missing $PROPOSE"
+chmod +x "$ROOT/bin/ct" "$PROPOSE" 2>/dev/null || true
 
 usage() {
   cat <<'EOF'
-coding-team CLI
+coding-team v2 CLI (platform-independent)
 
-After git clone:
+  ./bin/ct init [--platform codex|cursor|cline] [--yes] [--full]
+      Detect/install adapter, suggest model map, ask you to approve, then write.
 
-  ./bin/ct init           Install for Codex (global skill + model map)
-  ./bin/ct init --full    Same + enable caveman & ponytail addons
-
-Other:
-
-  ./bin/ct status                    Show links + toggle state
-  ./bin/ct refresh                   Refresh model-pool map
-  ./bin/ct enable caveman[,ponytail] Enable addon(s)
+  ./bin/ct status
+  ./bin/ct refresh [--yes] [--platform ...]
+  ./bin/ct enable caveman[,ponytail]     (Codex addons)
   ./bin/ct disable caveman[,ponytail]
-  ./bin/ct project <path>            Add AGENTS.md pointer to a project
+  ./bin/ct project <path>
   ./bin/ct help
 
-That's it. No --platform flags required for normal use.
+Notes
+  • Core policy has no host slugs — only abstract tiers.
+  • Model map is a SUGGESTION until you approve (or pass --yes).
+  • Default platform: auto-detect (Codex if ~/.codex exists, else ask).
 EOF
 }
 
-cmd_status() {
-  echo "CODING_TEAM_ROOT (this clone): $ROOT"
-  echo "CODEX_HOME: $CODEX_HOME"
-  echo
-  echo "Skills:"
-  for name in coding-team caveman ponytail caveman-commit caveman-review; do
-    local p="$CODEX_HOME/skills/$name"
-    if [[ -L "$p" ]]; then
-      echo "  $name → $(readlink "$p")"
-    elif [[ -e "$p" ]]; then
-      echo "  $name (present, not symlink)"
-    else
-      echo "  $name (not installed)"
-    fi
-  done
-  echo
-  if [[ -f "$ROOT/addons/toggles.json" ]]; then
-    echo "Addon toggles:"
-    python3 - "$ROOT/addons/toggles.json" <<'PY'
-import json, sys
-d = json.load(open(sys.argv[1]))
-for k, v in d.get("addons", {}).items():
-    print(f"  {k}: {'ON' if v.get('enabled') else 'OFF'}")
-PY
+detect_platform() {
+  if [[ -d "$CODEX_HOME" ]]; then
+    echo codex
+    return
   fi
-  local map="$CODEX_HOME/skills/coding-team/model-pool.map.md"
-  if [[ -f "$map" ]]; then
-    echo
-    echo "Model map: $map"
-  else
-    echo
-    echo "Model map: missing (run: ./bin/ct init)"
+  if [[ -d "$HOME/.cursor" ]] || [[ -d "$ROOT/../../.cursor" ]]; then
+    echo cursor
+    return
+  fi
+  echo ""
+}
+
+link_path() {
+  local src="$1" dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  if [[ -L "$dst" ]]; then
+    local cur
+    cur="$(readlink "$dst")"
+    if [[ "$cur" == "$src" ]]; then
+      echo "already linked: $dst"
+      return 0
+    fi
+    rm "$dst"
+  elif [[ -e "$dst" ]]; then
+    die "refusing to overwrite non-symlink: $dst"
+  fi
+  ln -s "$src" "$dst"
+  echo "linked: $dst → $src"
+}
+
+unlink_path() {
+  local dst="$1"
+  if [[ -L "$dst" ]]; then
+    rm "$dst"
+    echo "removed: $dst"
   fi
 }
 
+install_adapter() {
+  local platform="$1"
+  case "$platform" in
+    codex)
+      link_path "$ROOT/adapters/codex" "$CODEX_HOME/skills/coding-team"
+      ;;
+    cursor)
+      mkdir -p "$ROOT/.cursor-install"
+      link_path "$ROOT/adapters/cursor" "$ROOT/.cursor-install/coding-team"
+      echo "Cursor: symlink ready at $ROOT/.cursor-install/coding-team"
+      echo "Copy/link into your project: .cursor/skills/coding-team → that path"
+      echo "  or: ln -s \"$ROOT/adapters/cursor\" \"/path/to/project/.cursor/skills/coding-team\""
+      ;;
+    cline)
+      mkdir -p "$ROOT/.cline-install"
+      link_path "$ROOT/adapters/cline" "$ROOT/.cline-install/coding-team"
+      echo "Cline: symlink ready at $ROOT/.cline-install/coding-team"
+      echo "Point Cline skills/rules at CODING_TEAM_ROOT=$ROOT"
+      ;;
+    *)
+      die "unknown platform: $platform"
+      ;;
+  esac
+}
+
+map_outs() {
+  local platform="$1"
+  case "$platform" in
+    codex)
+      echo "$CODEX_HOME/skills/coding-team/model-pool.map.md"
+      echo "$ROOT/adapters/codex/model-pool.map.md"
+      echo "$ROOT/examples/model-pool.map.md"
+      ;;
+    cursor)
+      echo "$ROOT/adapters/cursor/model-pool.map.md"
+      echo "$ROOT/examples/model-pool.map.md"
+      ;;
+    cline)
+      echo "$ROOT/adapters/cline/model-pool.map.md"
+      echo "$ROOT/examples/model-pool.map.md"
+      ;;
+  esac
+}
+
+run_propose() {
+  local platform="$1"
+  shift
+  local outs=()
+  local o
+  while IFS= read -r o; do
+    [[ -n "$o" ]] && outs+=(--out "$o")
+  done < <(map_outs "$platform")
+  python3 "$PROPOSE" --platform "$platform" --codex-home "$CODEX_HOME" "${outs[@]}" "$@"
+}
+
 cmd_init() {
-  local full=0
+  local platform="" yes=0 full=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --full|-f) full=1; shift ;;
-      -h|--help) usage; exit 0 ;;
-      *) die "unknown init flag: $1 (try --full)" ;;
+      --platform)
+        platform="$2"
+        shift 2
+        ;;
+      --yes|-y)
+        yes=1
+        shift
+        ;;
+      --full|-f)
+        full=1
+        shift
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        die "unknown init flag: $1"
+        ;;
     esac
   done
-  echo "==> coding-team init (Codex)"
-  if [[ "$full" -eq 1 ]]; then
-    bash "$INSTALL" --platform codex --global --enable caveman,ponytail
-  else
-    bash "$INSTALL" --platform codex --global
+
+  if [[ -z "$platform" ]]; then
+    platform="$(detect_platform)"
+    if [[ -z "$platform" ]]; then
+      if [[ -t 0 ]]; then
+        echo "Which platform? [codex/cursor/cline]"
+        read -r platform
+      else
+        die "cannot auto-detect platform; pass --platform codex|cursor|cline"
+      fi
+    else
+      echo "Auto-detected platform: $platform"
+    fi
   fi
+
+  echo "==> coding-team v2 init (platform=$platform)"
+  install_adapter "$platform"
+
+  local extra=()
+  [[ "$yes" -eq 1 ]] && extra+=(--yes)
+
+  echo "==> Model map suggestion (approve to write)"
+  if ! run_propose "$platform" "${extra[@]}"; then
+    local rc=$?
+    if [[ "$rc" -eq 2 ]]; then
+      echo "Install linked, but model map was NOT approved/written."
+      echo "Re-run: ./bin/ct refresh --platform $platform"
+      exit 0
+    fi
+    exit "$rc"
+  fi
+
+  if [[ "$full" -eq 1 ]]; then
+    if [[ "$platform" != "codex" ]]; then
+      echo "note: --full addons currently Codex-only; skipped for $platform"
+    else
+      cmd_enable "caveman,ponytail"
+    fi
+  fi
+
   echo
-  echo "Done. In Codex, load the coding-team skill (or say: use coding-team as Lead)."
+  echo "Done. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
   echo "Check: ./bin/ct status"
+}
+
+cmd_status() {
+  echo "CODING_TEAM_ROOT: $ROOT"
+  echo "CODEX_HOME:       $CODEX_HOME"
+  echo
+  echo "Adapters / skills:"
+  for name in coding-team caveman ponytail; do
+    local p="$CODEX_HOME/skills/$name"
+    if [[ -L "$p" ]]; then
+      echo "  Codex $name → $(readlink "$p")"
+    fi
+  done
+  for p in \
+    "$ROOT/adapters/codex/model-pool.map.md" \
+    "$ROOT/adapters/cursor/model-pool.map.md" \
+    "$ROOT/adapters/cline/model-pool.map.md" \
+    "$CODEX_HOME/skills/coding-team/model-pool.map.md"; do
+    if [[ -f "$p" ]]; then
+      echo "  map: $p"
+      if rg -q "Status: \*\*proposal" "$p" 2>/dev/null; then
+        echo "       (proposal — not approved?)"
+      elif rg -q "Status: \*\*approved" "$p" 2>/dev/null; then
+        echo "       (approved)"
+      fi
+    fi
+  done
+  if [[ -f "$ROOT/addons/toggles.json" ]]; then
+    echo
+    echo "Addons:"
+    python3 -c "import json;d=json.load(open('$ROOT/addons/toggles.json'));
+[print(f\"  {k}: {'ON' if v.get('enabled') else 'OFF'}\") for k,v in d.get('addons',{}).items()]"
+  fi
+}
+
+cmd_refresh() {
+  local platform="" yes=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --platform) platform="$2"; shift 2 ;;
+      --yes|-y) yes=1; shift ;;
+      *) die "unknown refresh flag: $1" ;;
+    esac
+  done
+  [[ -n "$platform" ]] || platform="$(detect_platform)"
+  [[ -n "$platform" ]] || die "pass --platform"
+  local extra=()
+  [[ "$yes" -eq 1 ]] && extra+=(--yes)
+  run_propose "$platform" "${extra[@]}"
+}
+
+set_toggle() {
+  local name="$1" enabled="$2"
+  python3 - "$ROOT/addons/toggles.json" "$name" "$enabled" <<'PY'
+import json, sys
+path, name, enabled = sys.argv[1], sys.argv[2], sys.argv[3].lower() == "true"
+data = json.loads(open(path, encoding="utf-8").read())
+addons = data.setdefault("addons", {})
+if name not in addons:
+    sys.exit(f"unknown addon: {name}")
+addons[name]["enabled"] = enabled
+open(path, "w", encoding="utf-8").write(json.dumps(data, indent=2) + "\n")
+print(f"toggles: {name} = {enabled}")
+PY
+}
+
+cmd_enable() {
+  local csv="${1:-}"
+  [[ -n "$csv" ]] || die "usage: ct enable caveman[,ponytail]"
+  IFS=',' read -ra names <<<"$csv"
+  for name in "${names[@]}"; do
+    name="$(echo "$name" | tr -d '[:space:]')"
+    case "$name" in
+      caveman)
+        set_toggle caveman true
+        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
+          [[ -d "$ROOT/addons/caveman/skills/$s" ]] && link_path "$ROOT/addons/caveman/skills/$s" "$CODEX_HOME/skills/$s"
+        done
+        ;;
+      ponytail)
+        set_toggle ponytail true
+        link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
+        ;;
+      *) die "unknown addon: $name" ;;
+    esac
+  done
+}
+
+cmd_disable() {
+  local csv="${1:-}"
+  [[ -n "$csv" ]] || die "usage: ct disable caveman[,ponytail]"
+  IFS=',' read -ra names <<<"$csv"
+  for name in "${names[@]}"; do
+    name="$(echo "$name" | tr -d '[:space:]')"
+    case "$name" in
+      caveman)
+        set_toggle caveman false
+        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
+          unlink_path "$CODEX_HOME/skills/$s"
+        done
+        ;;
+      ponytail)
+        set_toggle ponytail false
+        unlink_path "$CODEX_HOME/skills/ponytail"
+        ;;
+      *) die "unknown addon: $name" ;;
+    esac
+  done
+}
+
+cmd_project() {
+  local project="${1:-}"
+  [[ -d "$project" ]] || die "not a directory: $project"
+  local agents="$project/AGENTS.md"
+  local marker="<!-- coding-team:begin -->"
+  if [[ -f "$agents" ]] && grep -q 'coding-team:begin' "$agents"; then
+    echo "AGENTS.md already has coding-team pointer"
+    return 0
+  fi
+  cat >>"$agents" <<BLOCK
+
+${marker}
+## Coding Team
+
+\`CODING_TEAM_ROOT=${ROOT}\`
+
+1. Load coding-team skill for your platform (Codex / Cursor / Cline adapter).
+2. Read \`core/\` + approved \`model-pool.map.md\`.
+3. WIP ≤ 2; TE → Gatekeeper sequential; incomplete → ask human.
+4. Addons default OFF — \`./bin/ct enable …\` if needed.
+<!-- coding-team:end -->
+BLOCK
+  echo "updated $agents"
 }
 
 main() {
@@ -102,22 +341,11 @@ main() {
     ""|help|-h|--help) usage ;;
     init|install|setup) cmd_init "$@" ;;
     status|st) cmd_status ;;
-    refresh|map) bash "$INSTALL" --platform codex --refresh-map ;;
-    enable|on)
-      [[ $# -ge 1 ]] || die "usage: ct enable caveman[,ponytail]"
-      bash "$INSTALL" --platform codex --global --enable "$1"
-      ;;
-    disable|off)
-      [[ $# -ge 1 ]] || die "usage: ct disable caveman[,ponytail]"
-      bash "$INSTALL" --platform codex --global --disable "$1"
-      ;;
-    project)
-      [[ $# -ge 1 ]] || die "usage: ct project /path/to/app"
-      bash "$INSTALL" --platform codex --project "$1"
-      ;;
-    *)
-      die "unknown command: $cmd (try: ./bin/ct help)"
-      ;;
+    refresh|map) cmd_refresh "$@" ;;
+    enable|on) cmd_enable "$@" ;;
+    disable|off) cmd_disable "$@" ;;
+    project) cmd_project "$@" ;;
+    *) die "unknown command: $cmd (try ./bin/ct help)" ;;
   esac
 }
 

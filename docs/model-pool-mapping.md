@@ -1,8 +1,6 @@
-# Model pool mapping
+# Model pool mapping (v2)
 
-Core policy never hardcodes vendor slugs. Install detects the **host model pool** and writes `model-pool.map.md`.
-
-## Abstract → intent
+## Abstract tiers (core — no host slugs)
 
 | Tier | Intent |
 |---|---|
@@ -12,33 +10,32 @@ Core policy never hardcodes vendor slugs. Install detects the **host model pool*
 | 2 | Premium plan / debate / Gatekeeper |
 | 3 | Max-risk judgment |
 
-## Codex v1 preferences (GPT-family)
+## Install flow
 
-When the Codex pool is available, the mapper prefers:
-
-| Tier | Preferred slug | Effort hint | Typical roles |
-|---|---|---|---|
-| 0 | `gpt-5.6-luna` (alt `gpt-5.4-mini`) | low/medium | Investigator; low-risk Frontend Builder; support cells |
-| 1 build | `gpt-5.6-terra` | medium | Complex UI / post-plan implement |
-| 1 validate | `gpt-5.6-terra` | high | Test Engineer |
-| 2 | `gpt-5.6-sol` | high | Lead plan; PM; Backend; UX Lead; Adv/Con; Gatekeeper |
-| 3 | `gpt-5.6-sol` | xhigh / max | N5 / Adv↔Con deadlock |
-
-If a preferred slug is missing, pick the closest remaining model by role in the pool (fast → 0, everyday → 1 build, deeper → 1 validate, frontier → 2/3). **Fail loud:** write `planned → actual | not available` in the map and in task handoffs.
-
-## Commands
-
-```bash
-./install.sh --platform codex --global --refresh-map
-# or
-python3 adapters/codex/scripts/detect-model-pool.py
-python3 adapters/codex/scripts/apply-pool-map.py --out adapters/codex/model-pool.map.md
+```text
+detect pool → suggest map → human approve → write model-pool.map.md
 ```
 
-Example: [`examples/model-pool.map.codex.example.md`](../examples/model-pool.map.codex.example.md).
+```bash
+./bin/ct init          # shows suggestion, asks [Y/n]
+./bin/ct init --yes    # approve without prompt
+./bin/ct refresh       # re-run suggestion + approval
+```
+
+Proposal script: [`scripts/propose-model-map.py`](../scripts/propose-model-map.py).
+
+## Codex preference hints (not core policy)
+
+| Tier | Typical suggestion |
+|---|---|
+| 0 | `gpt-5.6-luna` |
+| 1 build / validate | `gpt-5.6-terra` |
+| 2 / 3 | `gpt-5.6-sol` (+ effort) |
+
+Cursor/Cline detectors use that platform’s known pool labels; you can reject and re-run after editing prefs in the script if needed.
 
 ## Rules
 
-- Never block task start on a missing slug.
-- Prefer different family for Contradictor vs Advisor when the pool has multiple families; on GPT-only, use effort + independent subagent and record it.
-- Do not edit `core/model-routing.md` to bake in host slugs.
+- Never bake host slugs into `core/model-routing.md`
+- Never block task start on a missing slug — record `planned → actual`
+- Unapproved proposals must not be treated as live map

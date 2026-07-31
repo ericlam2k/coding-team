@@ -1,6 +1,6 @@
-# Installation
+# Installation (v2)
 
-One command after clone:
+## One command
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
@@ -8,53 +8,40 @@ cd coding-team
 ./bin/ct init
 ```
 
-| Command | What it does |
-|---|---|
-| `./bin/ct init` | Install coding-team for Codex + write model-pool map |
-| `./bin/ct init --full` | Same + enable caveman & ponytail |
-| `./bin/ct status` | Show skill links and addon ON/OFF |
-| `./bin/ct refresh` | Refresh model-pool map only |
-| `./bin/ct enable caveman,ponytail` | Turn addons on |
-| `./bin/ct disable caveman` | Turn an addon off |
-| `./bin/ct project /path/to/app` | Append AGENTS.md pointer |
+What happens:
 
-`./install.sh` still exists for advanced flags; normal use is **`./bin/ct`**.
+1. Auto-detect platform (Codex / Cursor / Cline) or pass `--platform …`
+2. Link the adapter skill
+3. **Show a suggested model map** (tier → slug)
+4. **Ask you to approve** before writing any map file
+5. Print next steps
 
-## Prerequisites
+```bash
+./bin/ct init --yes              # skip prompt (CI)
+./bin/ct init --platform cursor
+./bin/ct init --full             # Codex + enable caveman/ponytail after map approve
+./bin/ct status
+./bin/ct refresh                 # new suggestion + approve again
+```
 
-- Git
-- Python 3.9+ (model-pool scripts)
-- OpenAI Codex with local `~/.codex`
+## Why approve the map?
 
-## Activate in Codex
+Core is **platform-independent** (abstract tiers only). Host slugs differ (Codex GPT Luna/Terra/Sol vs Cursor pool vs Cline). The installer **suggests** a mapping; you confirm so a bad auto-pick never silently becomes policy.
+
+## Activate
+
+Set `CODING_TEAM_ROOT` to this clone, load the coding-team skill for your platform, then:
 
 ```text
-Load the coding-team skill. You are Lead Orchestrator.
-Read core/orchestration.md, core/model-routing.md, core/human-gates.md, and the installed model-pool.map.md.
-Classify my request with nature N0–N5, assign a tier, map the slug, then propose a Sprint → Batch → Task plan before any edits.
-WIP ≤ 2. TE → Gatekeeper sequential. Incomplete or non-APPROVE → stop and ask me.
-```
-
-## Verify
-
-```bash
-./bin/ct status
-```
-
-## Optional addons
-
-Default **OFF**. See [addons.md](addons.md).
-
-```bash
-./bin/ct init --full
-# or later:
-./bin/ct enable caveman,ponytail
+You are Lead. Read core/orchestration.md, core/model-routing.md, human-gates.md,
+and the approved model-pool.map.md. Classify N0–N5, assign tier, use mapped slug.
+WIP ≤ 2. TE → Gatekeeper sequential. Incomplete → ask me.
 ```
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| Skill points at old folder | Re-run `./bin/ct init` **from the clone you want** (rewrites symlink) |
-| `models_cache.json` missing | Open Codex once, then `./bin/ct refresh` |
-| Addon not loading | `./bin/ct enable <name>` then `./bin/ct status` |
+| Map not written | You answered `n` — run `./bin/ct refresh` and approve |
+| Wrong platform symlink | `./bin/ct init --platform <name>` from this clone |
+| Non-interactive refused | Add `--yes` |
