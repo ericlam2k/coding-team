@@ -28,7 +28,7 @@ Map via `model-pool.map.md` after install — these are intents, not host slugs:
 |---|---|---|
 | Investigator; low-risk Frontend Builder; eligible support cells | **0** | Cheap utility (often Luna-class on Codex) |
 | Frontend Builder (complex UI); Test Engineer | **1 build** / **1 validate** | Everyday implement / careful validate |
-| Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
+| Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Domain Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
 | N5 judgment; Adv↔Con deadlock | **3** | Max-risk only |
 
 Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity, validation failure, or a11y/security/privacy/public-contract impact appears. Escalate to Tier 2/3 only under the recorded triggers below.
@@ -42,16 +42,19 @@ Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity,
 | **N2** Contract/UX/integration | Inv → (PM if ambiguous) → Adv? → Con? → builders → TE → GK | 2 plan/critique; 1 build; 2 GK if material | Yes if direction non-obvious | **Required** if shared public contract, migration, auth/privacy, or multi-owner integration; else optional | Yes for material contract |
 | **N3** Validate/classify | Investigator / TE; Adv if release-impacting | 1 validate; 2 if architecture/security/release | Only if major decision | Only if disputed | If release-impacting |
 | **N4** Independent decide | Advisor; Contradictor when conflict/expensive; GK only post-implement | 2; 3 if irreversible | Yes | Yes when conflict / expensive reverse | After implement or completed packet |
-| **N5** High-risk | Inv → PM? → Adv → Con → **human gate** → eco build → TE → GK | 3 judgment; 1 build after approval | Yes | **Yes** | Yes |
-| **Consult** | Product Manager (peer); optional technical Advisor | 2 medium | Optional strategic | Optional if expensive misdirection | No unless consult becomes implement |
+| **N5** High-risk | Inv → PM? → Domain Advisor? → Adv → Con → **human gate** → eco build → TE → GK | 3 judgment; 1 build after approval | Yes | **Yes** | Yes |
+| **Consult** | Product Manager **and/or** Domain Advisor (peers); optional technical Advisor | 2 medium | Optional strategic | Optional if expensive misdirection | No unless consult becomes implement |
 | **Docs** | Docs Steward | 0 (1 if deep synthesis) | No | No | If docs describe public contract / compliance / security |
+
+On Consult / N5 when specialty judgment is needed and **domain is not named**: Lead asks the human for the domain, then instantiates `{domain}-advisor` per [domain-advisors.md](domain-advisors.md). Do not default to Talent or any product-specific domain.
 
 ## Role separation (non-negotiable)
 
 | Role | Answers | Timing |
 |---|---|---|
-| **Advisor** | What should we do? | Before implement |
+| **Advisor** | What should we do technically? | Before implement |
 | **Contradictor** | Why might this be wrong? | Before implement |
+| **Domain Advisor** | What does the named domain say? | Consult (peer to PM) |
 | **Gatekeeper** | Can this be accepted as done? | After implement + evidence |
 | **Product Manager** | Product scope / acceptance | Consult |
 

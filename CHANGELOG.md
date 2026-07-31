@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-07-31
+
+### Added
+
+- **Domain Expert** pattern: template `domain-advisor` → instances `[Domain]-Advisor` / `{domain}-advisor` (e.g. Talent-Advisor, Strategic-Advisor)
+- Lead must **ask the user for the domain** when specialty consult is needed and domain is unclear
+- [`core/domain-advisors.md`](core/domain-advisors.md) naming + activation rules; role card `core/roles/domain-advisor.md`
+
+### Changed
+
+- Consult / N5 routing includes optional Domain Advisor as peer to PM (not under PM or technical Advisor)
+- Docs/README role tables updated — no fixed Talent-Career role in the generic framework
+
 ## [2.0.0] — 2026-07-31
 
 ### Notes (release)

@@ -61,8 +61,9 @@ Use only these IDs (see `roles/`):
 |---|---|
 | `lead` | Lead |
 | `product-manager` | Product Manager |
-| `advisor` | Advisor |
+| `advisor` | Advisor (technical, pre-build) |
 | `contradictor` | Contradictor |
+| `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
 | `investigator` | Investigator |
 | `backend-engineer` | Backend Engineer |
 | `frontend-ux-lead` | Frontend UX Lead |
@@ -71,9 +72,9 @@ Use only these IDs (see `roles/`):
 | `docs-steward` | Docs Steward |
 | `gatekeeper` | Gatekeeper |
 
-Never invent roles. Domain specialists belong in the product install, not in core.
+Never invent a new role **family**. Instantiating `[Domain]-Advisor` from the `domain-advisor` template (after the human names the domain) is allowed and required when domain consult is needed.
 
-### Alias normalization (do not invent roles)
+### Alias normalization (do not invent role families)
 
 | Incoming label | Route to |
 |---|---|
@@ -85,8 +86,11 @@ Never invent roles. Domain specialists belong in the product install, not in cor
 | Reviewer — non-final domain/UX/code feedback | Existing accountable functional owner |
 | Pre-build technical judgment | `advisor` |
 | Pre-build challenge | `contradictor` |
+| Talent / Talent-Career / employment-domain consult | `talent-advisor` (Domain Advisor instance) — or **ask** if domain unclear |
+| Strategic / strategy consult | `strategic-advisor` — or **ask** |
+| “Domain expert” / “specialty advisor” with no domain | **Ask human** for domain → `{domain}-advisor` |
 
-If no predefined role can safely own the task → `HUMAN_DECISION_REQUIRED`.
+If no predefined role or Domain Advisor instance can safely own the task → `HUMAN_DECISION_REQUIRED`.
 
 ## Context caps (hard)
 
