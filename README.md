@@ -50,6 +50,19 @@ Approve and write this model map? [Y/n]:
 
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
 
+## Domain Expert (`[Domain]-Advisor`)
+
+No fixed Talent-Career role. When specialty judgment is needed, Lead **asks for the domain**, then maps:
+
+| Display | Instance ID |
+|---|---|
+| Talent-Advisor | `talent-advisor` |
+| Strategic-Advisor | `strategic-advisor` |
+| Security-Advisor | `security-advisor` |
+| … | `{domain}-advisor` |
+
+Template: `core/roles/domain-advisor.md` · Rules: `core/domain-advisors.md` · Roles doc: [docs/roles.md](docs/roles.md).
+
 ## License
 
 MIT for framework files. Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

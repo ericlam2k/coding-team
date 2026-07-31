@@ -51,7 +51,8 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 
 | Term | Definition |
 |---|---|
-| **Advisor** | Pre-build: what should we do? |
+| **Domain Advisor** | Specialty consult peer. Template `domain-advisor` → instance `{domain}-advisor` / display `[Domain]-Advisor` (e.g. Talent-Advisor, Strategic-Advisor). Lead asks for domain when unclear. Not under PM or technical Advisor. |
+| **Advisor** | Pre-build: what should we do *technically*? |
 | **Contradictor** | Pre-build: why might this be wrong? Serial debate with Advisor when required. |
 | **Gatekeeper** | Post-build: `APPROVE` / `APPROVE_WITH_NOTES` / `REVISE` / `BLOCK` after Test Engineer evidence. |
 | **Human gate** | Explicit human approval for irreversible or ambiguous risk. Silence is never approval. |
@@ -60,7 +61,7 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **Cheap-utility / Luna-class** | Pool **Tier 0** after install (often `gpt-5.6-luna` on Codex). For Investigator, low-risk FE Builder, eligible support cells — not for Lead/PM/Backend/UX/TE/Docs/Gatekeeper defaults. |
 | **PARTIAL** | Timed/incomplete work with evidence + next bounded step — not success. |
 | **FAILED_TRANSIENT** | Transport/runtime failure; shrink or retry per policy — do not invent success. |
-| **Alias normalization** | Map Explorer/Inspector/Reviewer labels to canonical roles — never invent a new role. |
+| **Alias normalization** | Map Explorer/Inspector/Reviewer labels to canonical roles; domain labels → `{domain}-advisor` — never invent a new role *family*. |
 
 ## Scope & validation levels
 

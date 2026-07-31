@@ -8,6 +8,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 |---|---|
 | [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
 | [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
+| [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
 | [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |
 | [roles/](roles/) | Canonical role cards |
@@ -21,6 +22,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [roles/product-manager.md](roles/product-manager.md) | `product-manager` |
 | [roles/advisor.md](roles/advisor.md) | `advisor` |
 | [roles/contradictor.md](roles/contradictor.md) | `contradictor` |
+| [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` |
 | [roles/investigator.md](roles/investigator.md) | `investigator` |
 | [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
 | [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |
