@@ -32,6 +32,15 @@ auth/privacy/security, migration/rollback, material regression risk, repeated
 failures, or fix–trial behavior. The overlay is a control plane, not a second
 test framework.
 
+Every bounded Test Engineer pass is timeboxed: target 120 seconds and hard
+stop at 240 seconds. Select the admitted layers and cases before execution; do
+not expand the pass into a repository-wide run. At the soft limit, stop
+scheduling new cases. At the hard limit, cancel the active command and record
+`state=BLOCKED`, `validation.result=BLOCKED`, and `timebox.outcome=TIMEOUT` (or
+`CANCELLED`) with the stop reason, evidence collected, and one next action.
+Timeout evidence stops promotion, does not start Gatekeeper, and does not
+trigger an automatic retry or patch.
+
 ## Traditional QA flow with owners and gates
 
 | Stage | Accountable owner | Required output / gate |
@@ -84,8 +93,9 @@ until the active TE validation pass is complete.
 
 ### Check
 
-Fresh TE executes the complete frozen matrix, selected layers, affected
-regressions, and relevant negative/adversarial cases. Every finding is logged
+Fresh TE executes the complete frozen matrix **within the declared timebox**,
+selected layers, affected regressions, and relevant negative/adversarial cases.
+Every finding is logged
 and classified as one of:
 
 `PRODUCT_DEFECT`, `TEST_CONTRACT_DEFECT`, `ENVIRONMENT_DEFECT`,
@@ -102,7 +112,9 @@ separate provisional Batch.
 
 Preserve or add a regression case for every confirmed defect. Run fresh TE
 validation after correction, then one sequential GK review. `FAIL`, `BLOCKED`,
-stale/insufficient evidence, or GK non-approval stops for the human gate.
+`TIMEOUT`, stale/insufficient evidence, or GK non-approval stops for the human
+gate. A blocked/timeboxed pass ends with a bounded next action; it does not
+remain running while waiting for a dependency or provider.
 
 ## Evidence packet and promotion rule
 

@@ -33,6 +33,9 @@ Load when the brief names them:
 - Classify: product defect / flake / env / bad brief — do not silently “fix forward” as Builder
 - During a validation pass, collect all in-scope findings before any correction;
   return a correlation-ready packet rather than dispatching fixes.
+- For bounded QA, declare a 120-second target and 240-second hard stop before
+  running tests. Stop scheduling at the target; cancel a hung command at the
+  hard stop and return `BLOCKED` with timeout evidence and one next action.
 - When qa_required=true or qa_mode=bounded, run the qa-evidence-enforcement
   validator before handing evidence to Gatekeeper.
 - Gatekeeper must not start until this evidence is accepted by Lead process

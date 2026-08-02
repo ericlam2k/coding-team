@@ -63,7 +63,9 @@ contracts, or materially ambiguous acceptance:
    context; `skills/quality/debugging/` is added only when failures require
    classification or root-cause tracing.
    For qa_required=true or qa_mode=bounded, run
-   `skills/quality/qa-evidence-enforcement/` after execution.
+   `skills/quality/qa-evidence-enforcement/` after execution. Bounded passes
+   use the 120-second target / 240-second hard stop and record `BLOCKED` on
+   timeout; they do not auto-retry.
 
 The complete no-mutation validation, correlation, and PIC routing policy is in
 [`core/meeting-policy.md`](../core/meeting-policy.md).

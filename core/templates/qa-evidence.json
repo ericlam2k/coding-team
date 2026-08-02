@@ -13,7 +13,15 @@
   },
   "scope": {
     "wip_max": 2,
-    "disjoint_writes": true
+    "disjoint_writes": true,
+    "selected_layers": ["unit", "integration", "regression"]
+  },
+  "timebox": {
+    "soft_seconds": 120,
+    "hard_seconds": 240,
+    "outcome": "COMPLETE",
+    "stop_reason": "",
+    "next_actions": []
   },
   "layers": [
     {"name": "unit", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},

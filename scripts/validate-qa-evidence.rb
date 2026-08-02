@@ -13,18 +13,20 @@ FINDING_CLASSES = %w[
   TOOL_TRANSPORT_DEFECT
   UNKNOWN
 ].freeze
-STATES = %w[DRAFT FROZEN_FOR_BUILD BUILDING VALIDATING TRIAGED CORRECTING REVALIDATING REVIEW COMPLETE].freeze
+STATES = %w[DRAFT FROZEN_FOR_BUILD BUILDING VALIDATING TRIAGED CORRECTING REVALIDATING REVIEW COMPLETE BLOCKED].freeze
 ALLOWED_TRANSITIONS = {
-  "DRAFT" => ["FROZEN_FOR_BUILD"],
-  "FROZEN_FOR_BUILD" => ["BUILDING"],
-  "BUILDING" => ["VALIDATING"],
-  "VALIDATING" => ["TRIAGED"],
-  "TRIAGED" => ["CORRECTING", "REVIEW"],
-  "CORRECTING" => ["REVALIDATING"],
-  "REVALIDATING" => ["TRIAGED"],
-  "REVIEW" => ["COMPLETE"],
-  "COMPLETE" => []
+  "DRAFT" => ["FROZEN_FOR_BUILD", "BLOCKED"],
+  "FROZEN_FOR_BUILD" => ["BUILDING", "BLOCKED"],
+  "BUILDING" => ["VALIDATING", "BLOCKED"],
+  "VALIDATING" => ["TRIAGED", "BLOCKED"],
+  "TRIAGED" => ["CORRECTING", "REVIEW", "BLOCKED"],
+  "CORRECTING" => ["REVALIDATING", "BLOCKED"],
+  "REVALIDATING" => ["TRIAGED", "BLOCKED"],
+  "REVIEW" => ["COMPLETE", "BLOCKED"],
+  "COMPLETE" => [],
+  "BLOCKED" => []
 }.freeze
+TIMEBOX_OUTCOMES = %w[COMPLETE TIMEOUT CANCELLED BLOCKED].freeze
 COMMIT_PATTERN = /\A[0-9a-f]{7,64}\z/i
 
 options = { repo: nil }
@@ -103,6 +105,31 @@ errors << "scenario_baseline.status must be Draft or Frozen for build" unless ["
 scope = required_hash(manifest, "scope", errors)
 errors << "scope.wip_max must be 2" unless scope["wip_max"] == 2
 errors << "scope.disjoint_writes must be true" unless scope["disjoint_writes"] == true
+selected_layers = scope["selected_layers"]
+if qa_mode == "bounded"
+  errors << "bounded scope.selected_layers must be a non-empty array" unless selected_layers.is_a?(Array) && !selected_layers.empty?
+  if selected_layers.is_a?(Array)
+    errors << "scope.selected_layers contains unknown layer" unless selected_layers.all? { |name| KNOWN_LAYERS.include?(name) }
+    errors << "scope.selected_layers contains duplicates" unless selected_layers.uniq.length == selected_layers.length
+  end
+end
+
+timebox = required_hash(manifest, "timebox", errors) if qa_mode == "bounded"
+if qa_mode == "bounded"
+  soft_seconds = timebox["soft_seconds"]
+  hard_seconds = timebox["hard_seconds"]
+  errors << "timebox.soft_seconds must be an integer from 30 to 180" unless soft_seconds.is_a?(Integer) && soft_seconds.between?(30, 180)
+  errors << "timebox.hard_seconds must be an integer from soft_seconds+1 to 240" unless hard_seconds.is_a?(Integer) && soft_seconds.is_a?(Integer) && hard_seconds > soft_seconds && hard_seconds <= 240
+  timebox_outcome = required_string(timebox, "outcome", errors)
+  errors << "timebox.outcome is invalid" unless TIMEBOX_OUTCOMES.include?(timebox_outcome)
+  stop_reason = timebox["stop_reason"]
+  next_actions = timebox["next_actions"]
+  errors << "timebox.next_actions must be an array" unless next_actions.is_a?(Array)
+  if timebox_outcome != "COMPLETE"
+    errors << "non-complete timebox requires stop_reason" unless stop_reason.is_a?(String) && !stop_reason.empty?
+    errors << "non-complete timebox requires one next action" unless next_actions.is_a?(Array) && !next_actions.empty?
+  end
+end
 
 layers = manifest["layers"]
 unless layers.is_a?(Array)
@@ -124,6 +151,12 @@ layers.each do |layer|
   errors << "layer #{name} has invalid result" unless %w[PASS FAIL BLOCKED N/A].include?(result)
   errors << "layer #{name} N/A requires skip_reason" if result == "N/A" && !(layer["skip_reason"].is_a?(String) && !layer["skip_reason"].empty?)
   errors << "mandatory layer #{name} cannot be N/A" if layer["mandatory"] == true && result == "N/A"
+  if qa_mode == "bounded" && selected_layers.is_a?(Array) && selected_layers.include?(name)
+    errors << "selected layer #{name} cannot be N/A" if result == "N/A"
+  end
+  if qa_mode == "bounded" && layer["mandatory"] == true && selected_layers.is_a?(Array) && !selected_layers.include?(name)
+    errors << "mandatory layer #{name} must be selected"
+  end
 end
 
 validation = required_hash(manifest, "validation", errors)
@@ -189,6 +222,7 @@ human_approved = required_boolean(human_gate, "approved", errors)
 errors << "required human gate needs approved=true and a reference" if human_required && (!human_approved || !human_gate["reference"].is_a?(String) || human_gate["reference"].empty?)
 
 is_final = %w[REVIEW COMPLETE].include?(state)
+is_blocked = state == "BLOCKED"
 if %w[FROZEN_FOR_BUILD BUILDING VALIDATING TRIAGED CORRECTING REVALIDATING REVIEW COMPLETE].include?(state)
   errors << "state #{state} requires scenario baseline Frozen for build" unless scenario_status == "Frozen for build"
 end
@@ -197,6 +231,17 @@ if %w[TRIAGED CORRECTING REVALIDATING REVIEW COMPLETE].include?(state)
 end
 if %w[CORRECTING REVALIDATING].include?(state)
   errors << "state #{state} requires corrective_batch_id" unless corrective_batch_id.is_a?(String) && !corrective_batch_id.empty?
+end
+if qa_mode == "bounded"
+  timebox_outcome = timebox["outcome"]
+  errors << "non-complete timebox must end in state BLOCKED" if timebox_outcome != "COMPLETE" && !is_blocked
+  if is_blocked
+    errors << "BLOCKED state requires validation.result BLOCKED" unless validation_result == "BLOCKED"
+    errors << "BLOCKED state requires a non-complete timebox" if timebox_outcome == "COMPLETE"
+    errors << "BLOCKED state must not start Gatekeeper" unless gatekeeper_decision == "NOT_STARTED"
+  elsif validation_result == "BLOCKED"
+    errors << "validation.result BLOCKED requires state BLOCKED"
+  end
 end
 if is_final
   errors << "final state requires scenario baseline Frozen for build" unless scenario_status == "Frozen for build" && !scenario_sha.to_s.empty?
@@ -207,6 +252,13 @@ if is_final
   errors << "final state requires clean working tree evidence" unless clean_tree
   errors << "final state requires Gatekeeper APPROVE or APPROVE_WITH_NOTES" unless %w[APPROVE APPROVE_WITH_NOTES].include?(gatekeeper_decision)
   errors << "Gatekeeper reviewed commit must equal TE validated commit" unless reviewed_commit == validated_commit
+  if qa_mode == "bounded"
+    errors << "final state requires timebox outcome COMPLETE" unless timebox["outcome"] == "COMPLETE"
+  end
+  layers.each do |layer|
+    next unless layer.is_a?(Hash) && layer["mandatory"] == true
+    errors << "final state requires mandatory layer #{layer["name"]} PASS" unless layer["result"] == "PASS"
+  end
   findings.each do |finding|
     next unless finding.is_a?(Hash)
     errors << "finding #{finding["id"]} is not resolved or human-accepted" unless %w[resolved accepted_residual_risk].include?(finding["status"])
@@ -229,7 +281,11 @@ if options[:repo] && errors.empty?
 end
 
 if errors.empty?
-  puts "PASS: QA evidence accepted for #{manifest["batch_id"]} (state=#{state}, mode=#{qa_mode}, scenario=#{scenario_id})"
+  if state == "BLOCKED"
+    puts "BLOCKED: QA evidence recorded for #{manifest["batch_id"]}; promotion stopped (state=#{state}, mode=#{qa_mode}, scenario=#{scenario_id})"
+  else
+    puts "PASS: QA evidence accepted for #{manifest["batch_id"]} (state=#{state}, mode=#{qa_mode}, scenario=#{scenario_id})"
+  end
   exit 0
 end
 

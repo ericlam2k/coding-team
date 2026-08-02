@@ -23,4 +23,6 @@ run_case(validator, fixtures.join("invalid-missing-layer.json"), :fail)
 run_case(validator, fixtures.join("invalid-commit-mismatch.json"), :fail)
 run_case(validator, fixtures.join("invalid-unresolved.json"), :fail)
 run_case(validator, fixtures.join("invalid-state-jump.json"), :fail)
+run_case(validator, fixtures.join("valid-timeout-blocked.json"), :pass)
+run_case(validator, fixtures.join("invalid-timeout-final.json"), :fail)
 puts "QA evidence validator tests: PASS"

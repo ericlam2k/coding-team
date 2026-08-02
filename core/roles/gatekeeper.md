@@ -25,6 +25,8 @@ Load when the brief names them:
   qa-evidence-enforcement validator `PASS` and verify the reviewed commit
   matches the Test Engineer validated commit. Do not override a failed
   validator.
+- Do not start on a `BLOCKED`/`TIMEOUT` evidence packet; return the stop reason
+  to Lead for one smaller bounded batch or a human decision.
 - Prefer different model family from implementers when pool allows
 - Non-APPROVE → stop for human; do not soft-merge
 

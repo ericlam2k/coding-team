@@ -200,6 +200,9 @@ Urgent work uses an explicit **expedite batch** after checkpointing the active b
 - Target ~120s when practical
 - At ~180s → `PARTIAL` with evidence, unresolved question, next bounded step
 - At ~240s → cancel or split rather than waiting out the provider
+- Bounded QA uses a 120s target / 240s hard stop. A timed-out validation
+  records `BLOCKED` evidence and one next action; it never auto-retries or
+  starts Gatekeeper.
 - Transport `completed` with empty/malformed/timeout content → `FAILED_TRANSIENT` (not accepted work)
 
 ## Adapter note

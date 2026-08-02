@@ -38,7 +38,9 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
 - Skills start at `none`; honor **skill overrides** in `core/orchestration.md`
 - When `qa_required=true` or `qa_mode=bounded`, load
   `$CODING_TEAM_ROOT/skills/quality/qa-evidence-enforcement/` after TE
-  execution and run the evidence validator before Gatekeeper.
+  execution and run the evidence validator before Gatekeeper. Bounded TE
+  passes use a 120-second target / 240-second hard stop; timeout returns
+  `BLOCKED` and queues one smaller next step rather than retrying.
 - **Addons default OFF:** do **not** load `caveman` or `ponytail` unless enabled (`./bin/ct enable`) or the human asks. Packs live under `$CODING_TEAM_ROOT/addons/` — never inject into core briefs
 - Platform independence: core has no host slugs; this file is the Codex adapter only
 

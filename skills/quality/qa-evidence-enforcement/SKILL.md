@@ -12,26 +12,35 @@ approve release.
 
 ## Workflow
 
-1. Read the batch brief, frozen scenario matrix, relevant contract/ADR, and
-   [core/qa-operating-model.md](../../../core/qa-operating-model.md).
-2. Confirm the scenario baseline is `Frozen for build`. A `Draft` baseline is
+1. Resolve `CODING_TEAM_ROOT` from the host adapter, then read the batch brief,
+   frozen scenario matrix, relevant contract/ADR, and
+   `$CODING_TEAM_ROOT/core/qa-operating-model.md`. Do not resolve the core file
+   relative to the installed skill symlink.
+2. Set the QA timebox before starting execution: target **120 seconds**, hard
+   stop **240 seconds**. Select only the layers and case references admitted by
+   the batch; never turn a bounded pass into a repository-wide test run.
+3. Confirm the scenario baseline is `Frozen for build`. A `Draft` baseline is
    design input only and cannot support promotion.
-3. Confirm the required test layers and explicit `N/A` reasons. Do not require
+4. Confirm the required test layers and explicit `N/A` reasons. Do not require
    every layer for every task; use the trigger flags in the manifest.
-4. After the complete validation pass, record every in-scope finding before any
+5. Run the selected cases once. At the soft limit, stop scheduling new cases;
+   at the hard limit, stop/cancel the active command and record a bounded
+   `BLOCKED` result with `TIMEOUT` or `CANCELLED`, the stop reason, evidence
+   paths, and one next action. Do not wait for a hung dependency or auto-retry.
+6. After the complete validation pass, record every in-scope finding before any
    correction. Do not dispatch or apply a product fix during that pass.
-5. Classify findings only as `PRODUCT_DEFECT`, `TEST_CONTRACT_DEFECT`,
+7. Classify findings only as `PRODUCT_DEFECT`, `TEST_CONTRACT_DEFECT`,
    `ENVIRONMENT_DEFECT`, `TOOL_TRANSPORT_DEFECT`, or `UNKNOWN`.
-6. Record the correlation result, demonstrated root cause or explicit
+8. Record the correlation result, demonstrated root cause or explicit
    no-shared-cause result, corrective Batch reference, and regression references.
-7. Record the exact `validated_commit` and require a clean working tree.
-8. Run the repository validator:
+9. Record the exact `validated_commit` and require a clean working tree.
+10. Run the repository validator:
 
    ```bash
    ruby scripts/validate-qa-evidence.rb path/to/qa-evidence.json --repo .
    ```
 
-9. Return `PASS`, `FAIL`, or `BLOCKED` with the command output and evidence
+11. Return `PASS`, `FAIL`, or `BLOCKED` with the command output and evidence
    paths. A failed validator is not an invitation to patch the product or
    weaken the manifest.
 
@@ -50,8 +59,10 @@ Promotion is valid only when all of these are true:
 - Gatekeeper reviewed commit equals the TE validated commit;
 - human approval exists when a human gate is required.
 
-`FAIL`, `BLOCKED`, `REVISE`, stale evidence, missing evidence, dirty-tree
-evidence, or commit mismatch stops promotion. Do not auto-retry.
+`FAIL`, `BLOCKED`, `TIMEOUT`, `REVISE`, stale evidence, missing evidence,
+dirty-tree evidence, or commit mismatch stops promotion. A timeout is a valid
+stop record, not a pass: Gatekeeper must not start, and the Lead must queue one
+smaller follow-up or ask the human. Do not auto-retry.
 
 ## Scope boundary
 

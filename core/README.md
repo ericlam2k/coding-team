@@ -52,7 +52,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | Tree | Contents |
 |---|---|
 | `skills/engineering/` | Backend, frontend, frameworks, performance, styling, data, devops |
-| `skills/quality/` | Testing, review, debugging, problem-solving, sequential thinking |
+| `skills/quality/` | Testing, review, debugging, bounded QA evidence, problem-solving, sequential thinking |
 | `skills/process/` | Context engineering, docs seeker, PM execution |
 | `skills/design/` | Hallmark + awesome-design-md (paired), ui-ux-pro-max, aesthetic, frontend-design |
 

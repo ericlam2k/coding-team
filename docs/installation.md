@@ -40,7 +40,18 @@ WIP ≤ 2. TE → Gatekeeper sequential. Incomplete → ask me.
 For bounded QA batches, installation also exposes the conditional
 `qa-evidence-enforcement` skill and the
 `scripts/validate-qa-evidence.rb` promotion validator. It is activated only
-when the batch declares `qa_required=true` or `qa_mode=bounded`.
+when the batch declares `qa_required=true` or `qa_mode=bounded`. The bounded
+pass is timeboxed at 120 seconds target / 240 seconds hard stop; timeout is a
+blocked evidence result, not an automatic retry.
+
+For a no-dependency activation of only the adapter, core policy, and QA skill:
+
+```bash
+./scripts/activate-codex-team.sh
+```
+
+This does not refresh model maps or enable addons. Use `--check` to verify an
+existing activation without changing links.
 ```
 
 ## Troubleshooting
