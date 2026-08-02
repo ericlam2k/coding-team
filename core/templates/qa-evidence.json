@@ -25,12 +25,8 @@
   },
   "layers": [
     {"name": "unit", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
-    {"name": "component", "mandatory": false, "result": "N/A", "skip_reason": "No component boundary in scope", "evidence_refs": []},
     {"name": "integration", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
-    {"name": "system_e2e", "mandatory": false, "result": "N/A", "skip_reason": "No user-facing journey in scope", "evidence_refs": []},
-    {"name": "acceptance", "mandatory": false, "result": "N/A", "skip_reason": "Product acceptance is unchanged", "evidence_refs": []},
-    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
-    {"name": "nonfunctional", "mandatory": false, "result": "N/A", "skip_reason": "No NFR trigger", "evidence_refs": []}
+    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []}
   ],
   "validation": {
     "result": "PASS",

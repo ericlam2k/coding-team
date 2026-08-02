@@ -1,133 +1,77 @@
-# Integrated QA Operating Model
+# QA Operating Model (Hybrid)
 
-This is the Coding Team's QA operating layer. Traditional QA supplies the
-workflow, layered testing supplies coverage depth, and the bounded evidence
-layer controls mutation loops, unclear product meaning, incomplete regression,
-and promotion without reliable evidence.
+This is the active Coding Team QA policy. The previous layered operating model
+is archived at
+`docs/archive/qa-operating-model-pre-hybrid-29311de.md`; do not load it by
+default.
 
-It does not add a router, standing QA meeting, or approval authority. It
-preserves WIP ≤2, disjoint write scopes, and sequential Test Engineer (TE) →
-Gatekeeper (GK).
+Use the smallest flow that gives reliable evidence. Keep WIP ≤2, disjoint write
+scopes, and Test Engineer (TE) → Gatekeeper (GK) sequential. Do not create a
+standing QA meeting or a second router.
 
-For bounded batches, Test Engineer runs the
-`skills/quality/qa-evidence-enforcement/` skill with
-`scripts/validate-qa-evidence.rb`. The manifest validator blocks promotion
-on missing evidence; it does not claim to observe arbitrary editor writes
-during an active test run.
+## Mode selection
 
-## Operating modes
+Use **Normal** mode by default. Escalate to **Risky** mode when any of these
+are present: mutation or state transition, replay/currentness, unclear user or
+domain meaning, shared contract, external integration, auth/privacy/security,
+migration/rollback, material regression risk, repeated failure, or a second
+failed fix attempt.
 
-### Standard QA mode
+If a normal task hits the same failure twice or reveals one of those triggers,
+stop the normal loop and restart it as a Risky batch. Do not keep patching
+forward.
 
-Use the normal QA flow for low-risk, behavior-preserving work. Select only the
-test levels and types that the change actually affects. Builders may use
-red-green-refactor for local tests; TE still supplies independent batch
-evidence when the batch is material.
+## Normal changes
 
-### Bounded evidence-first mode
+1. Agree the expected behavior and scope.
+2. Define key user-observable test cases, including the important negative or
+   edge case.
+3. Implement or fix the smallest boundary.
+4. Run the selected tests.
+5. Log each defect with expected/actual result and evidence.
+6. Retest the corrected case.
+7. Run suitable affected regression, not the whole repository by default.
+8. For a material batch, obtain fresh TE evidence, then one sequential GK
+   decision. Low-risk local work may close with its recorded check when the
+   batch does not require independent TE/GK review.
 
-Lead activates the overlay for mutation/state, replay or currentness,
-ambiguous product/domain meaning, shared contracts, external integrations,
-auth/privacy/security, migration/rollback, material regression risk, repeated
-failures, or fix–trial behavior. The overlay is a control plane, not a second
-test framework.
+PM, Domain Advisor, Architect, or Contradictor input is conditional: consult
+only when that decision can change the expected behavior, contract, or risk.
 
-Every bounded Test Engineer pass is timeboxed: target 120 seconds and hard
-stop at 240 seconds. Select the admitted layers and cases before execution; do
-not expand the pass into a repository-wide run. At the soft limit, stop
-scheduling new cases. At the hard limit, cancel the active command and record
-`state=BLOCKED`, `validation.result=BLOCKED`, and `timebox.outcome=TIMEOUT` (or
-`CANCELLED`) with the stop reason, evidence collected, and one next action.
-Timeout evidence stops promotion, does not start Gatekeeper, and does not
-trigger an automatic retry or patch.
+## Risky or confusing changes
 
-## Traditional QA flow with owners and gates
+1. Freeze the test batch before implementation. Resolve user/domain meaning
+   first; select only the affected test layers and cases.
+2. Run the complete frozen batch once before patching. Do not dispatch a fix
+   while that validation pass is active.
+3. Log all failures with scenario, expected/actual result, evidence, and
+   classification.
+4. Correlate findings once. Group only failures with a demonstrated shared
+   cause; do not cluster by symptom wording alone.
+5. Admit one controlled corrective Batch with exclusive files.
+6. Run a fresh TE pass for failed cases, affected regression, and relevant
+   negative/adversarial cases.
+7. Promote only with complete evidence and TE → GK approval. Human approval
+   remains required for production, irreversible, privacy/legal, or other
+   human-gated actions.
 
-| Stage | Accountable owner | Required output / gate |
-|---|---|---|
-| Requirement analysis | Lead + PM; Domain Advisor and System Architect when triggered | Requirements, user stories, acceptance, risks, dependencies, edge cases, NFR triggers, and unresolved decisions |
-| Test planning | TE with Lead | Scope, selected levels/types, environment, entry/exit criteria, owners, evidence plan, regression boundary, and stop condition |
-| Test design | TE; PM/domain inputs before freeze | User-observable scenarios, technical invariants, data, negative/exception cases, and requirement traceability; `Frozen for build` or `Draft` with blocked owners |
-| Environment setup | Builder/FIO with TE | Build/version, configuration, identities, fixtures, flags, dependencies, logs, monitoring, reset/snapshot, and rollback approach |
-| Test execution | TE | Complete required matrix for the frozen Batch, actual results, raw logs, traces, payloads, screenshots, and database/state evidence |
-| Defect logging | TE | Scenario reference, severity/priority, repro, expected/actual, evidence, build/data state, suspected layer, and owner |
-| Defect triage | Lead | Canonical classification, correlation map, PIC, hypothesis/options, decision, and correction boundary; no patching mid-pass |
-| Retesting | TE | Original failure passes on a clean or controlled corrected build; regression case retained |
-| Regression | TE | Prior defects, adjacent features, shared components, integrations, workflows, and triggered high-risk paths pass |
-| Closure/sign-off | TE → GK → human gate when required | Fresh TE result, open-risk and coverage summary, GK decision, and separate human release/production approval where applicable |
+## Timebox and stop rules
 
-## Layered testing
+For Risky batches, target 120 seconds and hard-stop at 240 seconds. At the
+target, stop scheduling new cases. At the hard stop, cancel the active command
+and record `BLOCKED` with the timeout reason, evidence collected, and one next
+action. Do not auto-retry, patch during the pass, or start GK on incomplete
+evidence.
 
-Layer selection is risk- and change-based. A layer is mandatory when its
-trigger applies; no layer is mandatory for every task.
+`FAIL`, `BLOCKED`, stale evidence, dirty-tree evidence, commit mismatch, or GK
+non-approval stops promotion and returns control to Lead/human decision.
 
-| Layer | Owner | Entry | Exit | Evidence | Mandatory trigger |
-|---|---|---|---|---|---|
-| **1. Unit** | Builder | Logic and expected behavior are known | Assertions pass; critical local rules covered | Command, assertions, failures, coverage where useful | Changed logic, validation, calculations, mutation guards |
-| **2. Component** | Builder; TE support when needed | Unit checks pass; component contract and fixtures exist | Component/API behavior, local persistence, state transitions, and errors match contract | Results, requests/responses, mocks/stubs, local logs | Component, service, local persistence, or local state change |
-| **3. Integration** | TE with Builder and System Architect support | Component checks pass; dependency and fixture boundary controlled | Interfaces, mappings, call order, timeout/retry behavior, and dependency failures are correct | Results, logs, traces, payloads, dependency responses | Cross-component, API, database, queue, or external-system change |
-| **4. System/E2E** | TE | Integration paths pass; controlled environment is ready | Critical journey works end to end without forbidden leakage or stale state | Run output, screenshots, traces, build/environment ID | Critical user workflow, public contract, auth/privacy, or stateful journey |
-| **5. Acceptance/UAT** | PM/domain define; TE executes; human/PIC decides | Product/domain meaning and acceptance are resolved | User outcome, role behavior, customary handling, and recovery expectations are met | Scenario results, domain/product decision, open-risk list | User-facing product behavior, domain meaning, fairness, or material ambiguity |
-| **6. Regression** | TE | Integrated change and impact inventory are available | Prior defects, adjacent behavior, shared seams, and high-risk paths pass | Regression matrix, commands, results, gaps | Every non-trivial change; full affected scope for high-risk changes |
-| **7. Non-functional** | Relevant specialist with TE | NFR trigger and target are defined | Required performance, reliability, security, privacy, accessibility, or operability evidence passes | Metrics, scans, traces, reports | Only when the change or risk triggers that NFR |
+## Minimum evidence
 
-“Test all” means all required scenarios and layers in the frozen Batch before
-correction—not the entire repository, every possible layer, or all roles in
-parallel.
+Normal mode records: expected behavior, selected cases, commands/results,
+defects, retest result, affected regression result, and next action or stop
+reason.
 
-## Bounded evidence-first overlay
-
-### Plan
-
-Lead opens a bounded concern meeting. PM uses `user-stories` when acceptance
-is unclear; PM uses `pre-mortem` when failure, replay, stale-state, or
-fix–trial risk is material; a named Domain Advisor supplies domain cases; TE
-freezes the scenario matrix; System Architect freezes technical invariants
-when the concern crosses boundaries.
-
-### Do
-
-Builders implement one admitted corrective Batch with exclusive files. Local
-tests are allowed, but no product fix is dispatched in response to a finding
-until the active TE validation pass is complete.
-
-### Check
-
-Fresh TE executes the complete frozen matrix **within the declared timebox**,
-selected layers, affected regressions, and relevant negative/adversarial cases.
-Every finding is logged
-and classified as one of:
-
-`PRODUCT_DEFECT`, `TEST_CONTRACT_DEFECT`, `ENVIRONMENT_DEFECT`,
-`TOOL_TRANSPORT_DEFECT`, or `UNKNOWN`.
-
-### Act
-
-After collection, correlate all findings once. Cluster only by demonstrated
-shared cause; trace to the implementation, product/domain decision, test
-contract, or architecture seam. Summarize at most three hypotheses/options and
-route to one PIC by default. Use multiple PICs only for distinct technical and
-domain decisions. Lead admits one integrable corrective Batch or queues a
-separate provisional Batch.
-
-Preserve or add a regression case for every confirmed defect. Run fresh TE
-validation after correction, then one sequential GK review. `FAIL`, `BLOCKED`,
-`TIMEOUT`, stale/insufficient evidence, or GK non-approval stops for the human
-gate. A blocked/timeboxed pass ends with a bounded next action; it does not
-remain running while waiting for a dependency or provider.
-
-## Evidence packet and promotion rule
-
-The final packet must identify the exact build/integration, frozen baseline,
-environment/data state, commands and results, defects and classifications,
-correlation/root-cause decision, regression result, residual risks, and stop
-condition.
-
-Promotion requires fresh TE `PASS` for the same frozen integration and GK
-`APPROVE` or `APPROVE_WITH_NOTES`. GK is an evidence gate, not production or
-release authority. Human approval remains required for irreversible actions,
-production identity/data, privacy/legal decisions, deployment, or other gates
-listed in `human-gates.md`.
-
-For bounded batches, Gatekeeper also requires a recorded validator `PASS` and
-must verify the reviewed commit equals the validated commit.
+Risky mode additionally records: frozen baseline, selected layers/cases, all
+findings, correlation/root cause, corrective Batch, fresh TE result, regression
+result, exact validated commit, and GK decision.

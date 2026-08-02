@@ -5,10 +5,11 @@ description: Validate bounded QA evidence and promotion readiness for Coding Tea
 
 # QA Evidence Enforcement
 
-Use this skill as the Test Engineer evidence-control step for a batch marked
-`qa_required=true` or `qa_mode=bounded`. The core policy and validator are the
-authority; this skill does not create roles, change WIP, fix product code, or
-approve release.
+Use this skill only for the **Risky** QA mode: a batch marked
+`qa_required=true` or `qa_mode=bounded`. Normal changes follow
+`$CODING_TEAM_ROOT/core/qa-operating-model.md` without this overlay. The core
+policy and validator are the authority; this skill does not create roles,
+change WIP, fix product code, or approve release.
 
 ## Workflow
 
@@ -21,8 +22,8 @@ approve release.
    the batch; never turn a bounded pass into a repository-wide test run.
 3. Confirm the scenario baseline is `Frozen for build`. A `Draft` baseline is
    design input only and cannot support promotion.
-4. Confirm the required test layers and explicit `N/A` reasons. Do not require
-   every layer for every task; use the trigger flags in the manifest.
+4. Confirm the selected test layers and explicit `N/A` reasons. Do not create
+   entries for unaffected layers or run the whole repository by default.
 5. Run the selected cases once. At the soft limit, stop scheduling new cases;
    at the hard limit, stop/cancel the active command and record a bounded
    `BLOCKED` result with `TIMEOUT` or `CANCELLED`, the stop reason, evidence

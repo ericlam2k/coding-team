@@ -136,9 +136,13 @@ unless layers.is_a?(Array)
   errors << "layers must be an array"
   layers = []
 end
+errors << "layers must contain at least one selected layer" if layers.empty?
 layer_names = layers.map { |layer| layer.is_a?(Hash) ? layer["name"] : nil }
-errors << "layers must list each known layer exactly once" unless layer_names.compact.sort == KNOWN_LAYERS.sort
+errors << "layers must use known layer names" unless layer_names.all? { |name| KNOWN_LAYERS.include?(name) }
 errors << "layers contain duplicate names" unless layer_names.compact.uniq.length == layer_names.compact.length
+if qa_mode == "bounded" && selected_layers.is_a?(Array)
+  errors << "layers must exactly match scope.selected_layers" unless layer_names.sort == selected_layers.sort
+end
 layers.each do |layer|
   unless layer.is_a?(Hash)
     errors << "each layer must be an object"

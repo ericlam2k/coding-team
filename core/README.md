@@ -9,7 +9,8 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
 | [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
 | [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
-| [qa-operating-model.md](qa-operating-model.md) | Traditional QA flow, conditional test layers, evidence packet, and promotion gates |
+| [qa-operating-model.md](qa-operating-model.md) | Hybrid Normal/Risky QA flow, selected layers, evidence, and promotion gates |
+| [../docs/archive/qa-operating-model-pre-hybrid-29311de.md](../docs/archive/qa-operating-model-pre-hybrid-29311de.md) | Archived pre-hybrid QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
 | [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |

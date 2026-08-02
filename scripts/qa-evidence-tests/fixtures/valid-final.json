@@ -11,12 +11,8 @@
   "timebox": {"soft_seconds": 120, "hard_seconds": 240, "outcome": "COMPLETE", "stop_reason": "", "next_actions": []},
   "layers": [
     {"name": "unit", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["unit.log"]},
-    {"name": "component", "mandatory": false, "result": "N/A", "skip_reason": "No component boundary", "evidence_refs": []},
     {"name": "integration", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["integration.log"]},
-    {"name": "system_e2e", "mandatory": false, "result": "N/A", "skip_reason": "No UI route", "evidence_refs": []},
-    {"name": "acceptance", "mandatory": false, "result": "N/A", "skip_reason": "Acceptance unchanged", "evidence_refs": []},
-    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["regression.log"]},
-    {"name": "nonfunctional", "mandatory": false, "result": "N/A", "skip_reason": "No NFR trigger", "evidence_refs": []}
+    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["regression.log"]}
   ],
   "validation": {"result": "PASS", "validated_commit": "abcdef1", "working_tree_clean": true, "all_findings_collected": true},
   "findings": [],
