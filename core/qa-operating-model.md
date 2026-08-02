@@ -58,10 +58,15 @@ only when that decision can change the expected behavior, contract, or risk.
 ## Timebox and stop rules
 
 For Risky batches, target 120 seconds and hard-stop at 240 seconds. At the
-target, stop scheduling new cases. At the hard stop, cancel the active command
-and record `BLOCKED` with the timeout reason, evidence collected, and one next
-action. Do not auto-retry, patch during the pass, or start GK on incomplete
-evidence.
+target, stop scheduling new cases. At 180 seconds without a complete artifact,
+emit a checkpoint; at the hard stop, cancel the active command and record
+`BLOCKED` with the timeout reason, evidence collected, and one next action. A
+Task is too wide when it has multiple owners/independent concerns, non-disjoint
+writes, no single acceptance artifact, or cannot fit the 250-word run-prompt /
+150-word handoff caps. If the remaining work is too wide or long, hand off one
+smaller dependency-safe Task with the checkpoint and next action. Do not
+auto-retry, patch during the pass, leave the work frozen, or start GK on
+incomplete evidence.
 
 `FAIL`, `BLOCKED`, stale evidence, dirty-tree evidence, commit mismatch, or GK
 non-approval stops promotion and returns control to Lead/human decision.

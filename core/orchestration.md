@@ -108,6 +108,30 @@ If no predefined role or Domain Advisor instance can safely own the task → `HU
 
 Prefer path/line evidence pointers over pasted dumps. Shrink the packet before escalating tier. Default each specialist run to a **fresh** session; continue only for one immediate follow-up that depends on unpersisted local reasoning and still fits the cap.
 
+## Task-size metric: when to split instead of waiting
+
+“Long” is an operational threshold, not a feeling. Measure from role start to
+the first complete artifact or stop reason (excluding human approval or queue
+wait). A Task is **too long** when it is expected to exceed the 120-second
+target, reaches 180 seconds without a complete artifact, or needs a second
+follow-up after its one permitted immediate handoff. At 240 seconds it is
+`BLOCKED` and must stop.
+
+A Task is **too wide** when any of these is true:
+
+- it has more than one accountable role or more than one independent concern;
+- it needs non-disjoint writers, crosses an unstable shared contract, or has no
+  single acceptance artifact;
+- its run prompt would exceed 250 words, its handoff would exceed 150 words,
+  or the stop condition cannot be stated in one sentence.
+
+Before starting, split a too-long/too-wide Task into dependency-safe slices
+with exclusive files, one owner, one acceptance artifact, and one stop
+condition. During a run, emit a checkpoint at 180 seconds or when a metric is
+crossed: completed work, evidence, unresolved question, and exactly one next
+bounded Task. The Lead hands that slice off; it does not silently extend the
+context, retry the same mutation loop, or leave the original Task frozen.
+
 ## Skill loading
 
 - **Start with none.** Load skills only when the task brief names them (or the role card’s “load when” trigger matches).
@@ -193,6 +217,12 @@ Parallel tasks require satisfied dependencies, stable contracts, disjoint files,
 
 Do not create standing coordinators, shadows, helpers, or consolidation agents. Every contributor owns a normal task-list item with exclusive deliverable and stop condition. When queueing blocks the critical path, re-sequence or split — optionally use cheap-utility temporary cells under the same WIP cap with one accountable synthesizer.
 
+If a task is too wide for one bounded run, split it into small dependency-safe
+Tasks with exclusive files, explicit acceptance, and a stop condition. Hand off
+the completed slice with evidence, unresolved questions, and the next bounded
+Task. Do not leave an oversized task frozen, silently extend its context, or
+restart it without a checkpoint.
+
 Urgent work uses an explicit **expedite batch** after checkpointing the active batch — never silent injection.
 
 ## Time budget and semantic status
@@ -201,7 +231,8 @@ Urgent work uses an explicit **expedite batch** after checkpointing the active b
 - At ~180s → `PARTIAL` with evidence, unresolved question, next bounded step
 - At ~240s → cancel or split rather than waiting out the provider
 - Bounded QA uses a 120s target / 240s hard stop. A timed-out validation
-  records `BLOCKED` evidence and one next action; it never auto-retries or
+  records `BLOCKED` evidence and one next action; Lead hands off one smaller
+  follow-up Task instead of leaving the batch frozen. It never auto-retries or
   starts Gatekeeper.
 - Transport `completed` with empty/malformed/timeout content → `FAILED_TRANSIENT` (not accepted work)
 

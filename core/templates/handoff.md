@@ -17,6 +17,7 @@
 ## Next
 
 - **Recommended next role ID:**
+- **Next bounded Task:** (one owner, exclusive scope, one acceptance artifact)
 - **Blocked on (human / role / evidence):**
 
 ## Tier note (if any)

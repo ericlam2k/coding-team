@@ -20,6 +20,10 @@ Usage:
   ./install.sh --platform codex [--global] [--project <path>] [--refresh-map]
                [--enable <addon[,addon...]>] [--disable <addon[,addon...]>]
 
+Recommended profile install:
+  ./scripts/install-coding-team.sh --profile hybrid --platform codex
+  ./scripts/install-coding-team.sh --profile full --platform codex
+
 Options:
   --platform codex|cursor|cline   Target runtime (only codex in v1)
   --global                        Symlink adapters/codex → $CODEX_HOME/skills/coding-team

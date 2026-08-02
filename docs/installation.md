@@ -1,26 +1,54 @@
 # Installation (v2)
 
-## One command
+## Clone and activate
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./bin/ct init
+./scripts/install-coding-team.sh --profile hybrid --platform codex
 ```
 
-What happens:
+The default **Hybrid** profile is the low-cost, platform-independent activation:
 
-1. Auto-detect platform (Codex / Cursor / Cline) or pass `--platform …`
-2. Link the adapter skill
-3. **Show a suggested model map** (tier → slug)
-4. **Ask you to approve** before writing any map file
-5. Print next steps
+- links only the selected platform adapter and the conditional QA evidence
+  skill;
+- keeps the active hybrid QA policy, WIP ≤2, disjoint writes, and TE →
+  Gatekeeper sequencing;
+- does not refresh a model map or enable caveman/ponytail addons.
+
+The optional **Full** profile is a separate install mode:
 
 ```bash
+./scripts/install-coding-team.sh --profile full --platform codex
+```
+
+Full delegates to `bin/ct init --full`, including model-map approval and
+supported Codex addons. Switch back explicitly:
+
+```bash
+./scripts/install-coding-team.sh --profile hybrid --platform codex
+./scripts/install-coding-team.sh --check --profile hybrid --platform codex
+./bin/ct status
+```
+
+Profiles are mutually exclusive at activation time. The installer records the
+active value in `$CODEX_HOME/coding-team.profile` and Hybrid removes only
+addon symlinks that point into this checkout; it never deletes unrelated user
+files. Use a project-local `CODEX_HOME` when the host sandbox cannot read the
+global Codex home.
+
+Both profiles load the same core task-size policy: split work expected to
+exceed 120 seconds or cross the width limits, checkpoint at 180 seconds, and
+hard-stop at 240 seconds with one bounded handoff. Full mode does not bypass
+WIP ≤2, disjoint writes, or TE → Gatekeeper sequencing.
+
+For direct interactive model-map management without profile switching, the
+advanced commands remain available:
+
+```bash
+./bin/ct init
 ./bin/ct init --yes              # skip prompt (CI)
 ./bin/ct init --platform cursor
-./bin/ct init --full             # Codex + enable caveman/ponytail after map approve
-./bin/ct status
 ./bin/ct refresh                 # new suggestion + approve again
 ```
 
@@ -44,20 +72,26 @@ when the batch declares `qa_required=true` or `qa_mode=bounded`. The bounded
 pass is timeboxed at 120 seconds target / 240 seconds hard stop; timeout is a
 blocked evidence result, not an automatic retry.
 
-For a no-dependency activation of only the adapter, core policy, and QA skill:
+For a no-dependency activation of only the adapter, core policy, and QA skill,
+use the generic installer (the old Codex name remains a compatibility wrapper):
+
+```text
+Set CODING_TEAM_ROOT to this clone and load the coding-team skill for your
+platform. The installer links the adapter and conditional QA skill.
+```
 
 ```bash
-./scripts/activate-codex-team.sh
+./scripts/install-coding-team.sh --profile hybrid --platform codex
 ```
 
 This does not refresh model maps or enable addons. Use `--check` to verify an
-existing activation without changing links.
-```
+existing activation without changing links. `scripts/activate-codex-team.sh`
+continues to invoke the same Hybrid Codex path for existing automation.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| Map not written | You answered `n` — run `./bin/ct refresh` and approve |
-| Wrong platform symlink | `./bin/ct init --platform <name>` from this clone |
-| Non-interactive refused | Add `--yes` |
+| Map not written | Hybrid does not write maps; choose `--profile full` or run `./bin/ct refresh` |
+| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --profile <profile> --platform <name>` |
+| Non-interactive refused | Add `--yes` to the advanced `bin/ct` command |

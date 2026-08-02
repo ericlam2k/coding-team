@@ -18,6 +18,8 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 
 - WIP ≤ 2; TE → Gatekeeper sequential
 - Incomplete / non-APPROVE → stop for human
+- Oversized or timed-out work → split into a bounded Task and hand off the
+  checkpoint; do not leave it frozen or silently extend the run.
 - Lead cost discipline — briefs, not implementation code
 - Addons (caveman/ponytail) default OFF
 - When `qa_required=true` or `qa_mode=bounded`, Test Engineer runs the

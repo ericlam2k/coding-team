@@ -31,6 +31,14 @@
 - **Depends on:**
 - **Stop / escalate if:**
 
+## Size budget
+
+- **Expected active run:** ≤120s target / 240s hard stop
+- **Independent concerns:** 1
+- **Acceptance artifact:**
+- **Immediate handoffs allowed:** 1; a second means split again
+- **Checkpoint trigger:** 180s, missing artifact, or any width limit crossed
+
 ## Run prompt
 
 ```text

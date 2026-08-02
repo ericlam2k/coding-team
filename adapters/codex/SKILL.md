@@ -31,6 +31,8 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
 - **WIP ≤ 2** concurrent tool-using subagents; prefer a queue of small Tasks over raising the cap
 - **Test Engineer → Gatekeeper** sequential (never simultaneous)
 - Incomplete / non-APPROVE → **stop and ask the human** (no auto-chain)
+- Oversized or timed-out work → split into a bounded Task and hand off the
+  checkpoint; do not leave it frozen or silently extend the run.
 - **Lead cost discipline:** emit judgment and briefs — not implementation code; defects return as corrected briefs; apply the **spec-readiness test** before dispatch
 - Human gates for commit, push, Production deploy, destructive ops, new dependencies
 - Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
