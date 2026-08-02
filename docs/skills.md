@@ -13,6 +13,7 @@ skills/
   engineering/   backend-development, frontend-development, databases, devops,
                  web-frameworks, react-next-performance, ui-styling
   quality/       debugging (+ sub-skills), code-review, web-testing,
+                 qa-evidence-enforcement,
                  sequential-thinking, problem-solving
   process/       context-engineering, pm-execution, docs-seeker
   design/        hallmark, awesome-design-md, frontend-design, aesthetic,
@@ -39,7 +40,7 @@ skills/
 | Backend Engineer | `backend-development`, `databases`, `debugging`, `web-frameworks` |
 | Frontend/UX Lead | `hallmark`, `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
 | Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
-| Test Engineer | `web-testing`, `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
+| Test Engineer | `web-testing`, `qa-evidence-enforcement` (bounded evidence only), `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
 | Docs Steward | `docs-seeker`, `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
 | Gatekeeper | `code-review` (read-only) |
 
@@ -61,6 +62,8 @@ contracts, or materially ambiguous acceptance:
 5. Final Test Engineer execution uses `skills/quality/web-testing/` in a fresh
    context; `skills/quality/debugging/` is added only when failures require
    classification or root-cause tracing.
+   For qa_required=true or qa_mode=bounded, run
+   `skills/quality/qa-evidence-enforcement/` after execution.
 
 The complete no-mutation validation, correlation, and PIC routing policy is in
 [`core/meeting-policy.md`](../core/meeting-policy.md).

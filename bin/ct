@@ -10,11 +10,14 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROPOSE="$ROOT/scripts/propose-model-map.py"
+QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
+QA_VALIDATOR="$ROOT/scripts/validate-qa-evidence.rb"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 
 die() { echo "error: $*" >&2; exit 1; }
 [[ -f "$PROPOSE" ]] || die "missing $PROPOSE"
+[[ -f "$QA_SKILL_SRC/SKILL.md" && -f "$QA_VALIDATOR" ]] || die "missing QA evidence enforcement assets"
 chmod +x "$ROOT/bin/ct" "$PROPOSE" 2>/dev/null || true
 
 usage() {
@@ -81,6 +84,7 @@ install_adapter() {
   case "$platform" in
     codex)
       link_path "$ROOT/adapters/codex" "$CODEX_HOME/skills/coding-team"
+      link_path "$QA_SKILL_SRC" "$CODEX_HOME/skills/qa-evidence-enforcement"
       ;;
     cursor)
       mkdir -p "$ROOT/.cursor-install"
@@ -206,12 +210,13 @@ cmd_status() {
   echo "CODEX_HOME:       $CODEX_HOME"
   echo
   echo "Adapters / skills:"
-  for name in coding-team caveman ponytail; do
+  for name in coding-team qa-evidence-enforcement caveman ponytail; do
     local p="$CODEX_HOME/skills/$name"
     if [[ -L "$p" ]]; then
       echo "  Codex $name → $(readlink "$p")"
     fi
   done
+  echo "  QA validator: $QA_VALIDATOR"
   for p in \
     "$ROOT/adapters/codex/model-pool.map.md" \
     "$ROOT/adapters/cursor/model-pool.map.md" \

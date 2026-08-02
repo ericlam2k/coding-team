@@ -109,6 +109,9 @@ CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 
 SKILL_SRC="$ROOT/adapters/codex"
 SKILL_DST="$CODEX_HOME/skills/coding-team"
+QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
+QA_SKILL_DST="$CODEX_HOME/skills/qa-evidence-enforcement"
+QA_VALIDATOR="$ROOT/scripts/validate-qa-evidence.rb"
 DETECT="$SKILL_SRC/scripts/detect-model-pool.py"
 APPLY="$SKILL_SRC/scripts/apply-pool-map.py"
 EXAMPLE_MAP="$ROOT/examples/model-pool.map.codex.example.md"
@@ -117,6 +120,8 @@ TOGGLES="$ROOT/addons/toggles.json"
 
 [[ -d "$SKILL_SRC" ]] || die "missing adapter: $SKILL_SRC"
 [[ -f "$DETECT" && -f "$APPLY" ]] || die "missing pool scripts under adapters/codex/scripts/"
+[[ -f "$QA_SKILL_SRC/SKILL.md" ]] || die "missing QA enforcement skill: $QA_SKILL_SRC/SKILL.md"
+[[ -f "$QA_VALIDATOR" ]] || die "missing QA evidence validator: $QA_VALIDATOR"
 
 link_path() {
   local src="$1" dst="$2"
@@ -153,6 +158,8 @@ unlink_path() {
 
 link_skill() {
   link_path "$SKILL_SRC" "$SKILL_DST"
+  link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
+  echo "QA evidence enforcement: conditional skill + validator installed"
 }
 
 set_toggle() {

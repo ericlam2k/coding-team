@@ -14,6 +14,7 @@
 Load when the brief names them:
 
 - `skills/quality/web-testing/`
+- `skills/quality/qa-evidence-enforcement/` — bounded QA evidence and promotion-readiness validation after execution
 - `skills/quality/debugging/` — classify failures with repro
 - `skills/quality/sequential-thinking/` — second failure / complex triage when named
 - `skills/quality/problem-solving/` — exception-only after known root cause still contested
@@ -32,6 +33,8 @@ Load when the brief names them:
 - Classify: product defect / flake / env / bad brief — do not silently “fix forward” as Builder
 - During a validation pass, collect all in-scope findings before any correction;
   return a correlation-ready packet rather than dispatching fixes.
+- When qa_required=true or qa_mode=bounded, run the qa-evidence-enforcement
+  validator before handing evidence to Gatekeeper.
 - Gatekeeper must not start until this evidence is accepted by Lead process
 
 ## Stop conditions

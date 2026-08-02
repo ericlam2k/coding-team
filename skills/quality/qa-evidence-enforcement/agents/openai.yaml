@@ -1,0 +1,4 @@
+interface:
+  display_name: "QA Evidence Enforcement"
+  short_description: "Validate bounded QA evidence before promotion"
+  default_prompt: "Use $qa-evidence-enforcement to validate bounded QA evidence and promotion readiness."

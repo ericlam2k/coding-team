@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "qa_required": true,
+  "qa_mode": "bounded",
+  "batch_id": "B-TEST-002",
+  "state": "COMPLETE",
+  "state_history": ["DRAFT", "FROZEN_FOR_BUILD", "BUILDING", "VALIDATING", "TRIAGED", "REVIEW", "COMPLETE"],
+  "scenario_baseline": {"status": "Frozen for build", "id": "SC-002", "sha256": "abc123"},
+  "scope": {"wip_max": 2, "disjoint_writes": true},
+  "layers": [],
+  "validation": {"result": "PASS", "validated_commit": "abcdef1", "working_tree_clean": true, "all_findings_collected": true},
+  "findings": [],
+  "correlation": {"complete": true, "root_cause_refs": [], "corrective_batch_id": ""},
+  "regression": {"result": "PASS", "case_refs": []},
+  "gatekeeper": {"decision": "APPROVE", "reviewed_commit": "abcdef1"},
+  "human_gate": {"required": false, "approved": false, "reference": ""}
+}

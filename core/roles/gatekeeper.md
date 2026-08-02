@@ -21,6 +21,10 @@ Load when the brief names them:
 ## Duties
 
 - Verify scope match, evidence freshness, gate compliance, and material risk
+- When qa_required=true or qa_mode=bounded, require a recorded
+  qa-evidence-enforcement validator `PASS` and verify the reviewed commit
+  matches the Test Engineer validated commit. Do not override a failed
+  validator.
 - Prefer different model family from implementers when pool allows
 - Non-APPROVE → stop for human; do not soft-merge
 

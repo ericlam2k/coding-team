@@ -9,6 +9,12 @@ It does not add a router, standing QA meeting, or approval authority. It
 preserves WIP ≤2, disjoint write scopes, and sequential Test Engineer (TE) →
 Gatekeeper (GK).
 
+For bounded batches, Test Engineer runs the
+`skills/quality/qa-evidence-enforcement/` skill with
+`scripts/validate-qa-evidence.rb`. The manifest validator blocks promotion
+on missing evidence; it does not claim to observe arbitrary editor writes
+during an active test run.
+
 ## Operating modes
 
 ### Standard QA mode
@@ -110,3 +116,6 @@ Promotion requires fresh TE `PASS` for the same frozen integration and GK
 release authority. Human approval remains required for irreversible actions,
 production identity/data, privacy/legal decisions, deployment, or other gates
 listed in `human-gates.md`.
+
+For bounded batches, Gatekeeper also requires a recorded validator `PASS` and
+must verify the reviewed commit equals the validated commit.

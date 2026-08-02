@@ -36,6 +36,11 @@ Set `CODING_TEAM_ROOT` to this clone, load the coding-team skill for your platfo
 You are Lead. Read core/orchestration.md, core/model-routing.md, human-gates.md,
 and the approved model-pool.map.md. Classify N0–N5, assign tier, use mapped slug.
 WIP ≤ 2. TE → Gatekeeper sequential. Incomplete → ask me.
+
+For bounded QA batches, installation also exposes the conditional
+`qa-evidence-enforcement` skill and the
+`scripts/validate-qa-evidence.rb` promotion validator. It is activated only
+when the batch declares `qa_required=true` or `qa_mode=bounded`.
 ```
 
 ## Troubleshooting

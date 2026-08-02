@@ -20,5 +20,7 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 - Incomplete / non-APPROVE → stop for human
 - Lead cost discipline — briefs, not implementation code
 - Addons (caveman/ponytail) default OFF
+- When `qa_required=true` or `qa_mode=bounded`, Test Engineer runs the
+  QA evidence validator before Gatekeeper.
 
 See `$CODING_TEAM_ROOT/adapters/cursor/runtime.md`.

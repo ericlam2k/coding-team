@@ -42,6 +42,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [templates/task-brief.md](templates/task-brief.md) | Task + run prompt (≤250w) |
 | [templates/handoff.md](templates/handoff.md) | Role handoff (≤150w) |
 | [templates/batch-checkpoint.md](templates/batch-checkpoint.md) | Batch checkpoint (≤300w) |
+| [templates/qa-evidence.json](templates/qa-evidence.json) | Machine-readable QA evidence and promotion manifest |
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |

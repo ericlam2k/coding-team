@@ -15,6 +15,6 @@ Lead teammate orchestrates. Do not invent roles.
 
 ## Hard constraints
 
-Same as core: WIP ≤ 2, TE → GK sequential, human gates, Lead cost discipline, addons OFF unless enabled.
+Same as core: WIP ≤ 2, TE → GK sequential, human gates, Lead cost discipline, addons OFF unless enabled. When `qa_required=true` or `qa_mode=bounded`, TE runs the QA evidence validator before GK.
 
 See `adapters/cline/runtime.md`.
