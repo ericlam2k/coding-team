@@ -39,6 +39,8 @@ The **Lead** (parent orchestrator) is the only role that:
 - Classifies **nature** (N0–N5 / Consult / Docs) and assigns **model tier**
 - Opens/closes batches, admits tasks, and enforces WIP / gates
 - Resolves Advisor vs Contradictor debates
+- Synthesizes PM, Domain Advisor, System Architect, and specialist input into
+  one recorded decision, owner, acceptance artifact, and next gate
 - Routes defects to the classified owner as corrected briefs
 - Does **not** implement product code or invent new roles
 
@@ -61,6 +63,7 @@ Use only these IDs (see `roles/`):
 |---|---|
 | `lead` | Lead |
 | `product-manager` | Product Manager |
+| `system-architect` | System Architect |
 | `advisor` | Advisor (technical, pre-build) |
 | `contradictor` | Contradictor |
 | `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
@@ -85,6 +88,7 @@ Never invent a new role **family**. Instantiating `[Domain]-Advisor` from the `d
 | Reviewer — final independent review | `gatekeeper` |
 | Reviewer — non-final domain/UX/code feedback | Existing accountable functional owner |
 | Pre-build technical judgment | `advisor` |
+| Backbone, framework, API, data, or shared-contract ownership | `system-architect` |
 | Pre-build challenge | `contradictor` |
 | Talent / Talent-Career / employment-domain consult | `talent-advisor` (Domain Advisor instance) — or **ask** if domain unclear |
 | Strategic / strategy consult | `strategic-advisor` — or **ask** |
@@ -140,13 +144,36 @@ Each batch names one **Functional Integration Owner**: the role accountable for 
 
 ## Default batch shape
 
-1. Brief + nature/tier classification  
-2. Optional Investigator / PM / Advisor / Contradictor (per [model-routing.md](model-routing.md))  
-3. Human gate when required ([human-gates.md](human-gates.md))  
-4. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))  
-5. **Test Engineer** evidence  
-6. **Gatekeeper** accept / revise / block  
-7. Docs Steward if durable docs are in scope  
+1. Brief + nature/tier classification
+2. Triggered concern method + consult: choose the smallest fitting method, start with one accountable role, and add one decision-changing specialist at a time (per [model-routing.md](model-routing.md))
+3. Conditional acceptance design: PM/domain input → pre-build Test Engineer scenario matrix
+4. Human gate when required ([human-gates.md](human-gates.md))
+5. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))
+6. **Test Engineer** evidence in a fresh post-integration context
+7. **Gatekeeper** accept / revise / block
+8. Docs Steward if durable docs are in scope
+
+Use acceptance design for user-facing workflows, input parsing/matching, AI
+extraction, public contracts, or materially ambiguous acceptance. PM supplies
+user outcomes, personas, and acceptance criteria; a Domain Advisor supplies
+named-domain meaning only when triggered. Test Engineer freezes an observable
+scenario matrix before builders. It is implementation input, not final TE
+evidence. For suitable deterministic unit, contract, or component cases,
+builder briefs require selective red-green-refactor; do not force E2E-first.
+
+### Corrective batch loop
+
+Each Test Engineer or Gatekeeper pass collects all in-scope findings before
+issuing its result; Lead does not dispatch fixes mid-pass. Human approval
+enumerates correction scope; new defects or scope expansion require a new gate.
+Cluster findings by demonstrated root cause, never symptom similarity. Keep a
+corrective Batch one integrable slice; queue cross-contract findings as
+provisional Batches. Preserve or add one failing regression per finding where
+feasible, reintegrate once, then run targeted checks, affected regressions,
+independent negative/adversarial cases, and Batch acceptance. A fresh Test
+Engineer validates before one sequential Gatekeeper re-review. Final TE
+`FAIL`/`BLOCKED`, insufficient fresh evidence, or a Gatekeeper verdict outside
+`APPROVE`/`APPROVE_WITH_NOTES` stops for the human gate.
 
 ## WIP, rotation, and context economy
 

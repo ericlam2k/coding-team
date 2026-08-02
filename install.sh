@@ -25,7 +25,7 @@ Options:
   --global                        Symlink adapters/codex → $CODEX_HOME/skills/coding-team
   --project <path>                Append AGENTS.md coding-team pointer into a consumer project
   --refresh-map                   Re-run model pool detect/apply (skill target + examples/)
-  --enable NAME[,NAME...]         Enable standalone addons (caveman, ponytail). Default OFF.
+  --enable NAME[,NAME...]         Enable standalone addons (caveman, ponytail, pm-lean). Default OFF.
   --disable NAME[,NAME...]        Disable standalone addons (removes Codex skill symlinks)
   -h, --help                      Show this help
 
@@ -190,8 +190,13 @@ enable_addon() {
       set_toggle ponytail true
       link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
       ;;
+    pm-lean)
+      set_toggle pm-lean true
+      link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
+      link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
+      ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail)"
+      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
       ;;
   esac
 }
@@ -209,8 +214,13 @@ disable_addon() {
       set_toggle ponytail false
       unlink_path "$CODEX_HOME/skills/ponytail"
       ;;
+    pm-lean)
+      set_toggle pm-lean false
+      unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
+      unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
+      ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail)"
+      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
       ;;
   esac
 }
@@ -330,9 +340,11 @@ Next steps
      ./install.sh --platform codex --global --enable caveman
      ./install.sh --platform codex --global --enable ponytail
      ./install.sh --platform codex --global --enable caveman,ponytail
+     ./install.sh --platform codex --global --enable pm-lean
      ./install.sh --platform codex --global --disable caveman
+     ./install.sh --platform codex --global --disable pm-lean
    State file: $TOGGLES
-3. In Codex, invoke **Coding Team**; enable caveman/ponytail only when you want them.
+3. In Codex, invoke **Coding Team**; enable addons only when you want them.
 4. Refresh the pool map after Codex model changes:
      ./install.sh --platform codex --refresh-map
 

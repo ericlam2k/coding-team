@@ -1,0 +1,6 @@
+interface:
+  display_name: "Stakeholder Update"
+  short_description: "Verified stakeholder status updates"
+  default_prompt: "Use $stakeholder-update to draft a verified stakeholder update."
+policy:
+  allow_implicit_invocation: false

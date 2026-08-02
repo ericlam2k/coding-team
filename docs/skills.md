@@ -2,6 +2,10 @@
 
 Start every task with **no** specialist skill (`none`). Load **one** primary skill only when the brief names its trigger. A second skill needs a separate unresolved question.
 
+Concern methods are not skills. Choose the lean concern method first; load an
+existing skill only when its named trigger remains necessary. Never load a
+skill merely because a brainstorm, debate, or `5 Whys` occurs.
+
 ## Bundled layout
 
 ```text
@@ -29,17 +33,22 @@ skills/
 | Lead | `context-engineering` (packets only), `code-review` (handoff check) |
 | Product Manager | `pm-execution`, `context-engineering` |
 | Advisor / Contradictor | usually `none` (+ packet if assigned) |
+| Domain Advisor | supplied domain evidence; `context-engineering` only for a named multi-source packet; one project-domain skill only when named |
 | Investigator | `context-engineering` for bounded investigation |
+| System Architect | `system-architecture`, `web-frameworks`, `backend-development`, `databases`, `debugging`, `context-engineering` |
 | Backend Engineer | `backend-development`, `databases`, `debugging`, `web-frameworks` |
 | Frontend/UX Lead | `hallmark`, `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
 | Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
-| Test Engineer | `web-testing`, `debugging` |
-| Docs Steward | `docs-seeker` |
+| Test Engineer | `web-testing`, `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
+| Docs Steward | `docs-seeker`, `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
 | Gatekeeper | `code-review` (read-only) |
 
 ## Debugging family
 
 `skills/quality/debugging/` counts as one primary with exactly one matching sub-skill initially (`systematic-debugging`, `root-cause-tracing`, `defense-in-depth`, `verification-before-completion`). Second failure may add `sequential-thinking`. Known-root-cause design deadlocks use `problem-solving`.
+
+PM Lean is default OFF and explicit-only: use at most one PM Lean skill per
+Product Manager task; it adds no routing, agents, or approval authority.
 
 ## Not bundled (add per project)
 

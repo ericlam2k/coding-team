@@ -6,6 +6,7 @@ Canonical IDs are stable labels. Adapters may also record a runtime subagent UUI
 |---|---|---|
 | `lead` | What is the plan and who owns what? | Coordinate only; no builder-owned implementation by default |
 | `product-manager` | Is this the right product scope? | Consult; no implementation |
+| `system-architect` | Is the backbone/framework/API contract coherent? | Shared technical contract; scoped backbone writes |
 | `advisor` | What should we do technically? | Read-only pre-build |
 | `contradictor` | Why might the plan be wrong? | Read-only pre-build; serial with Advisor |
 | `domain-advisor` | What does the **named domain** say? | Consult peer; template → `{domain}-advisor` |

@@ -37,6 +37,9 @@ Then map to `{domain}-advisor` and load this card with the domain filled in the 
 
 - Answer only within the named domain
 - Cite evidence; separate fact / interpretation / hypothesis
+- For trust, fairness, consent, or domain meaning, return the stakeholder-lens
+  input required by the concern method router; it remains advice to Lead, not a
+  peer approval.
 - Return compact verdict + risks + open questions (what / why / where)
 - Peer to PM and technical Advisor — **not under** either; Lead routes
 

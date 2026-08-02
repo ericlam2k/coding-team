@@ -1,0 +1,6 @@
+interface:
+  display_name: "System Architecture Review"
+  short_description: "ADR and NFR architecture review"
+  default_prompt: "Use $system-architecture for this bounded architecture review."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "PM Lean Experiment Design"
+  short_description: "Design a smallest safe product test"
+  default_prompt: "Use $pm-lean-experiment-design to design the smallest safe test for this assumption."
+policy:
+  allow_implicit_invocation: false
