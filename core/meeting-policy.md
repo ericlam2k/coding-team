@@ -59,8 +59,12 @@ artifact, stop condition, and clean-fixture strategy.
 
 Run a fresh TE pass after correction, then one sequential Gatekeeper review.
 `FAIL`, `BLOCKED`, insufficient evidence, or a non-approval stops for the
-human gate. “Test all” means all scenarios in the frozen Batch, not the whole
-repository on every loop.
+human gate. “Test all” means all required scenarios and selected layers in the
+frozen Batch, not the whole repository or every possible layer on every loop.
+
+The full traditional QA workflow and conditional layered-test matrix are in
+[qa-operating-model.md](qa-operating-model.md). Gatekeeper evidence is not
+production/release approval; human gates still apply.
 
 ## Meeting packet
 

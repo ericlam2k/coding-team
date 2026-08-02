@@ -61,3 +61,4 @@ On context pressure: checkpoint ≤300 words → shrink → fresh session → re
 
 Full policy: [`core/orchestration.md`](../core/orchestration.md).
 Material defect and mutation concerns: [`core/meeting-policy.md`](../core/meeting-policy.md).
+Layered QA and promotion evidence: [`core/qa-operating-model.md`](../core/qa-operating-model.md).

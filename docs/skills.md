@@ -65,6 +65,11 @@ contracts, or materially ambiguous acceptance:
 The complete no-mutation validation, correlation, and PIC routing policy is in
 [`core/meeting-policy.md`](../core/meeting-policy.md).
 
+Layer selection and QA evidence requirements are governed by
+[`core/qa-operating-model.md`](../core/qa-operating-model.md). The model adds
+no skills or automatic role calls; it only activates the named skill when its
+trigger applies.
+
 ## Debugging family
 
 `skills/quality/debugging/` counts as one primary with exactly one matching sub-skill initially (`systematic-debugging`, `root-cause-tracing`, `defense-in-depth`, `verification-before-completion`). Second failure may add `sequential-thinking`. Known-root-cause design deadlocks use `problem-solving`.
