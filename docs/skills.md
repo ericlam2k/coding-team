@@ -43,6 +43,28 @@ skills/
 | Docs Steward | `docs-seeker`, `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
 | Gatekeeper | `code-review` (read-only) |
 
+## Pre-build test-case development chain
+
+For user-facing workflows, input parsing/matching, AI extraction, public
+contracts, or materially ambiguous acceptance:
+
+1. Product Manager uses `pm-execution/user-stories` when the user outcome or
+   acceptance is unclear.
+2. Product Manager uses `pm-execution/pre-mortem` when failure, replay, stale
+   state, or fix–trial-loop risk is material. These are sequential conditional
+   skills, not a default pair.
+3. A named Domain Advisor supplies domain workflow, exception, fairness, and
+   recovery cases when triggered; it has no default specialist skill.
+4. Test Engineer uses
+   `skills/process/pm-execution/test-scenarios/` before builders to freeze the
+   user-observable matrix. This is design input only.
+5. Final Test Engineer execution uses `skills/quality/web-testing/` in a fresh
+   context; `skills/quality/debugging/` is added only when failures require
+   classification or root-cause tracing.
+
+The complete no-mutation validation, correlation, and PIC routing policy is in
+[`core/meeting-policy.md`](../core/meeting-policy.md).
+
 ## Debugging family
 
 `skills/quality/debugging/` counts as one primary with exactly one matching sub-skill initially (`systematic-debugging`, `root-cause-tracing`, `defense-in-depth`, `verification-before-completion`). Second failure may add `sequential-thinking`. Known-root-cause design deadlocks use `problem-solving`.

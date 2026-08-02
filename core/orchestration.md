@@ -145,8 +145,8 @@ Each batch names one **Functional Integration Owner**: the role accountable for 
 ## Default batch shape
 
 1. Brief + nature/tier classification
-2. Triggered concern method + consult: choose the smallest fitting method, start with one accountable role, and add one decision-changing specialist at a time (per [model-routing.md](model-routing.md))
-3. Conditional acceptance design: PM/domain input → pre-build Test Engineer scenario matrix
+2. Triggered concern method + consult: choose the smallest fitting method, start with one accountable role, and add one decision-changing specialist at a time (per [model-routing.md](model-routing.md)); use the bounded meeting rules in [meeting-policy.md](meeting-policy.md) for material defects, state risks, or cross-role conflicts
+3. Conditional acceptance design: PM `user-stories`/`pre-mortem` when triggered + Domain Advisor input → pre-build Test Engineer scenario matrix
 4. Human gate when required ([human-gates.md](human-gates.md))
 5. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))
 6. **Test Engineer** evidence in a fresh post-integration context
@@ -174,6 +174,10 @@ independent negative/adversarial cases, and Batch acceptance. A fresh Test
 Engineer validates before one sequential Gatekeeper re-review. Final TE
 `FAIL`/`BLOCKED`, insufficient fresh evidence, or a Gatekeeper verdict outside
 `APPROVE`/`APPROVE_WITH_NOTES` stops for the human gate.
+
+For the full participant, artifact, and PDCA rules, use
+[meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
+Batch matrix, not an unbounded repository-wide rerun.
 
 ## WIP, rotation, and context economy
 

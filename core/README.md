@@ -8,6 +8,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 |---|---|
 | [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
 | [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
+| [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
 | [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |

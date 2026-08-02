@@ -24,8 +24,14 @@ Load when the brief names them:
 
 - Produce accept/reject evidence for the batch (commands, results, gaps)
 - Before build, when assigned, freeze a user-observable scenario matrix from accepted PM input and any triggered Domain Advisor decision
+- The expected input chain is PM `user-stories` and, when risk warrants,
+  `pre-mortem`; Domain Advisor contributes named-domain edge cases. TE owns
+  `pm-execution/test-scenarios` and does not silently resolve missing product
+  or domain decisions.
 - Treat that matrix as design input, never final TE evidence; validate again in a fresh post-integration context
 - Classify: product defect / flake / env / bad brief — do not silently “fix forward” as Builder
+- During a validation pass, collect all in-scope findings before any correction;
+  return a correlation-ready packet rather than dispatching fixes.
 - Gatekeeper must not start until this evidence is accepted by Lead process
 
 ## Stop conditions

@@ -20,6 +20,10 @@ Load when the brief names them:
 ## Duties
 
 - Resolve ICP/problem, in/out of scope, success criteria
+- Use `pm-execution/user-stories` when user behavior or acceptance is unclear;
+  use `pm-execution/pre-mortem` for material failure, replay, stale-state, or
+  fix–trial-loop risk. Run these sequentially only when triggered, then hand
+  the accepted outcome and risks to Test Engineer.
 - Return a clear verdict: ready for build / validate first / defer / drop / human decision
 - Hand off open questions with what/why/where — do not invent preferences
 
