@@ -1,0 +1,6 @@
+interface:
+  display_name: "Acceptance Scenario Matrix"
+  short_description: "Freeze pre-build user acceptance scenarios"
+  default_prompt: "Use $test-scenarios to create and freeze a pre-build acceptance-scenario matrix."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Artifact Theme"
+  short_description: "Style non-product artifacts consistently"
+  default_prompt: "Use $artifact-theme to style this report with a restrained accessible theme."
+policy:
+  allow_implicit_invocation: false

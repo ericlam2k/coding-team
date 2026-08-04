@@ -39,6 +39,8 @@ The **Lead** (parent orchestrator) is the only role that:
 - Classifies **nature** (N0–N5 / Consult / Docs) and assigns **model tier**
 - Opens/closes batches, admits tasks, and enforces WIP / gates
 - Resolves Advisor vs Contradictor debates
+- Synthesizes PM, Domain Advisor, System Architect, and specialist input into
+  one recorded decision, owner, acceptance artifact, and next gate
 - Routes defects to the classified owner as corrected briefs
 - Does **not** implement product code or invent new roles
 
@@ -53,6 +55,16 @@ The Lead runs the most expensive context in the system. Its output is classifica
 - **Reason once, then hand off:** capture architecture/hypothesis thinking in the brief; do not re-derive it across turns.
 - **Spec-readiness test:** a run prompt you cannot finish writing (objective, files, interfaces, constraints, verification) means the decision is not made yet. That is Lead/Advisor work — never delegate the ambiguity to a cheaper tier.
 
+### Architecture-contract lane
+
+Before allocating builders, the Lead dispatches `system-architect` when a
+change establishes a shared multi-owner contract or crosses two or more of
+FE, API, BE, and DB layers. The Architect freezes one named contract; the Lead
+then allocates exclusive work and names the FIO. Builders implement against the
+frozen contract, TE validates, and Gatekeeper decides. Material drift routes
+**FIO → Lead → System Architect**. The Architect does not allocate, assemble,
+implement, validate, or accept.
+
 ## Canonical role IDs
 
 Use only these IDs (see `roles/`):
@@ -61,6 +73,7 @@ Use only these IDs (see `roles/`):
 |---|---|
 | `lead` | Lead |
 | `product-manager` | Product Manager |
+| `system-architect` | System Architect |
 | `advisor` | Advisor (technical, pre-build) |
 | `contradictor` | Contradictor |
 | `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
@@ -85,6 +98,7 @@ Never invent a new role **family**. Instantiating `[Domain]-Advisor` from the `d
 | Reviewer — final independent review | `gatekeeper` |
 | Reviewer — non-final domain/UX/code feedback | Existing accountable functional owner |
 | Pre-build technical judgment | `advisor` |
+| Backbone, framework, API, data, or shared-contract ownership | `system-architect` |
 | Pre-build challenge | `contradictor` |
 | Talent / Talent-Career / employment-domain consult | `talent-advisor` (Domain Advisor instance) — or **ask** if domain unclear |
 | Strategic / strategy consult | `strategic-advisor` — or **ask** |
@@ -103,6 +117,30 @@ If no predefined role or Domain Advisor instance can safely own the task → `HU
 | Batch checkpoint | **300** |
 
 Prefer path/line evidence pointers over pasted dumps. Shrink the packet before escalating tier. Default each specialist run to a **fresh** session; continue only for one immediate follow-up that depends on unpersisted local reasoning and still fits the cap.
+
+## Task-size metric: when to split instead of waiting
+
+“Long” is an operational threshold, not a feeling. Measure from role start to
+the first complete artifact or stop reason (excluding human approval or queue
+wait). A Task is **too long** when it is expected to exceed the 120-second
+target, reaches 180 seconds without a complete artifact, or needs a second
+follow-up after its one permitted immediate handoff. At 240 seconds it is
+`BLOCKED` and must stop.
+
+A Task is **too wide** when any of these is true:
+
+- it has more than one accountable role or more than one independent concern;
+- it needs non-disjoint writers, crosses an unstable shared contract, or has no
+  single acceptance artifact;
+- its run prompt would exceed 250 words, its handoff would exceed 150 words,
+  or the stop condition cannot be stated in one sentence.
+
+Before starting, split a too-long/too-wide Task into dependency-safe slices
+with exclusive files, one owner, one acceptance artifact, and one stop
+condition. During a run, emit a checkpoint at 180 seconds or when a metric is
+crossed: completed work, evidence, unresolved question, and exactly one next
+bounded Task. The Lead hands that slice off; it does not silently extend the
+context, retry the same mutation loop, or leave the original Task frozen.
 
 ## Skill loading
 
@@ -140,13 +178,40 @@ Each batch names one **Functional Integration Owner**: the role accountable for 
 
 ## Default batch shape
 
-1. Brief + nature/tier classification  
-2. Optional Investigator / PM / Advisor / Contradictor (per [model-routing.md](model-routing.md))  
-3. Human gate when required ([human-gates.md](human-gates.md))  
-4. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))  
-5. **Test Engineer** evidence  
-6. **Gatekeeper** accept / revise / block  
-7. Docs Steward if durable docs are in scope  
+1. Brief + nature/tier classification
+2. Triggered concern method + consult: choose the smallest fitting method, start with one accountable role, and add one decision-changing specialist at a time (per [model-routing.md](model-routing.md)); use the bounded meeting rules in [meeting-policy.md](meeting-policy.md) for material defects, state risks, or cross-role conflicts
+3. Conditional acceptance design: PM `user-stories`/`pre-mortem` when triggered + Domain Advisor input → pre-build Test Engineer scenario matrix
+4. Human gate when required ([human-gates.md](human-gates.md))
+5. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))
+6. **Test Engineer** evidence in a fresh post-integration context
+7. **Gatekeeper** accept / revise / block
+8. Docs Steward if durable docs are in scope
+
+Use acceptance design for user-facing workflows, input parsing/matching, AI
+extraction, public contracts, or materially ambiguous acceptance. PM supplies
+user outcomes, personas, and acceptance criteria; a Domain Advisor supplies
+named-domain meaning only when triggered. Test Engineer freezes an observable
+scenario matrix before builders. It is implementation input, not final TE
+evidence. For suitable deterministic unit, contract, or component cases,
+builder briefs require selective red-green-refactor; do not force E2E-first.
+
+### Corrective batch loop
+
+Each Test Engineer or Gatekeeper pass collects all in-scope findings before
+issuing its result; Lead does not dispatch fixes mid-pass. Human approval
+enumerates correction scope; new defects or scope expansion require a new gate.
+Cluster findings by demonstrated root cause, never symptom similarity. Keep a
+corrective Batch one integrable slice; queue cross-contract findings as
+provisional Batches. Preserve or add one failing regression per finding where
+feasible, reintegrate once, then run targeted checks, affected regressions,
+independent negative/adversarial cases, and Batch acceptance. A fresh Test
+Engineer validates before one sequential Gatekeeper re-review. Final TE
+`FAIL`/`BLOCKED`, insufficient fresh evidence, or a Gatekeeper verdict outside
+`APPROVE`/`APPROVE_WITH_NOTES` stops for the human gate.
+
+For the full participant, artifact, and PDCA rules, use
+[meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
+Batch matrix, not an unbounded repository-wide rerun.
 
 ## WIP, rotation, and context economy
 
@@ -162,6 +227,12 @@ Parallel tasks require satisfied dependencies, stable contracts, disjoint files,
 
 Do not create standing coordinators, shadows, helpers, or consolidation agents. Every contributor owns a normal task-list item with exclusive deliverable and stop condition. When queueing blocks the critical path, re-sequence or split — optionally use cheap-utility temporary cells under the same WIP cap with one accountable synthesizer.
 
+If a task is too wide for one bounded run, split it into small dependency-safe
+Tasks with exclusive files, explicit acceptance, and a stop condition. Hand off
+the completed slice with evidence, unresolved questions, and the next bounded
+Task. Do not leave an oversized task frozen, silently extend its context, or
+restart it without a checkpoint.
+
 Urgent work uses an explicit **expedite batch** after checkpointing the active batch — never silent injection.
 
 ## Time budget and semantic status
@@ -169,6 +240,10 @@ Urgent work uses an explicit **expedite batch** after checkpointing the active b
 - Target ~120s when practical
 - At ~180s → `PARTIAL` with evidence, unresolved question, next bounded step
 - At ~240s → cancel or split rather than waiting out the provider
+- Bounded QA uses a 120s target / 240s hard stop. A timed-out validation
+  records `BLOCKED` evidence and one next action; Lead hands off one smaller
+  follow-up Task instead of leaving the batch frozen. It never auto-retries or
+  starts Gatekeeper.
 - Transport `completed` with empty/malformed/timeout content → `FAILED_TRANSIENT` (not accepted work)
 
 ## Adapter note

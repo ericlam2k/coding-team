@@ -9,28 +9,34 @@
 ## v2 notes
 
 - **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
-- **Installation:** `./bin/ct init` **suggests** a model map and **shows it for your approval** before writing. Use `--yes` only when you intentionally skip the prompt.
+- **Installation:** `scripts/install-coding-team.sh` activates the lightweight Hybrid profile by default. The optional Full profile uses `bin/ct init --full` and is mutually exclusive with Hybrid.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./bin/ct init
+./scripts/install-coding-team.sh --profile hybrid --platform codex
 ```
 
-You will see a suggested tier → slug table, then:
+Hybrid links only the platform adapter and conditional QA skill. It does not
+refresh model maps or enable addons. To opt into the full framework:
 
-```text
-Approve and write this model map? [Y/n]:
+```bash
+./scripts/install-coding-team.sh --profile full --platform codex
 ```
 
 ```bash
-./bin/ct init --yes              # auto-approve (CI)
-./bin/ct init --platform cursor
-./bin/ct init --full             # + caveman/ponytail (Codex)
+./scripts/install-coding-team.sh --profile hybrid --platform cursor
+./scripts/install-coding-team.sh --profile full --platform codex
+./scripts/install-coding-team.sh --check --profile hybrid --platform codex
 ./bin/ct status
 ```
+
+Profiles are toggled by rerunning the installer. The marker at
+`$CODEX_HOME/coding-team.profile` records the active profile; switching back to
+Hybrid removes only addon links owned by this checkout. `bin/ct init` remains
+available for advanced, interactive model-map setup.
 
 ## What this is
 

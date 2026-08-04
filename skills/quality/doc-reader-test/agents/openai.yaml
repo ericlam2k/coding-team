@@ -1,0 +1,6 @@
+interface:
+  display_name: "Document Reader Test"
+  short_description: "Fresh-context test for major documents"
+  default_prompt: "Use $doc-reader-test to validate this architecture document for its intended readers and decision."
+policy:
+  allow_implicit_invocation: false

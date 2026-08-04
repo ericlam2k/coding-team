@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "qa_required": true,
+  "qa_mode": "bounded",
+  "batch_id": "B-TEST-TIMEOUT-FINAL",
+  "state": "COMPLETE",
+  "state_history": ["DRAFT", "FROZEN_FOR_BUILD", "BUILDING", "VALIDATING", "TRIAGED", "REVIEW", "COMPLETE"],
+  "scenario_baseline": {"status": "Frozen for build", "id": "SC-TIMEOUT-FINAL", "sha256": "abc123"},
+  "scope": {"wip_max": 2, "disjoint_writes": true, "selected_layers": ["unit", "integration", "regression"]},
+  "timebox": {
+    "soft_seconds": 120,
+    "hard_seconds": 240,
+    "outcome": "TIMEOUT",
+    "stop_reason": "The pass timed out",
+    "next_actions": ["Split the batch"]
+  },
+  "layers": [
+    {"name": "unit", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["unit.log"]},
+    {"name": "component", "mandatory": false, "result": "N/A", "skip_reason": "No component boundary", "evidence_refs": []},
+    {"name": "integration", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["integration.log"]},
+    {"name": "system_e2e", "mandatory": false, "result": "N/A", "skip_reason": "No UI route", "evidence_refs": []},
+    {"name": "acceptance", "mandatory": false, "result": "N/A", "skip_reason": "Acceptance unchanged", "evidence_refs": []},
+    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": ["regression.log"]},
+    {"name": "nonfunctional", "mandatory": false, "result": "N/A", "skip_reason": "No NFR trigger", "evidence_refs": []}
+  ],
+  "validation": {"result": "PASS", "validated_commit": "abcdef1", "working_tree_clean": true, "all_findings_collected": true},
+  "findings": [],
+  "correlation": {"complete": true, "root_cause_refs": [], "corrective_batch_id": ""},
+  "regression": {"result": "PASS", "case_refs": ["SC-TIMEOUT-FINAL"]},
+  "gatekeeper": {"decision": "APPROVE", "reviewed_commit": "abcdef1"},
+  "human_gate": {"required": false, "approved": false, "reference": ""}
+}

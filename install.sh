@@ -20,12 +20,16 @@ Usage:
   ./install.sh --platform codex [--global] [--project <path>] [--refresh-map]
                [--enable <addon[,addon...]>] [--disable <addon[,addon...]>]
 
+Recommended profile install:
+  ./scripts/install-coding-team.sh --profile hybrid --platform codex
+  ./scripts/install-coding-team.sh --profile full --platform codex
+
 Options:
   --platform codex|cursor|cline   Target runtime (only codex in v1)
   --global                        Symlink adapters/codex → $CODEX_HOME/skills/coding-team
   --project <path>                Append AGENTS.md coding-team pointer into a consumer project
   --refresh-map                   Re-run model pool detect/apply (skill target + examples/)
-  --enable NAME[,NAME...]         Enable standalone addons (caveman, ponytail). Default OFF.
+  --enable NAME[,NAME...]         Enable standalone addons (caveman, ponytail, pm-lean). Default OFF.
   --disable NAME[,NAME...]        Disable standalone addons (removes Codex skill symlinks)
   -h, --help                      Show this help
 
@@ -109,6 +113,9 @@ CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 
 SKILL_SRC="$ROOT/adapters/codex"
 SKILL_DST="$CODEX_HOME/skills/coding-team"
+QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
+QA_SKILL_DST="$CODEX_HOME/skills/qa-evidence-enforcement"
+QA_VALIDATOR="$ROOT/scripts/validate-qa-evidence.rb"
 DETECT="$SKILL_SRC/scripts/detect-model-pool.py"
 APPLY="$SKILL_SRC/scripts/apply-pool-map.py"
 EXAMPLE_MAP="$ROOT/examples/model-pool.map.codex.example.md"
@@ -117,6 +124,8 @@ TOGGLES="$ROOT/addons/toggles.json"
 
 [[ -d "$SKILL_SRC" ]] || die "missing adapter: $SKILL_SRC"
 [[ -f "$DETECT" && -f "$APPLY" ]] || die "missing pool scripts under adapters/codex/scripts/"
+[[ -f "$QA_SKILL_SRC/SKILL.md" ]] || die "missing QA enforcement skill: $QA_SKILL_SRC/SKILL.md"
+[[ -f "$QA_VALIDATOR" ]] || die "missing QA evidence validator: $QA_VALIDATOR"
 
 link_path() {
   local src="$1" dst="$2"
@@ -153,6 +162,8 @@ unlink_path() {
 
 link_skill() {
   link_path "$SKILL_SRC" "$SKILL_DST"
+  link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
+  echo "QA evidence enforcement: conditional skill + validator installed"
 }
 
 set_toggle() {
@@ -190,8 +201,13 @@ enable_addon() {
       set_toggle ponytail true
       link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
       ;;
+    pm-lean)
+      set_toggle pm-lean true
+      link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
+      link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
+      ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail)"
+      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
       ;;
   esac
 }
@@ -209,8 +225,13 @@ disable_addon() {
       set_toggle ponytail false
       unlink_path "$CODEX_HOME/skills/ponytail"
       ;;
+    pm-lean)
+      set_toggle pm-lean false
+      unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
+      unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
+      ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail)"
+      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
       ;;
   esac
 }
@@ -330,9 +351,11 @@ Next steps
      ./install.sh --platform codex --global --enable caveman
      ./install.sh --platform codex --global --enable ponytail
      ./install.sh --platform codex --global --enable caveman,ponytail
+     ./install.sh --platform codex --global --enable pm-lean
      ./install.sh --platform codex --global --disable caveman
+     ./install.sh --platform codex --global --disable pm-lean
    State file: $TOGGLES
-3. In Codex, invoke **Coding Team**; enable caveman/ponytail only when you want them.
+3. In Codex, invoke **Coding Team**; enable addons only when you want them.
 4. Refresh the pool map after Codex model changes:
      ./install.sh --platform codex --refresh-map
 

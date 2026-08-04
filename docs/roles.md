@@ -6,6 +6,7 @@ Canonical IDs are stable labels. Adapters may also record a runtime subagent UUI
 |---|---|---|
 | `lead` | What is the plan and who owns what? | Coordinate only; no builder-owned implementation by default |
 | `product-manager` | Is this the right product scope? | Consult; no implementation |
+| `system-architect` | What frozen contract governs this cross-layer/shared change? | One named architecture contract only; no product-code or FIO work |
 | `advisor` | What should we do technically? | Read-only pre-build |
 | `contradictor` | Why might the plan be wrong? | Read-only pre-build; serial with Advisor |
 | `domain-advisor` | What does the **named domain** say? | Consult peer; template → `{domain}-advisor` |
@@ -29,6 +30,10 @@ There is **no** fixed Talent-Career role in this framework. When specialty judgm
 3. Load `core/roles/domain-advisor.md` with that instance id in the brief.
 
 Domain Advisor is a peer to PM — not under PM or technical Advisor; no implementation; no Gatekeeper power.
+
+For a shared multi-owner or 2+ FE/API/BE/DB-layer change, the System Architect
+must freeze [`core/templates/architecture-contract.md`](../core/templates/architecture-contract.md)
+before Lead allocation. Material drift returns FIO → Lead → System Architect.
 
 ## Authority rules
 

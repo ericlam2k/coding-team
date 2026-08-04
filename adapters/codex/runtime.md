@@ -10,6 +10,7 @@ Lead (this skill) classifies nature, writes a ≤250-word run prompt, and spawns
 | `advisor` | N2/N4/N5 direction | Subagent, read-only | 2 | Pre-build verdict; never implements or Gatekeeps |
 | `contradictor` | Required N2/N4/N5 debate | Subagent, read-only | 2 | **Serial after Advisor**; never parallel with Advisor under WIP |
 | `product-manager` | Ambiguous product scope | Subagent | 2 | Consult peer; not under Advisor |
+| `system-architect` | Shared multi-owner contract or ≥2 FE/API/BE/DB layers | Subagent, writes one named contract | 2 | Contract before Lead allocates; not FIO, builder, TE, or Gatekeeper |
 | `backend-engineer` | Server/API/persistence | Subagent, write to owned paths | 1 build | Exclusive file ownership |
 | `frontend-builder` | UI implement after UX contract | Subagent, write to owned paths | 1 build | No product/UX direction ownership |
 | `frontend-ux-lead` | Journey/UX contract | Subagent | 1–2 | Contract first; implement only if brief assigns writes |

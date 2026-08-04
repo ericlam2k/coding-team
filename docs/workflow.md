@@ -6,8 +6,10 @@
 Human goal
   → Lead classifies natures + proposes Sprint
   → Admit Batch READY (freeze validation + ownership)
+  → PM/domain decisions → TE scenario matrix
   → Delegate Tasks (WIP ≤ 2)
-  → Integrate → Test Engineer → Gatekeeper
+  → Integrate → complete TE pass → correlate → one corrective Batch if needed
+  → fresh Test Engineer → Gatekeeper
   → Checkpoint / next Batch or Sprint close
 ```
 
@@ -58,3 +60,5 @@ Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.
 On context pressure: checkpoint ≤300 words → shrink → fresh session → reload checkpoint + brief + named paths only.
 
 Full policy: [`core/orchestration.md`](../core/orchestration.md).
+Material defect and mutation concerns: [`core/meeting-policy.md`](../core/meeting-policy.md).
+Hybrid QA and promotion evidence: [`core/qa-operating-model.md`](../core/qa-operating-model.md).

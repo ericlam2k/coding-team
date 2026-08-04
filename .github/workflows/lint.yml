@@ -22,3 +22,5 @@ jobs:
       # Soft lint for v0.1 — do not fail the whole tree of vendored skills yet
       - name: note
         run: echo "Docs lint completed (vendored skills excluded)."
+      - name: QA evidence validator fixtures
+        run: ruby scripts/qa-evidence-tests/run.rb

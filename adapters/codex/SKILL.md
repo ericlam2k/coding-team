@@ -31,11 +31,19 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
 - **WIP ≤ 2** concurrent tool-using subagents; prefer a queue of small Tasks over raising the cap
 - **Test Engineer → Gatekeeper** sequential (never simultaneous)
 - Incomplete / non-APPROVE → **stop and ask the human** (no auto-chain)
+- Shared-contract or 2+ layer change → dispatch `system-architect` before builders; it writes one named contract only, then FIO assembles against it.
+- Oversized or timed-out work → split into a bounded Task and hand off the
+  checkpoint; do not leave it frozen or silently extend the run.
 - **Lead cost discipline:** emit judgment and briefs — not implementation code; defects return as corrected briefs; apply the **spec-readiness test** before dispatch
 - Human gates for commit, push, Production deploy, destructive ops, new dependencies
 - Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
 - Model tiers are **non-binding**: use only an **approved** `model-pool.map.md` (written after install suggestion + human approve). Record planned → actual; never block start on a missing slug
 - Skills start at `none`; honor **skill overrides** in `core/orchestration.md`
+- When `qa_required=true` or `qa_mode=bounded`, load
+  `$CODING_TEAM_ROOT/skills/quality/qa-evidence-enforcement/` after TE
+  execution and run the evidence validator before Gatekeeper. Bounded TE
+  passes use a 120-second target / 240-second hard stop; timeout returns
+  `BLOCKED` and queues one smaller next step rather than retrying.
 - **Addons default OFF:** do **not** load `caveman` or `ponytail` unless enabled (`./bin/ct enable`) or the human asks. Packs live under `$CODING_TEAM_ROOT/addons/` — never inject into core briefs
 - Platform independence: core has no host slugs; this file is the Codex adapter only
 
@@ -49,7 +57,7 @@ Prefer the Tier **0** mapped slug (usually `gpt-5.6-luna`) for Investigator, low
 2. Assign lowest capable **tier**; resolve slug from `model-pool.map.md`
 3. Normalize aliases (Explorer→Investigator, etc.); never invent roles
 4. Create/update the batch task list; delegate one role per task via [runtime.md](runtime.md)
-5. Integrate → Test Engineer → Gatekeeper
+5. Integrate → Test Engineer → bounded QA evidence validation when triggered → Gatekeeper
 6. On incomplete output: ask human; do not invent an APPROVE
 
 ## Refresh map

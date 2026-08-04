@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "qa_required": true,
+  "qa_mode": "bounded",
+  "batch_id": "B-TEST-004",
+  "state": "COMPLETE",
+  "state_history": ["DRAFT", "FROZEN_FOR_BUILD", "BUILDING", "VALIDATING", "TRIAGED", "REVIEW", "COMPLETE"],
+  "scenario_baseline": {"status": "Frozen for build", "id": "SC-004", "sha256": "abc123"},
+  "scope": {"wip_max": 2, "disjoint_writes": true, "selected_layers": ["unit", "integration", "regression"]},
+  "timebox": {"soft_seconds": 120, "hard_seconds": 240, "outcome": "COMPLETE", "stop_reason": "", "next_actions": []},
+  "layers": [
+    {"name": "unit", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
+    {"name": "component", "mandatory": false, "result": "N/A", "skip_reason": "No component", "evidence_refs": []},
+    {"name": "integration", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
+    {"name": "system_e2e", "mandatory": false, "result": "N/A", "skip_reason": "No UI", "evidence_refs": []},
+    {"name": "acceptance", "mandatory": false, "result": "N/A", "skip_reason": "Unchanged", "evidence_refs": []},
+    {"name": "regression", "mandatory": true, "result": "PASS", "skip_reason": "", "evidence_refs": []},
+    {"name": "nonfunctional", "mandatory": false, "result": "N/A", "skip_reason": "No trigger", "evidence_refs": []}
+  ],
+  "validation": {"result": "PASS", "validated_commit": "abcdef1", "working_tree_clean": true, "all_findings_collected": true},
+  "findings": [{"id": "F-1", "scenario_id": "SC-004", "classification": "PRODUCT_DEFECT", "status": "deferred", "expected": "no mutation", "actual": "mutation occurred", "evidence_refs": ["failure.log"], "regression_case_refs": []}],
+  "correlation": {"complete": true, "root_cause_refs": ["R-1"], "corrective_batch_id": "B-CORRECT-1"},
+  "regression": {"result": "PASS", "case_refs": []},
+  "gatekeeper": {"decision": "APPROVE", "reviewed_commit": "abcdef1"},
+  "human_gate": {"required": false, "approved": false, "reference": ""}
+}
