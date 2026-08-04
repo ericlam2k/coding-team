@@ -27,6 +27,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [roles/contradictor.md](roles/contradictor.md) | `contradictor` |
 | [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` |
 | [roles/investigator.md](roles/investigator.md) | `investigator` |
+| [roles/system-architect.md](roles/system-architect.md) | `system-architect` |
 | [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
 | [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |
 | [roles/frontend-builder.md](roles/frontend-builder.md) | `frontend-builder` |
@@ -47,12 +48,13 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |
+| [templates/architecture-contract.md](templates/architecture-contract.md) | Named architecture contract before allocation |
 
 ## Skills layout (this repo)
 
 | Tree | Contents |
 |---|---|
-| `skills/engineering/` | Backend, frontend, frameworks, performance, styling, data, devops |
+| `skills/engineering/` | Backend, frontend, system architecture, frameworks, performance, styling, data, devops |
 | `skills/quality/` | Testing, review, debugging, bounded QA evidence, problem-solving, sequential thinking |
 | `skills/process/` | Context engineering, docs seeker, PM execution |
 | `skills/design/` | Hallmark + awesome-design-md (paired), ui-ux-pro-max, aesthetic, frontend-design |

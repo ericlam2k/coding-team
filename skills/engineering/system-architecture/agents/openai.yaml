@@ -1,6 +1,6 @@
 interface:
-  display_name: "System Architecture Review"
-  short_description: "ADR and NFR architecture review"
-  default_prompt: "Use $system-architecture for this bounded architecture review."
+  display_name: "System Architecture"
+  short_description: "Freeze cross-layer architecture contracts before allocation."
+  default_prompt: "Use $system-architecture to freeze the named cross-layer architecture contract without implementing product code."
 policy:
   allow_implicit_invocation: false

@@ -55,6 +55,16 @@ The Lead runs the most expensive context in the system. Its output is classifica
 - **Reason once, then hand off:** capture architecture/hypothesis thinking in the brief; do not re-derive it across turns.
 - **Spec-readiness test:** a run prompt you cannot finish writing (objective, files, interfaces, constraints, verification) means the decision is not made yet. That is Lead/Advisor work — never delegate the ambiguity to a cheaper tier.
 
+### Architecture-contract lane
+
+Before allocating builders, the Lead dispatches `system-architect` when a
+change establishes a shared multi-owner contract or crosses two or more of
+FE, API, BE, and DB layers. The Architect freezes one named contract; the Lead
+then allocates exclusive work and names the FIO. Builders implement against the
+frozen contract, TE validates, and Gatekeeper decides. Material drift routes
+**FIO → Lead → System Architect**. The Architect does not allocate, assemble,
+implement, validate, or accept.
+
 ## Canonical role IDs
 
 Use only these IDs (see `roles/`):

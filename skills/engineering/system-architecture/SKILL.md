@@ -1,56 +1,43 @@
 ---
 name: system-architecture
-description: Review or design system architecture through bounded ADRs, non-functional requirements, technology trade-offs, scalability, and resilience checks. Use for shared contracts, framework or database decisions, migrations, cross-module changes, production-readiness reviews, and architecture conformance audits.
+description: Freeze or review a named host-neutral architecture contract before allocation when a change spans two or more FE, API, BE, or DB layers or changes a shared multi-owner contract. Define boundaries, ownership, lifecycle, failures, safeguards, integration order, and verification without implementing product code.
 ---
 
-# System Architecture Review
+# System Architecture
 
-Use this skill only as the System Architect's primary skill for a named
-architecture concern. Coding Team remains the sole router: this skill does not
-create `/flow:*` commands, a backlog runtime, extra agents, or new approval
-authority.
+Use this skill only as the System Architect's primary skill for the named
+architecture-contract task. Coding Team remains the sole router: this skill
+does not create another runtime, agents, or approval authority.
 
 ## Workflow
 
-1. Read the current architecture baseline, relevant ADRs, product/domain
-   contract, role brief, implementation evidence, and human gates before
-   proposing a change. Prefer path/line evidence over copied source.
-2. State the architecture concern, affected boundaries, constraints, current
-   behavior, assumptions, and the smallest reversible decision.
-3. Check the six NFR lenses when they can change the decision: performance,
+1. Confirm the trigger and named artifact path in the Lead brief. If fewer than
+   two FE/API/BE/DB layers and no shared multi-owner contract are affected,
+   stop and route to the smallest accountable role.
+2. Read only the named governing references, existing interfaces, relevant
+   evidence, human gates, and `core/templates/architecture-contract.md`.
+3. Freeze a concise contract covering every template heading. Mark unknowns,
+   assumptions, and ownership rather than inventing product requirements.
+4. Check the six NFR lenses only when they can change the decision: performance,
    availability/recovery, security/privacy, scalability, maintainability/test,
-   and operability/observability. Mark a lens `not decision-changing` with a
-   reason when appropriate; never invent targets without evidence.
-4. For technology choices, compare only viable options with a compact weighted
-   matrix: product/architecture fit, correctness and data integrity,
-   security/privacy, operability, cost, and migration/reversibility. Record
-   weights, evidence, residual risk, and the cheapest validation experiment.
-5. For a consequential choice, write or update one ADR under `docs/adr/` (or
-   the repository's named architecture artifact) with context, decision,
-   alternatives, consequences, NFR impact, migration/rollback, and acceptance
-   evidence. Inspect related ADRs first and preserve still-valid decisions.
-6. Apply scalability and resilience checks only when the concern triggers
-   them. Prefer the smallest measured control: timeout, idempotency, bounded
-   retry, recovery proof, or a clear manual fallback. Do not introduce CQRS,
-   event sourcing, circuit breakers, microservices, queues, or caching merely
-   because the pattern is available.
-7. Return a contract-ready handoff: decision, owned seams, invariants, API/data
-   changes, security/privacy controls, migration risk, test hooks, owner,
-   planned→actual model/skill, and stop condition.
+   and operability/observability. Never invent targets without evidence.
+5. For consequential choices, compare only viable options with a compact matrix
+   covering fit, correctness/data integrity, security/privacy, operability,
+   cost, and migration/reversibility. Record residual risk and the cheapest
+   validation experiment.
+6. Write or update exactly one named contract/ADR. Do not edit product code,
+   allocate builders, integrate work, or issue validation/acceptance decisions.
+7. Return the artifact to the Lead. Material implementation drift returns
+   **FIO → Lead → System Architect**; builders do not silently revise it.
 
-## Decision record template
+## Evidence and output
 
 ```text
-Concern and user/business outcome
-Evidence and current behavior
-Constraints and assumptions
-Options and weighted trade-offs
-Decision: Proceed | Modify | Reject | More evidence
-NFR impact: performance / availability / security / scalability / maintainability / operability
-Data/API/module invariants
-Migration, rollback, and residual risk
-Cheapest validation experiment
-Owner, acceptance artifact, and stop condition
+- Label material claims `verified`, `reasoned-not-tested`, or `not-verified`.
+- Record planned → actual model capability and any `full`, `reduced`,
+  `read-only`, or `planning-only` downshift.
+- Return one named contract plus a ≤150-word handoff with evidence labels,
+  unresolved gates, residual risk, and next owner.
 ```
 
 ## Coding Team boundaries
@@ -58,6 +45,8 @@ Owner, acceptance artifact, and stop condition
 - System Architect owns the technical contract; Lead owns cross-role
   synthesis/admission. PM and project-domain roles advise on meaning; they do
   not approve architecture.
+- FIO assembles against the frozen contract. The Architect is not FIO and does
+  not allocate, integrate, validate, or accept.
 - Add Advisor for non-obvious or high-leverage direction. Add Contradictor
   after Advisor for material conflict, shared/public contracts,
   security/privacy, costly reversal, or explicit challenge. Keep debate serial.

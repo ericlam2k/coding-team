@@ -36,7 +36,7 @@ skills/
 | Advisor / Contradictor | usually `none` (+ packet if assigned) |
 | Domain Advisor | supplied domain evidence; `context-engineering` only for a named multi-source packet; one project-domain skill only when named |
 | Investigator | `context-engineering` for bounded investigation |
-| System Architect | `system-architecture`, `web-frameworks`, `backend-development`, `databases`, `debugging`, `context-engineering` |
+| System Architect | `engineering/system-architecture` only for the cross-layer/shared-contract trigger; add another named skill only for a distinct unresolved question |
 | Backend Engineer | `backend-development`, `databases`, `debugging`, `web-frameworks` |
 | Frontend/UX Lead | `hallmark`, `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
 | Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |

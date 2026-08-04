@@ -59,7 +59,7 @@ For triggered **N1/N2/N5** user-facing workflows, input parsing or matching, AI 
 | **Domain Advisor** | What does the named domain say? | Consult (peer to PM) |
 | **Gatekeeper** | Can this be accepted as done? | After implement + evidence |
 | **Product Manager** | Product scope / acceptance | Consult |
-| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; integration owner when assigned |
+| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO assembles |
 
 ## Lean concern routing
 
