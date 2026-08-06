@@ -14,7 +14,7 @@ The default **Hybrid** profile is the low-cost, platform-independent activation:
   skill;
 - keeps the active hybrid QA policy, WIP ≤2, disjoint writes, and TE →
   Gatekeeper sequencing;
-- does not refresh a model map or enable caveman/ponytail addons.
+- does not refresh a model map or enable addons.
 
 The optional **Full** profile is a separate install mode:
 
@@ -22,8 +22,9 @@ The optional **Full** profile is a separate install mode:
 ./scripts/install-coding-team.sh --profile full --platform codex
 ```
 
-Full delegates to `bin/ct init --full`, including model-map approval and
-supported Codex addons. Switch back explicitly:
+Full delegates to `bin/ct init --full` for full Codex setup. Addons remain
+explicit and setup is still model-map-free; mapping is a separate explicit
+action. Switch back explicitly:
 
 ```bash
 ./scripts/install-coding-team.sh --profile hybrid --platform codex
@@ -42,19 +43,27 @@ exceed 120 seconds or cross the width limits, checkpoint at 180 seconds, and
 hard-stop at 240 seconds with one bounded handoff. Full mode does not bypass
 WIP ≤2, disjoint writes, or TE → Gatekeeper sequencing.
 
-For direct interactive model-map management without profile switching, the
+For direct setup and model-map management without profile switching, the
 advanced commands remain available:
 
 ```bash
-./bin/ct init
-./bin/ct init --yes              # skip prompt (CI)
-./bin/ct init --platform cursor
-./bin/ct refresh                 # new suggestion + approve again
+./bin/ct init                    # adapter/QA setup only; no map write
+./bin/ct init --yes              # compatibility flag; still no map write
+./bin/ct map propose             # print a proposal; no write
+./bin/ct map approve --yes       # explicit approval; write declared outputs
+./bin/ct map decline             # no write
+./bin/ct refresh --yes           # compatibility alias for explicit approval
 ```
 
 ## Why approve the map?
 
-Core is **platform-independent** (abstract tiers only). Host slugs differ (Codex GPT Luna/Terra/Sol vs Cursor pool vs Cline). The installer **suggests** a mapping; you confirm so a bad auto-pick never silently becomes policy.
+Core is **platform-independent** (abstract tiers only). Host slugs differ by
+adapter. For this WYSY Codex installer, the approved map excludes Terra and
+uses `gpt-5.6-luna` at `max` for Tier 1 build and validate (the current
+frontend, backend, and Test Engineer build/validate path). Cursor/Cline pools
+remain separate adapter suggestions. Mapping is optional metadata; you
+explicitly propose and approve it so a bad auto-pick never silently becomes
+policy. Missing or declined mapping does not block planning.
 
 ## Activate
 
@@ -92,6 +101,6 @@ continues to invoke the same Hybrid Codex path for existing automation.
 
 | Symptom | Fix |
 |---|---|
-| Map not written | Hybrid does not write maps; choose `--profile full` or run `./bin/ct refresh` |
+| Map not written | Both profiles are map-free; run `./bin/ct map propose` then `./bin/ct map approve` (or `./bin/ct refresh --yes`) |
 | Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --profile <profile> --platform <name>` |
-| Non-interactive refused | Add `--yes` to the advanced `bin/ct` command |
+| Non-interactive map approval refused | Add `--yes` to `bin/ct map approve` or `bin/ct refresh`; `init --yes` never approves a map |

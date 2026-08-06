@@ -14,7 +14,7 @@ Standard Lean/Kanban/Agile names the management ideas; this framework remains th
 | Batch | Small batch | One integrable slice with known acceptance |
 | Task | Work item / story slice | Spec-ready brief with stop condition |
 | Sprint | Cadence / planning box | Coordination window — not story-point theater |
-| PDCA + experiments + performance log | Kaizen | Root cause + named PIC → plan → observe → re-evaluate → **consolidate** (bake or close) |
+| PDCA + experiments + performance log | Kaizen | Root cause + named PIC → plan → observe → re-evaluate → **consolidate** (bake or close); see [learning-and-distillation.md](learning-and-distillation.md) |
 | Gatekeeper after TE | Quality gate / Definition of Done | Evidence first; TE → Gatekeeper sequential |
 | Human gates | Pull / stop-the-line | Irreversible actions need explicit human approval |
 
@@ -78,6 +78,7 @@ Use only these IDs (see `roles/`):
 | `contradictor` | Contradictor |
 | `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
 | `investigator` | Investigator |
+| `monitor-agent` | Monitor Agent (run trace and cost visibility) |
 | `backend-engineer` | Backend Engineer |
 | `frontend-ux-lead` | Frontend UX Lead |
 | `frontend-builder` | Frontend Builder |
@@ -148,6 +149,14 @@ context, retry the same mutation loop, or leave the original Task frozen.
 - Paths are relative to this repo: `skills/engineering/…`, `skills/quality/…`, `skills/process/…`, `skills/design/…`.
 - One primary skill per task; a second requires a separately recorded unresolved question.
 - Do not auto-load every skill because Lead or multi-agent work is happening.
+- The stable policy bundle is a separate session/context concern. The Codex
+  adapter may reuse an unchanged policy manifest after a verified cache `HIT`,
+  but this does not cache task facts, role-card bytes, system instructions, or
+  host tools. A missing/changed policy file, new session, context loss or
+  compaction, high-risk/learning trigger, or human refresh request requires a
+  fresh policy read. `BYPASSED`/`UNAVAILABLE` fails closed for policy-sensitive
+  delegation. Record cache/timing/token provenance in the local Monitor
+  receipt; never infer provider savings from a cache hit.
 
 ### Skill overrides
 
@@ -167,14 +176,40 @@ Prefer the host’s **Tier 0** mapped slug (Codex often maps this to a Luna-clas
 
 **Do not** use cheap-utility as the accountable default for Lead, PM, Backend, Frontend/UX contract ownership, Test Engineer validation synthesis, Docs Steward governed docs, or Gatekeeper. Escalate Tier 0 → Tier 1 build/validate when evidence conflicts, scope crosses modules, behavior is statefully complex, validation fails, or accessibility/security/privacy/public-contract implications appear. Escalate to Tier 2/3 only under recorded high-risk triggers in [model-routing.md](model-routing.md).
 
-## Functional Integration Owner (FIO)
+## Functional Integration Owner (FIO) overlay
 
-Each batch names one **Functional Integration Owner**: the role accountable for the integrated behavior after individual tasks land (usually Backend or Frontend Builder for that surface). FIO:
+**FIO is a temporary responsibility overlay on one existing canonical
+implementation role, not a role ID.** The role registry, role cards, model map,
+and adapter delegation table must never contain `fio`. The Lead records the
+overlay in the Batch brief before build:
 
-- Owns cross-task seams inside the batch
-- Does not replace Test Engineer evidence or Gatekeeper accept/block
-- Surfaces integration gaps in the checkpoint before TE runs
-- Does not manage teammates, expand scope, or issue Gatekeeper decisions
+- `scope`: `frontend`, `backend`, `cross-layer`, `ux-contract`, or `none`
+- one `integration_seam` and one canonical `fio_role_id` plus its task ID, or
+  `NONE` when no seam exists
+- the FIO's exclusive paths, frozen `contract_ref` and hash when applicable,
+  and `fio_status`
+
+Assignment follows the primary seam. A Frontend Builder carries a frontend
+seam, a Backend Engineer carries an API/data seam, and the role owning the
+primary seam carries a cross-layer overlay. A single-task Batch may set the
+task owner as FIO without creating another task or ceremony. Docs,
+consultation, architecture-only, evidence-only, and no-seam Batches use
+`FIO = NONE`. A Batch must never name two FIOs; split independent seams or
+return to Lead for a new decision.
+
+FIO owns only the admitted seam: it may read the frozen contract and named
+handoffs, and may write only its own exclusive paths. It does not manage or
+reassign teammates, broaden scope, amend the architecture contract, edit
+another owner's paths, replace the System Architect, or issue TE/Gatekeeper
+decisions. Material contract or invariant drift routes **FIO → Lead → System
+Architect**; an ordinary defect returns as a corrected brief to its canonical
+owner. FIO reports `NOT_ASSIGNED`, `IN_PROGRESS`, `READY_FOR_TE`,
+`DRIFT_REPORTED`, or `BLOCKED` and hands the seam to an independent TE. FIO
+`READY_FOR_TE` is never TE evidence or acceptance.
+
+There is no FIO skill or model tier. The overlay inherits the canonical
+owner's named skills and planned→actual model/effort. It must not auto-load
+skills or escalate a model merely because the assignment is called FIO.
 
 ## Default batch shape
 
@@ -212,6 +247,16 @@ Engineer validates before one sequential Gatekeeper re-review. Final TE
 For the full participant, artifact, and PDCA rules, use
 [meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
 Batch matrix, not an unbounded repository-wide rerun.
+
+### Learning and distillation
+
+At material Batch and Sprint close, Lead records an evidence-linked learning
+disposition using [learning-and-distillation.md](learning-and-distillation.md).
+Monitor Agent capture is observational only. A single observation remains a
+candidate; durable policy, routing, skill, template, security, privacy, or
+public-contract promotion requires the validation and human-gate rules in that
+policy. Never create a standing learning/consolidation role or silently mutate
+core policy from a run.
 
 ## WIP, rotation, and context economy
 

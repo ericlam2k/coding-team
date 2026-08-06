@@ -17,13 +17,16 @@
 
 ## Scope
 
+- **Task scope:** `frontend` | `backend` | `cross-layer` | `ux-contract` | `none`
 - **Owned files (exclusive):**
+- **Owned integration seam (if this task carries the FIO overlay):**
+- **FIO overlay:** `this task` | `none` — never create a separate FIO task
 - **Read-only inputs:**
 - **Do not touch:**
 
 ## Skills (named or none)
 
-- 
+-
 
 ## Constraints
 

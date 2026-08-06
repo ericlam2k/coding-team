@@ -15,33 +15,31 @@ from pathlib import Path
 
 
 # Preferred candidates per abstract tier (first match wins among available).
+# WYSY Codex policy excludes Terra; Tier 1 build/validate use Luna Max.
+CODEX_POLICY_EXCLUDED = {"gpt-5.6-terra"}
 TIER_PREFS: dict[str, list[dict[str, str]]] = {
     "0": [
         {"slug": "gpt-5.6-luna", "effort": "medium", "label": "luna"},
         {"slug": "gpt-5.4-mini", "effort": "medium", "label": "5.4-mini"},
         {"slug": "gpt-5.4", "effort": "low", "label": "5.4 low"},
         {"slug": "gpt-5.5", "effort": "low", "label": "5.5 low"},
-        {"slug": "gpt-5.6-terra", "effort": "low", "label": "terra low"},
         {"slug": "gpt-5.6-sol", "effort": "low", "label": "sol low"},
     ],
     "1 build": [
-        {"slug": "gpt-5.6-terra", "effort": "medium", "label": "terra"},
+        {"slug": "gpt-5.6-luna", "effort": "max", "label": "luna max"},
         {"slug": "gpt-5.4", "effort": "medium", "label": "5.4"},
         {"slug": "gpt-5.5", "effort": "medium", "label": "5.5"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
-        {"slug": "gpt-5.6-luna", "effort": "high", "label": "luna high"},
         {"slug": "gpt-5.4-mini", "effort": "high", "label": "5.4-mini high"},
     ],
     "1 validate": [
-        {"slug": "gpt-5.6-terra", "effort": "high", "label": "terra high"},
+        {"slug": "gpt-5.6-luna", "effort": "max", "label": "luna max"},
         {"slug": "gpt-5.4", "effort": "high", "label": "5.4 high"},
         {"slug": "gpt-5.5", "effort": "high", "label": "5.5 high"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
-        {"slug": "gpt-5.6-terra", "effort": "medium", "label": "terra medium"},
     ],
     "2": [
         {"slug": "gpt-5.6-sol", "effort": "high", "label": "sol high"},
-        {"slug": "gpt-5.6-terra", "effort": "xhigh", "label": "terra xhigh"},
         {"slug": "gpt-5.5", "effort": "xhigh", "label": "5.5 xhigh"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
         {"slug": "gpt-5.4", "effort": "xhigh", "label": "5.4 xhigh"},
@@ -50,15 +48,14 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
         {"slug": "gpt-5.6-sol", "effort": "xhigh", "label": "sol xhigh"},
         {"slug": "gpt-5.6-sol", "effort": "max", "label": "sol max"},
         {"slug": "gpt-5.6-sol", "effort": "high", "label": "sol high"},
-        {"slug": "gpt-5.6-terra", "effort": "max", "label": "terra max"},
         {"slug": "gpt-5.5", "effort": "xhigh", "label": "5.5 xhigh"},
     ],
 }
 
 PLANNED: dict[str, str] = {
     "0": "gpt-5.6-luna (or gpt-5.4-mini)",
-    "1 build": "gpt-5.6-terra (or gpt-5.4)",
-    "1 validate": "gpt-5.6-terra + effort high",
+    "1 build": "gpt-5.6-luna + effort max",
+    "1 validate": "gpt-5.6-luna + effort max",
     "2": "gpt-5.6-sol + effort high",
     "3": "gpt-5.6-sol + effort xhigh/max",
 }
@@ -159,7 +156,7 @@ def main() -> int:
     parser.add_argument("--slugs-json", help="Path to JSON list of slugs")
     args = parser.parse_args()
 
-    available_list = load_slugs(args)
+    available_list = [slug for slug in load_slugs(args) if slug not in CODEX_POLICY_EXCLUDED]
     available = set(available_list)
     rows: list[dict[str, object]] = []
     for tier in TIER_ORDER:

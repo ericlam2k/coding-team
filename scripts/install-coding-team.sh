@@ -6,6 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 PROFILE="hybrid"
+PROFILE_EXPLICIT=0
 PLATFORM=""
 CHECK_ONLY=0
 PROFILE_FILE="$CODEX_HOME/coding-team.profile"
@@ -18,7 +19,8 @@ Usage:
 
 Profiles:
   hybrid  Lightweight default: adapter + QA skill; no model refresh or addons.
-  full    Opt-in framework: model-map setup plus full Codex addons.
+  full    Opt-in framework: adapter + QA skill plus full Codex addons.
+          Model mapping remains a separate, explicit user action.
 
 Start from a clean standalone clone:
   git clone https://github.com/ericlam2k/coding-team.git
@@ -41,6 +43,7 @@ while [[ $# -gt 0 ]]; do
     --profile)
       [[ $# -ge 2 ]] || die "--profile requires hybrid or full"
       PROFILE="$2"
+      PROFILE_EXPLICIT=1
       shift 2
       ;;
     --platform)
@@ -106,7 +109,7 @@ link_path() {
 
 remove_owned_addon_links() {
   [[ "$PLATFORM" == "codex" ]] || return 0
-  for name in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew ponytail; do
+  for name in agentic-worker; do
     local dst="$CODEX_HOME/skills/$name"
     if [[ -L "$dst" && "$(readlink "$dst")" == "$ROOT/addons/"* ]]; then
       rm "$dst"
@@ -128,6 +131,11 @@ check_links() {
   [[ -f "$PROFILE_FILE" ]] || die "profile marker is missing: $PROFILE_FILE"
   [[ "$(<"$PROFILE_FILE")" == "$PROFILE" ]] || die "active profile is $(<"$PROFILE_FILE"), requested $PROFILE"
   echo "activation check: PASS ($PROFILE/$PLATFORM)"
+  if [[ "$PROFILE_EXPLICIT" -eq 1 ]]; then
+    echo "scope_selected: $PROFILE"
+  else
+    echo "scope_assumed: $PROFILE (compatibility default; pass --profile explicitly for internal/CI runs)"
+  fi
 }
 
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
@@ -143,9 +151,11 @@ if [[ "$PROFILE" == "hybrid" ]]; then
   echo "Hybrid profile active: no model-map refresh and no addons enabled."
 else
   [[ -x "$ROOT/bin/ct" ]] || die "missing executable: $ROOT/bin/ct"
-  "$ROOT/bin/ct" init --platform "$PLATFORM" --yes --full
+  # Setup is deliberately map-free. Addons are explicit through --full;
+  # mapping is approved separately with `bin/ct map approve`.
+  "$ROOT/bin/ct" init --platform "$PLATFORM" --full
   write_profile
-  echo "Full profile active: model-map setup completed; Codex full addons enabled where supported."
+  echo "Full profile active: model map unchanged; Codex full addons enabled where supported."
 fi
 
 check_links

@@ -10,11 +10,16 @@ Shared vocabulary for coding-team. Use these terms in briefs, handoffs, and docs
 | **Batch** | The dependency-safe unit of context, integration, validation, and Gatekeeper review. Normal size: 2–5 related tasks. States: `PROPOSED → READY → ACTIVE → VALIDATING → REVIEW → COMPLETE` (also `PAUSED` / `BLOCKED` / `CANCELLED`). |
 | **Task** | One atomic deliverable with one canonical owner, exclusive file ownership, dependencies, stop condition, one primary skill or `none`, and an owner self-check. |
 | **Lead** | The parent agent/session that classifies nature, assigns tiers, creates the task list, delegates, integrates, and enforces gates. Never spawn Lead as a subagent. |
-| **Functional Integration Owner** | An assignment (not a new role) naming which existing role owns the batch’s shared contract and integration order before independent validation. |
+| **Functional Integration Owner (FIO)** | A temporary Batch assignment, not a canonical role: one existing Frontend Builder, Backend Engineer, or explicitly named UX owner carries the primary integration seam. The Batch records scope, seam, role/task, exclusive paths, contract reference/hash when applicable, and status; `NONE` is required when no seam exists. FIO does not orchestrate, architect, validate, accept, or write another owner’s paths, and inherits the assigned role’s skills and model tier. |
 | **WIP ≤ 2** | At most two concurrent tool-using specialist runs. Accelerate by smaller queued work and proven-disjoint parallels — never by raising the cap. |
 | **Handoff** | ≤150-word return packet from a specialist: status, evidence paths, unresolved questions, next owner. |
 | **Checkpoint** | ≤300-word batch state snapshot used after pause, context shrink, or Gatekeeper acceptance. |
 | **Run prompt** | ≤250-word delegation prompt projected from the task brief. The full template is never the run prompt. |
+| **Learning** | An evidence-linked observation from a run, batch, or sprint; local and provisional until supported. |
+| **Distillation** | A bounded, evidence-backed claim extracted from learning records, with scope, confidence, and validation. |
+| **Promotion** | The separately approved act of baking a distilled claim into policy, routing, a skill, a template, or an adapter/project overlay. |
+| **Experiment (`EXP-*`)** | One falsifiable hypothesis with owner, measure, stop/revert rule, review point, evidence, and human continue/success/revert decision. |
+| **Fallback mode** | `FULL`, `REDUCED_SCOPE`, `READ_ONLY`, or `PLANNING_ONLY` declaration when a lower-tier model substitutes for a planned role model. |
 
 ## Nature (N0–N5)
 

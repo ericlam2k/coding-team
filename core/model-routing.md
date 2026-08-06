@@ -31,6 +31,18 @@ Map via `model-pool.map.md` after install — these are intents, not host slugs:
 | System Architect; Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Domain Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
 | N5 judgment; Adv↔Con deadlock | **3** | Max-risk only |
 
+### FIO model and skill inheritance
+
+FIO is a Batch assignment, not a routed role. It has no independent skill,
+model tier, or adapter entry. The assigned canonical owner keeps its task
+brief, named skills, planned→actual model/effort, and exclusive paths; carrying
+the FIO overlay adds only the admitted integration-seam check and handoff.
+Frontend seams inherit `frontend-builder` skills/model, API/data seams inherit
+`backend-engineer`, and an explicitly named UX-only seam inherits
+`frontend-ux-lead`. Do not auto-load every skill or escalate the model because
+the word FIO appears. Architecture, product, privacy, or UX decisions outside
+the frozen brief route to the corresponding canonical role.
+
 Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity, validation failure, or a11y/security/privacy/public-contract impact appears. Escalate to Tier 2/3 only under the recorded triggers below.
 
 ## Nature → route
@@ -59,7 +71,7 @@ For triggered **N1/N2/N5** user-facing workflows, input parsing or matching, AI 
 | **Domain Advisor** | What does the named domain say? | Consult (peer to PM) |
 | **Gatekeeper** | Can this be accepted as done? | After implement + evidence |
 | **Product Manager** | Product scope / acceptance | Consult |
-| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO assembles |
+| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO checks the admitted seam |
 
 ## Lean concern routing
 

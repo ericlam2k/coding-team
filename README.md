@@ -1,15 +1,38 @@
-# coding-team
+# WYSY + coding-team
+
+**WYSY = What You See, You Ship.**
+
+Vibe-code, but don't build blind.
+
+WYSY is the visible AI coding control layer for repo-based delivery. Describe a
+change in plain English, see the plan and file scope, confirm it, then review
+model routing, cost, Test Engineer evidence, and the Gatekeeper decision.
+
+The underlying `coding-team` framework remains platform-independent and keeps
+its Sprint → Batch → Task workflow, role cards, WIP ≤ 2, human gates, and
+Test Engineer → Gatekeeper sequence. Plain Mode hides backend taxonomy;
+Expert Mode exposes it for technical operators.
+
+Current WYSY scaffolding records runs, cost, evidence, and Project Graph facts.
+The Codex adapter also has a session/context policy-manifest cache and local
+telemetry receipt ([policy-cache](core/policy-cache.md)); it does not claim a
+host token meter or provider KV-cache savings. It does not claim a hosted
+dashboard, full GraphRAG indexing, or implemented Cursor/Cline runtimes.
+
+---
 
 **Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
 
-[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Learning, experiments, and distillation](core/learning-and-distillation.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
 
 ---
 
 ## v2 notes
 
 - **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
-- **Installation:** `scripts/install-coding-team.sh` activates the lightweight Hybrid profile by default. The optional Full profile uses `bin/ct init --full` and is mutually exclusive with Hybrid.
+- **Installation:** `scripts/install-coding-team.sh` exposes Hybrid/Full as the
+  host scope choice. Both profiles are map-free; Full uses `bin/ct init --full`
+  only to enable supported addons and remains mutually exclusive with Hybrid.
 
 ## Quick start
 
@@ -36,7 +59,8 @@ refresh model maps or enable addons. To opt into the full framework:
 Profiles are toggled by rerunning the installer. The marker at
 `$CODEX_HOME/coding-team.profile` records the active profile; switching back to
 Hybrid removes only addon links owned by this checkout. `bin/ct init` remains
-available for advanced, interactive model-map setup.
+available for adapter setup, while `bin/ct map propose|approve|decline` are the
+explicit model-map actions.
 
 ## What this is
 
@@ -45,7 +69,7 @@ available for advanced, interactive model-map setup.
 | **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
-| **Addons** | Caveman + Ponytail — default OFF, toggleable |
+| **Addons** | PM Lean + Agentic Worker — default OFF, toggleable |
 
 ## How routing works
 

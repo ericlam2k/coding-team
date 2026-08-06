@@ -8,7 +8,8 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 |---|---|
 | [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
 | [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
-| [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
+| [meeting-policy.md](meeting-policy.md) | Lead-owned concern and new-idea brainstorm meetings, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
+| [learning-and-distillation.md](learning-and-distillation.md) | Evidence-linked learning capture, bounded distillation, validation, and governed promotion |
 | [qa-operating-model.md](qa-operating-model.md) | Hybrid Normal/Risky QA flow, selected layers, evidence, and promotion gates |
 | [../docs/archive/qa-operating-model-pre-hybrid-29311de.md](../docs/archive/qa-operating-model-pre-hybrid-29311de.md) | Archived pre-hybrid QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
@@ -48,7 +49,11 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |
+| [templates/learning-entry.md](templates/learning-entry.md) | Learning signal and distillation disposition |
+| [templates/experiment-entry.md](templates/experiment-entry.md) | Bounded `EXP-*` / PDCA hypothesis and human decision |
+| [templates/distillation-entry.md](templates/distillation-entry.md) | Fallback/project lesson and governed promotion |
 | [templates/architecture-contract.md](templates/architecture-contract.md) | Named architecture contract before allocation |
+| [templates/discovery-brainstorm-meeting.md](templates/discovery-brainstorm-meeting.md) | Lead-owned product-trio discovery packet before PRD/solution selection |
 
 ## Skills layout (this repo)
 

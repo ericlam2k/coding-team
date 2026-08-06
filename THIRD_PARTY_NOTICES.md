@@ -4,21 +4,6 @@ This repository vendors third-party skills and reference libraries. Framework fi
 
 ---
 
-## Caveman (Julius Brussee)
-
-- Path: `addons/caveman/`
-- License: MIT — see `addons/caveman/LICENSE`
-- Copyright: Copyright (c) 2026 Julius Brussee
-- Note: **Standalone addon, default OFF.** Not part of coding-team core. Enable with `./install.sh --enable caveman`.
-
-## Ponytail (coding-team)
-
-- Path: `addons/ponytail/`
-- License: MIT (same as this repository’s [LICENSE](LICENSE))
-- Note: **Standalone addon, default OFF.** Enable with `./install.sh --enable ponytail`.
-
----
-
 ## awesome-design-md (VoltAgent)
 
 - Path: `skills/design/awesome-design-md/`
