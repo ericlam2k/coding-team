@@ -106,13 +106,9 @@ link_path() {
 
 remove_owned_addon_links() {
   [[ "$PLATFORM" == "codex" ]] || return 0
-  for name in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew ponytail; do
-    local dst="$CODEX_HOME/skills/$name"
-    if [[ -L "$dst" && "$(readlink "$dst")" == "$ROOT/addons/"* ]]; then
-      rm "$dst"
-      echo "removed full-profile addon link: $dst"
-    fi
-  done
+  # Hybrid owns only the core and QA links. Optional PM Lean activation is
+  # explicit and is never enabled or removed by profile switching.
+  :
 }
 
 write_profile() {
@@ -145,7 +141,7 @@ else
   [[ -x "$ROOT/bin/ct" ]] || die "missing executable: $ROOT/bin/ct"
   "$ROOT/bin/ct" init --platform "$PLATFORM" --yes --full
   write_profile
-  echo "Full profile active: model-map setup completed; Codex full addons enabled where supported."
+  echo "Full profile active: model-map setup completed; optional addons remain explicit-only."
 fi
 
 check_links

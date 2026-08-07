@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Standalone **addons/** (default OFF): full caveman + ponytail skillsets
+- Standalone **addons/** (default OFF): optional PM Lean decision-support pack
 - `./install.sh --enable` / `--disable`
 
 ## [0.2.0] — 2026-07-22

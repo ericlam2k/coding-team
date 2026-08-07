@@ -1,30 +1,23 @@
-# Addons (caveman & ponytail)
+# Addons (PM Lean)
 
-Standalone skill packs. **Default OFF.** Not injected into coding-team core, roles, or Lead policy.
+The PM Lean skill pack is standalone, **default OFF**, and never injected into
+coding-team core, roles, Lead policy, or approval gates.
 
 | Addon | Purpose | Enable |
 |---|---|---|
-| **caveman** | Full compressed-communication skillset (caveman, commit, review, compress, stats, help, cavecrew) | `./install.sh --platform codex --global --enable caveman` |
-| **ponytail** | Full lazy-senior skillset (ladder, bugfix, shortcuts, challenge, check) | `./install.sh --platform codex --global --enable ponytail` |
-
-Both:
-
-```bash
-./install.sh --platform codex --global --enable caveman,ponytail
-```
+| **pm-lean** | Explicit-only PM assumption triage and experiment design | `./install.sh --platform codex --global --enable pm-lean` |
 
 Disable:
 
 ```bash
-./install.sh --platform codex --global --disable caveman
-./install.sh --platform codex --global --disable ponytail
+./install.sh --platform codex --global --disable pm-lean
 ```
 
-State: [`addons/toggles.json`](../addons/toggles.json). Details: [`addons/README.md`](../addons/README.md).
+State: [`addons/toggles.json`](../addons/toggles.json). Details:
+[`addons/README.md`](../addons/README.md).
 
 ## Rules
 
-1. Core never requires these addons.
-2. Do not paste addon bodies into every Task brief.
-3. Caveman = mouth small (tokens). Ponytail = hands efficient (diff). Safe together.
-4. Human gates still apply (commit/push/Production).
+1. Core orchestration, roles, and human gates do not depend on PM Lean.
+2. Use at most one PM Lean skill inside the existing Product Manager call.
+3. It adds no routing, agents, approval authority, or auto-chain.

@@ -45,7 +45,7 @@ available for advanced, interactive model-map setup.
 | **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
-| **Addons** | Caveman + Ponytail — default OFF, toggleable |
+| **Addons** | PM Lean decision support — default OFF, explicit-only |
 
 ## How routing works
 

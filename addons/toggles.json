@@ -1,17 +1,7 @@
 {
   "version": 1,
-  "description": "Standalone addons. Default OFF \u2014 not part of core coding-team policy. Enable via ./install.sh --enable <name> or edit this file then re-run install.",
+  "description": "Standalone addons. Default OFF \\u2014 not part of core coding-team policy. Enable via ./install.sh --enable <name> or edit this file then re-run install.",
   "addons": {
-    "caveman": {
-      "enabled": false,
-      "path": "addons/caveman",
-      "kind": "skill-pack"
-    },
-    "ponytail": {
-      "enabled": false,
-      "path": "addons/ponytail",
-      "kind": "skill-pack"
-    },
     "pm-lean": {
       "enabled": false,
       "path": "addons/pm-lean",

@@ -44,7 +44,7 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
   execution and run the evidence validator before Gatekeeper. Bounded TE
   passes use a 120-second target / 240-second hard stop; timeout returns
   `BLOCKED` and queues one smaller next step rather than retrying.
-- **Addons default OFF:** do **not** load `caveman` or `ponytail` unless enabled (`./bin/ct enable`) or the human asks. Packs live under `$CODING_TEAM_ROOT/addons/` — never inject into core briefs
+- **PM Lean addon default OFF:** do **not** load `pm-lean` unless explicitly enabled (`./bin/ct enable pm-lean`) or the human asks. It lives under `$CODING_TEAM_ROOT/addons/` and is never injected into core briefs
 - Platform independence: core has no host slugs; this file is the Codex adapter only
 
 ## Cheap-utility defaults (Codex)

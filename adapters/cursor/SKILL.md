@@ -21,7 +21,7 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 - Oversized or timed-out work → split into a bounded Task and hand off the
   checkpoint; do not leave it frozen or silently extend the run.
 - Lead cost discipline — briefs, not implementation code
-- Addons (caveman/ponytail) default OFF
+- PM Lean addon default OFF; enable it only for an explicit PM task
 - When `qa_required=true` or `qa_mode=bounded`, Test Engineer runs the
   QA evidence validator before Gatekeeper. Bounded passes use a 120-second
   target / 240-second hard stop; timeout returns `BLOCKED` without auto-retry.

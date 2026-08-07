@@ -2,8 +2,8 @@
 # Install coding-team for a host runtime.
 # Usage:
 #   ./install.sh --platform codex [--global|--project <path>] [--refresh-map]
-#   ./install.sh --platform codex --global --enable caveman,ponytail
-#   ./install.sh --platform codex --global --disable caveman
+#   ./install.sh --platform codex --global --enable pm-lean
+#   ./install.sh --platform codex --global --disable pm-lean
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -29,7 +29,7 @@ Options:
   --global                        Symlink adapters/codex → $CODEX_HOME/skills/coding-team
   --project <path>                Append AGENTS.md coding-team pointer into a consumer project
   --refresh-map                   Re-run model pool detect/apply (skill target + examples/)
-  --enable NAME[,NAME...]         Enable standalone addons (caveman, ponytail, pm-lean). Default OFF.
+  --enable NAME[,NAME...]         Enable standalone addons (pm-lean). Default OFF.
   --disable NAME[,NAME...]        Disable standalone addons (removes Codex skill symlinks)
   -h, --help                      Show this help
 
@@ -184,30 +184,13 @@ PY
 enable_addon() {
   local name="$1"
   case "$name" in
-    caveman)
-      set_toggle caveman true
-      # Link primary caveman skill + commit/review helpers commonly used
-      link_path "$ROOT/addons/caveman/skills/caveman" "$CODEX_HOME/skills/caveman"
-      link_path "$ROOT/addons/caveman/skills/caveman-commit" "$CODEX_HOME/skills/caveman-commit"
-      link_path "$ROOT/addons/caveman/skills/caveman-review" "$CODEX_HOME/skills/caveman-review"
-      link_path "$ROOT/addons/caveman/skills/caveman-compress" "$CODEX_HOME/skills/caveman-compress"
-      link_path "$ROOT/addons/caveman/skills/caveman-stats" "$CODEX_HOME/skills/caveman-stats"
-      link_path "$ROOT/addons/caveman/skills/caveman-help" "$CODEX_HOME/skills/caveman-help"
-      if [[ -d "$ROOT/addons/caveman/skills/cavecrew" ]]; then
-        link_path "$ROOT/addons/caveman/skills/cavecrew" "$CODEX_HOME/skills/cavecrew"
-      fi
-      ;;
-    ponytail)
-      set_toggle ponytail true
-      link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
-      ;;
     pm-lean)
       set_toggle pm-lean true
       link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
       link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
       ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
+      die "unknown addon: $name (expected pm-lean)"
       ;;
   esac
 }
@@ -215,23 +198,13 @@ enable_addon() {
 disable_addon() {
   local name="$1"
   case "$name" in
-    caveman)
-      set_toggle caveman false
-      for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
-        unlink_path "$CODEX_HOME/skills/$s"
-      done
-      ;;
-    ponytail)
-      set_toggle ponytail false
-      unlink_path "$CODEX_HOME/skills/ponytail"
-      ;;
     pm-lean)
       set_toggle pm-lean false
       unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
       unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
       ;;
     *)
-      die "unknown addon: $name (expected caveman|ponytail|pm-lean)"
+      die "unknown addon: $name (expected pm-lean)"
       ;;
   esac
 }
@@ -284,7 +257,7 @@ When orchestrating multi-role work:
 2. Resolve \`CODING_TEAM_ROOT\` and read \`core/\` + skill \`model-pool.map.md\`.
 3. WIP ≤ 2; Test Engineer → Gatekeeper sequential; incomplete → ask human.
 4. Design: hallmark + awesome-design-md under \`\$CODING_TEAM_ROOT/skills/design/\`.
-5. Optional addons (default OFF): caveman / ponytail — enable via \`./install.sh --enable …\` — see \`addons/README.md\`.
+5. Optional PM Lean addon (default OFF) — enable via \`./install.sh --enable pm-lean\` — see \`addons/README.md\`.
 
 Drop-in reference from the coding-team repo: see also \`${ROOT}/AGENTS.md\`.
 <!-- coding-team:end -->
@@ -348,11 +321,7 @@ Next steps
 1. Confirm the coding-team skill:
      ls -la "$SKILL_DST"
 2. Optional addons (default OFF — not injected into core):
-     ./install.sh --platform codex --global --enable caveman
-     ./install.sh --platform codex --global --enable ponytail
-     ./install.sh --platform codex --global --enable caveman,ponytail
      ./install.sh --platform codex --global --enable pm-lean
-     ./install.sh --platform codex --global --disable caveman
      ./install.sh --platform codex --global --disable pm-lean
    State file: $TOGGLES
 3. In Codex, invoke **Coding Team**; enable addons only when you want them.

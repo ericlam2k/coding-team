@@ -14,7 +14,7 @@ The default **Hybrid** profile is the low-cost, platform-independent activation:
   skill;
 - keeps the active hybrid QA policy, WIP ≤2, disjoint writes, and TE →
   Gatekeeper sequencing;
-- does not refresh a model map or enable caveman/ponytail addons.
+- does not refresh a model map or enable optional addons.
 
 The optional **Full** profile is a separate install mode:
 
@@ -22,8 +22,8 @@ The optional **Full** profile is a separate install mode:
 ./scripts/install-coding-team.sh --profile full --platform codex
 ```
 
-Full delegates to `bin/ct init --full`, including model-map approval and
-supported Codex addons. Switch back explicitly:
+Full delegates to `bin/ct init --full`, including model-map approval. Optional
+addons remain explicit-only. Switch back explicitly:
 
 ```bash
 ./scripts/install-coding-team.sh --profile hybrid --platform codex

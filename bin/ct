@@ -4,7 +4,7 @@
 #   ./bin/ct init                 # auto-detect platform, propose map, ask approve
 #   ./bin/ct init --yes           # non-interactive approve
 #   ./bin/ct init --platform codex|cursor|cline
-#   ./bin/ct init --full          # + enable caveman,ponytail (Codex)
+#   ./bin/ct init --full          # legacy compatibility; no addon auto-enable
 #   ./bin/ct status | refresh | enable | disable | project | help
 set -euo pipefail
 
@@ -29,8 +29,8 @@ coding-team v2 CLI (platform-independent)
 
   ./bin/ct status
   ./bin/ct refresh [--yes] [--platform ...]
-  ./bin/ct enable caveman[,ponytail]     (Codex addons)
-  ./bin/ct disable caveman[,ponytail]
+  ./bin/ct enable pm-lean                (optional PM addon)
+  ./bin/ct disable pm-lean
   ./bin/ct project <path>
   ./bin/ct help
 
@@ -193,11 +193,7 @@ cmd_init() {
   fi
 
   if [[ "$full" -eq 1 ]]; then
-    if [[ "$platform" != "codex" ]]; then
-      echo "note: --full addons currently Codex-only; skipped for $platform"
-    else
-      cmd_enable "caveman,ponytail"
-    fi
+    echo "note: --full is retained for compatibility; no addon is enabled automatically"
   fi
 
   echo
@@ -210,7 +206,7 @@ cmd_status() {
   echo "CODEX_HOME:       $CODEX_HOME"
   echo
   echo "Adapters / skills:"
-  for name in coding-team qa-evidence-enforcement caveman ponytail; do
+  for name in coding-team qa-evidence-enforcement pm-lean-assumption-triage pm-lean-experiment-design; do
     local p="$CODEX_HOME/skills/$name"
     if [[ -L "$p" ]]; then
       echo "  Codex $name → $(readlink "$p")"
@@ -272,20 +268,15 @@ PY
 
 cmd_enable() {
   local csv="${1:-}"
-  [[ -n "$csv" ]] || die "usage: ct enable caveman[,ponytail]"
+  [[ -n "$csv" ]] || die "usage: ct enable pm-lean"
   IFS=',' read -ra names <<<"$csv"
   for name in "${names[@]}"; do
     name="$(echo "$name" | tr -d '[:space:]')"
     case "$name" in
-      caveman)
-        set_toggle caveman true
-        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
-          [[ -d "$ROOT/addons/caveman/skills/$s" ]] && link_path "$ROOT/addons/caveman/skills/$s" "$CODEX_HOME/skills/$s"
-        done
-        ;;
-      ponytail)
-        set_toggle ponytail true
-        link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
+      pm-lean)
+        set_toggle pm-lean true
+        link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
+        link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
         ;;
       *) die "unknown addon: $name" ;;
     esac
@@ -294,20 +285,15 @@ cmd_enable() {
 
 cmd_disable() {
   local csv="${1:-}"
-  [[ -n "$csv" ]] || die "usage: ct disable caveman[,ponytail]"
+  [[ -n "$csv" ]] || die "usage: ct disable pm-lean"
   IFS=',' read -ra names <<<"$csv"
   for name in "${names[@]}"; do
     name="$(echo "$name" | tr -d '[:space:]')"
     case "$name" in
-      caveman)
-        set_toggle caveman false
-        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
-          unlink_path "$CODEX_HOME/skills/$s"
-        done
-        ;;
-      ponytail)
-        set_toggle ponytail false
-        unlink_path "$CODEX_HOME/skills/ponytail"
+      pm-lean)
+        set_toggle pm-lean false
+        unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
+        unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
         ;;
       *) die "unknown addon: $name" ;;
     esac
@@ -333,7 +319,7 @@ ${marker}
 1. Load coding-team skill for your platform (Codex / Cursor / Cline adapter).
 2. Read \`core/\` + approved \`model-pool.map.md\`.
 3. WIP ≤ 2; TE → Gatekeeper sequential; incomplete → ask human.
-4. Addons default OFF — \`./bin/ct enable …\` if needed.
+4. PM Lean is default OFF — \`./bin/ct enable pm-lean\` only when needed.
 <!-- coding-team:end -->
 BLOCK
   echo "updated $agents"
