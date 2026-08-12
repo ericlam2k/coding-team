@@ -1,8 +1,42 @@
 # coding-team
 
-**Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
+**A reviewable delivery loop for vibecoders.** Turn a plain-English coding goal into a small, inspectable path from Sprint → Batch → Task—then keep a human in control of what ships.
 
-[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+coding-team is a platform-independent framework for organizing AI-assisted repository work. It gives an agent team a shared shape: named roles, bounded work in progress, explicit acceptance, and evidence before the final review.
+
+[Install](docs/installation.md) · [See the workflow](docs/workflow.md) · [Meet the roles](docs/roles.md) · [Try the marketing pack](docs/marketing/README.md) · [Definitions](docs/definitions.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+
+## Why it exists
+
+Vibecoding is excellent at getting from idea to motion. The hard part is knowing what the agent is doing, when the work is small enough to review, and whether “done” has evidence behind it.
+
+coding-team makes those decisions visible:
+
+- **Sprint → Batch → Task** keeps a big goal small enough to steer.
+- **Role cards** make ownership and boundaries explicit.
+- **WIP ≤ 2** limits concurrent tool-using work.
+- **Human gates** protect irreversible actions.
+- **Test Engineer → Gatekeeper** puts independent evidence before final acceptance.
+
+The result is not “more autonomous.” It is a clearer path to a change you can inspect, test, and consciously accept.
+
+## Choose how the framework speaks
+
+Prefer an everyday explanation, or skip metaphors and go straight to the
+technical terms. The [communication guide](docs/communication-style.md) gives
+the copy-paste mode choices, and the [validation example](docs/examples/validation-scenario.md)
+shows that both modes preserve the same constraints and evidence.
+
+## A first bounded task
+
+```text
+Goal: add one small feature
+Boundary: touch only the named files
+Proof: run the focused check and report changed paths
+Stop: pause for review before commit or release
+```
+
+Install the adapter for your host, start with one bounded task, and adapt the framework to your project. The core stays host-neutral; Codex, Cursor, and Cline bindings live under `adapters/`.
 
 ---
 
