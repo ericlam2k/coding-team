@@ -1,14 +1,20 @@
 # coding-team
 
-**A reviewable delivery loop for vibecoders.** Turn a plain-English coding goal into a small, inspectable path from Sprint → Batch → Task—then keep a human in control of what ships.
+**Vibe-code, but don't build blind.** Turn a plain-English idea into one small,
+reviewable change with a clear scope, useful proof, and your decision at the
+end.
 
-coding-team is a platform-independent framework for organizing AI-assisted repository work. It gives an agent team a shared shape: named roles, bounded work in progress, explicit acceptance, and evidence before the final review.
+`coding-team` is a standalone public, lite framework. It provides role cards,
+bounded work, evidence rules, and human gates that can be used by a project
+without access to a private product or hosted service.
 
-[Install](docs/installation.md) · [See the workflow](docs/workflow.md) · [Meet the roles](docs/roles.md) · [Try the marketing pack](docs/marketing/README.md) · [Definitions](docs/definitions.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+[Install](docs/installation.md) · [Project scope](docs/project-scope.md) · [See the workflow](docs/workflow.md) · [Meet the roles](docs/roles.md) · [Try the example](docs/examples/validation-scenario.md) · [Definitions](docs/definitions.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
 
-## Why it exists
+## Why it helps
 
-Vibecoding is excellent at getting from idea to motion. The hard part is knowing what the agent is doing, when the work is small enough to review, and whether “done” has evidence behind it.
+AI coding is fast. The hard part is knowing what the agent is changing, when
+the work is small enough to review, what was actually tested, and whether it
+is ready to ship.
 
 coding-team makes those decisions visible:
 
@@ -18,14 +24,20 @@ coding-team makes those decisions visible:
 - **Human gates** protect irreversible actions.
 - **Test Engineer → Gatekeeper** puts independent evidence before final acceptance.
 
-The result is not “more autonomous.” It is a clearer path to a change you can inspect, test, and consciously accept.
+The result is a visible path from request to reviewed change—not a promise of
+more autonomy. You keep the final decision.
 
-## Choose how the framework speaks
+## See it in one minute
 
-Prefer an everyday explanation, or skip metaphors and go straight to the
-technical terms. The [communication guide](docs/communication-style.md) gives
-the copy-paste mode choices, and the [validation example](docs/examples/validation-scenario.md)
-shows that both modes preserve the same constraints and evidence.
+Start with one request. Make its boundary visible, run the focused check, and
+pause for your decision when the evidence is ready or incomplete.
+
+![Illustrative diagram: a plain-English goal moves through scoped work, evidence, and a human ship decision.](docs/examples/assets/coding-team-lite-loop.svg)
+
+This illustrative visual shows the public loop: request → bounded work →
+evidence → your decision. The [communication guide](docs/communication-style.md)
+keeps the language clear without changing the underlying constraints or
+evidence.
 
 ## A first bounded task
 
@@ -36,41 +48,48 @@ Proof: run the focused check and report changed paths
 Stop: pause for review before commit or release
 ```
 
-Install the adapter for your host, start with one bounded task, and adapt the framework to your project. The core stays host-neutral; Codex, Cursor, and Cline bindings live under `adapters/`.
+Install the adapter for your host, start with one bounded task, and adapt the
+framework to your project. The core stays host-neutral; Codex, Cursor, and
+Cline bindings live under `adapters/`. See [Project scope](docs/project-scope.md)
+for the public release boundary.
 
 ---
 
-## v2 notes
+## Install in one command
 
-- **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
-- **Installation:** `scripts/install-coding-team.sh` activates the lightweight Hybrid profile by default. The optional Full profile uses `bin/ct init --full` and is mutually exclusive with Hybrid.
-
-## Quick start
+For most people, the friendly entrypoint detects the available host and can
+optionally prepare a first project. Press Enter to skip the project prompt:
 
 ```bash
-git clone https://github.com/ericlam2k/coding-team.git
-cd coding-team
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./install.sh
 ```
 
-Hybrid links only the platform adapter and conditional QA skill. It does not
-refresh model maps or enable addons. To opt into the full framework:
+It can optionally add a pointer to your first project:
 
 ```bash
-./scripts/install-coding-team.sh --profile full --platform codex
+./install.sh --project /path/to/your/project
 ```
+
+If the folder is missing or cannot be updated, installation still completes
+and the command explains how to prepare it later.
+
+For CI, scripts, or a fully explicit setup, skip all prompts:
 
 ```bash
-./scripts/install-coding-team.sh --profile hybrid --platform cursor
-./scripts/install-coding-team.sh --profile full --platform codex
-./scripts/install-coding-team.sh --check --profile hybrid --platform codex
-./bin/ct status
+./install.sh --platform codex --no-questionnaire
 ```
 
-Profiles are toggled by rerunning the installer. The marker at
-`$CODEX_HOME/coding-team.profile` records the active profile; switching back to
-Hybrid removes only addon links owned by this checkout. `bin/ct init` remains
-available for advanced, interactive model-map setup.
+## Advanced install and explicit extensions
+
+The canonical installer links the selected adapter and conditional QA support:
+
+```bash
+./scripts/install-coding-team.sh --platform codex
+```
+
+There are no separate public installation modes. Legacy `--profile hybrid` and
+`--profile full` flags are accepted as compatibility aliases only. Model maps
+and addons are explicit extensions; see [Installation](docs/installation.md).
 
 ## What this is
 
@@ -85,7 +104,7 @@ available for advanced, interactive model-map setup.
 
 1. Lead classifies **nature** (N0–N5 / Consult / Docs).
 2. Nature selects an abstract **tier**.
-3. Lead uses the **approved** `model-pool.map.md` slug for that tier.
+3. Lead uses a host-local approved `model-pool.map.md` slug when one exists.
 4. Missing slug → next best; record `planned → actual` (never block start).
 
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**

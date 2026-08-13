@@ -1,13 +1,18 @@
-# One validation scenario, two explanations
+# One validation scenario
 
-The scenario is identical in both columns. Only the explanation changes.
+The validation scope contains four areas. Each area requires three minutes of
+validation. The acceptance constraints are complete coverage and a five-minute
+total timebox.
 
-| Familiar daily-life explanation | Direct technical explanation |
-| --- | --- |
-| You have four rooms to check before guests arrive: the living room, bedroom, toilet, and kitchen. Each room needs three minutes for a reliable check. | The validation scope contains four areas. Each area requires three minutes of validation. The acceptance constraints are complete coverage and a five-minute total timebox. |
-| Four rooms × three minutes = twelve minutes of work. A five-minute timer cannot cover all four rooms properly. | Required validation time is 4 × 3 = 12 minutes, but the timebox is 5 minutes. The constraints are unsatisfiable as written. |
-| You can give yourself more time, check fewer rooms, split the rooms into smaller visits, or make the check lighter. | Choose one: increase the timebox; reduce or split the workload; or reduce validation depth. Record the changed acceptance criteria before continuing. |
-| If you stop after checking only two rooms, you cannot honestly say the whole house passed. | Partial coverage is not `PASS`. Return `FAIL` when the stated requirement is not met, or `BLOCKED` when the missing time or evidence prevents a valid result. Preserve the evidence and stop condition. |
+Required validation time is 4 × 3 = 12 minutes, but the timebox is 5 minutes.
+The constraints are unsatisfiable as written.
+
+Choose one: increase the timebox; reduce or split the workload; or reduce
+validation depth. Record the changed acceptance criteria before continuing.
+
+Partial coverage is not `PASS`. Return `FAIL` when the stated requirement is
+not met, or `BLOCKED` when the missing time or evidence prevents a valid
+result. Preserve the evidence and stop condition.
 
 ## The framework terms
 

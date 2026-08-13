@@ -141,7 +141,7 @@ def render(available: list[str], rows: list[dict[str, object]]) -> str:
         "## Usage",
         "",
         "Lead assigns a tier, then uses **Actual slug** + **Effort** when spawning Codex subagents.",
-        "Refresh: `./install.sh --platform codex --refresh-map`",
+        "Inspect: `./bin/ct map propose --platform codex`; approve/write: `./bin/ct map approve --platform codex`",
         "",
     ]
     return "\n".join(lines)

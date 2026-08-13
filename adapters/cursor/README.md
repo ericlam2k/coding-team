@@ -6,7 +6,9 @@ Install:
 ./bin/ct init --platform cursor
 ```
 
-Shows a suggested model map for approval, then writes `adapters/cursor/model-pool.map.md`.
+Installation links the adapter only. An optional local model map is shown with
+`./bin/ct map propose --platform cursor` and written only with the explicit
+`./bin/ct map approve --platform cursor` command.
 
 Link into a project:
 

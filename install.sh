@@ -1,43 +1,34 @@
 #!/usr/bin/env bash
-# Install coding-team for a host runtime.
-# Usage:
-#   ./install.sh --platform codex [--global|--project <path>] [--refresh-map]
-#   ./install.sh --platform codex --global --enable pm-lean
-#   ./install.sh --platform codex --global --disable pm-lean
+# Friendly one-command entrypoint. The lower-level installer remains
+# scripts/install-coding-team.sh for automation and explicit host selection.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLATFORM=""
-DO_GLOBAL=0
 PROJECT_PATH=""
-REFRESH_MAP=0
+CHECK_ONLY=0
+PROPOSE_MAP=0
 ENABLE_LIST=""
 DISABLE_LIST=""
+QUESTIONNAIRE=1
+INTERACTIVE=0
 
 usage() {
   cat <<'USAGE'
 Usage:
-  ./install.sh --platform codex [--global] [--project <path>] [--refresh-map]
-               [--enable <addon[,addon...]>] [--disable <addon[,addon...]>]
+  ./install.sh                                  # detect host and install
+  ./install.sh --platform codex|cursor|cline   # choose host explicitly
+  ./install.sh --project /path/to/repo         # install + add project pointer
+  ./install.sh --no-questionnaire               # skip prompts (CI/automation)
+  ./install.sh --check                          # verify an existing install
 
-Recommended profile install:
-  ./scripts/install-coding-team.sh --profile hybrid --platform codex
-  ./scripts/install-coding-team.sh --profile full --platform codex
+Helpful options:
+  --refresh-map       Show a read-only model-map suggestion
+  --enable pm-lean    Enable the optional PM Lean addon
+  --disable pm-lean   Disable the optional PM Lean addon
+  --global            Accepted for compatibility; the default is global where supported
 
-Options:
-  --platform codex|cursor|cline   Target runtime (only codex in v1)
-  --global                        Symlink adapters/codex → $CODEX_HOME/skills/coding-team
-  --project <path>                Append AGENTS.md coding-team pointer into a consumer project
-  --refresh-map                   Re-run model pool detect/apply (skill target + examples/)
-  --enable NAME[,NAME...]         Enable standalone addons (pm-lean). Default OFF.
-  --disable NAME[,NAME...]        Disable standalone addons (removes Codex skill symlinks)
-  -h, --help                      Show this help
-
-Addons are NOT part of core. See addons/README.md and addons/toggles.json.
-
-Environment:
-  CODEX_HOME   Codex config home (default: ~/.codex)
-  CODING_TEAM_ROOT  Optional; AGENTS.md / skill resolve to this checkout when set
+The normal path is one command: ./install.sh
 USAGE
 }
 
@@ -46,287 +37,226 @@ die() {
   exit 1
 }
 
+is_supported_platform() {
+  case "$1" in
+    codex|cursor|cline) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+detect_platform() {
+  if [[ -n "${CODING_TEAM_PLATFORM:-}" ]]; then
+    printf '%s\n' "$CODING_TEAM_PLATFORM"
+    return 0
+  fi
+
+  local candidates=""
+  if [[ -n "${CODEX_HOME:-}" || -d "$HOME/.codex" ]]; then
+    candidates="codex"
+  fi
+  if [[ -n "${CURSOR_HOME:-}" || -d "$HOME/.cursor" ]]; then
+    candidates="${candidates:+$candidates,}cursor"
+  fi
+  if [[ -n "${CLINE_HOME:-}" || -d "$HOME/.cline" ]]; then
+    candidates="${candidates:+$candidates,}cline"
+  fi
+  printf '%s\n' "$candidates"
+}
+
+choose_platform() {
+  local detected="" selected="" first=""
+  detected="$(detect_platform)"
+
+  if [[ "$detected" != *,* && -n "$detected" ]]; then
+    echo "Detected host: $detected" >&2
+    printf '%s\n' "$detected"
+    return 0
+  fi
+
+  if [[ "$detected" == *,* ]]; then
+    first="${detected%%,*}"
+    if [[ "$INTERACTIVE" -eq 1 ]]; then
+      echo "I found more than one AI coding host: ${detected//,/, }." >&2
+      if ! read -r -p "Which host should coding-team use? [$first]: " selected; then
+        selected=""
+      fi
+      selected="${selected:-$first}"
+    else
+      die "multiple hosts detected ($detected); pass --platform or run interactively"
+    fi
+  elif [[ "$INTERACTIVE" -eq 1 ]]; then
+    echo "I could not detect your AI coding host." >&2
+    echo "Choose one: codex, cursor, or cline." >&2
+    if ! read -r -p "Host [codex]: " selected; then
+      selected=""
+    fi
+    selected="${selected:-codex}"
+  else
+    # Codex is the safest non-interactive default because it has a stable
+    # user-home install target and can be overridden with --platform.
+    selected="codex"
+    echo "No host detected; using Codex. Use --platform to choose another host." >&2
+  fi
+
+  if ! is_supported_platform "$selected"; then
+    if [[ "$INTERACTIVE" -ne 1 ]]; then
+      die "unsupported host '$selected'; choose codex, cursor, or cline"
+    fi
+    local attempt=1
+    while (( attempt <= 3 )); do
+      echo "Please enter codex, cursor, or cline." >&2
+      if ! read -r -p "Host [$first]: " selected; then
+        selected=""
+      fi
+      selected="${selected:-$first}"
+      is_supported_platform "$selected" && break
+      attempt=$((attempt + 1))
+    done
+  fi
+
+  is_supported_platform "$selected" || die "unsupported host '$selected'; choose codex, cursor, or cline"
+  printf '%s\n' "$selected"
+}
+
+run_questionnaire() {
+  [[ "$QUESTIONNAIRE" -eq 1 ]] || return 0
+  if [[ "$INTERACTIVE" -ne 1 ]]; then
+    echo "Questionnaire skipped because this is a non-interactive session." >&2
+    return 0
+  fi
+
+  local project=""
+  echo
+  if [[ -z "$PROJECT_PATH" ]]; then
+    echo "Optional first-project setup (press Enter to skip):"
+    if ! read -r -p "Project folder (optional; press Enter to skip): " project; then
+      project=""
+    fi
+    PROJECT_PATH="$project"
+  else
+    echo "First project: $PROJECT_PATH"
+  fi
+}
+
+prepare_project() {
+  [[ -n "$PROJECT_PATH" ]] || return 0
+
+  # Shells expand ~ before a command, but text entered at a prompt does not.
+  PROJECT_PATH="${PROJECT_PATH/#\~/$HOME}"
+  if [[ ! -d "$PROJECT_PATH" ]]; then
+    echo "Project setup skipped: not a directory: $PROJECT_PATH" >&2
+    echo "You can run this later: ./bin/ct project /path/to/your/project" >&2
+    return 0
+  fi
+
+  if ! "$ROOT/bin/ct" project "$PROJECT_PATH"; then
+    echo "Project setup skipped because the folder could not be updated: $PROJECT_PATH" >&2
+    echo "The framework installation itself is still complete." >&2
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform)
-      [[ $# -ge 2 ]] || die "--platform requires a value"
+      [[ $# -ge 2 ]] || die "--platform requires codex, cursor, or cline"
       PLATFORM="$2"
       shift 2
       ;;
-    --global)
-      DO_GLOBAL=1
-      shift
-      ;;
     --project)
-      [[ $# -ge 2 ]] || die "--project requires a path"
+      [[ $# -ge 2 ]] || die "--project requires a repository path"
       PROJECT_PATH="$2"
       shift 2
       ;;
+    --no-questionnaire)
+      QUESTIONNAIRE=0
+      shift
+      ;;
+    --check)
+      CHECK_ONLY=1
+      shift
+      ;;
     --refresh-map)
-      REFRESH_MAP=1
+      PROPOSE_MAP=1
       shift
       ;;
     --enable)
-      [[ $# -ge 2 ]] || die "--enable requires a value"
+      [[ $# -ge 2 ]] || die "--enable requires an addon name"
       ENABLE_LIST="$2"
       shift 2
       ;;
     --disable)
-      [[ $# -ge 2 ]] || die "--disable requires a value"
+      [[ $# -ge 2 ]] || die "--disable requires an addon name"
       DISABLE_LIST="$2"
       shift 2
+      ;;
+    --global)
+      echo "note: --global is retained for compatibility; the normal install is already global where supported." >&2
+      shift
       ;;
     -h|--help)
       usage
       exit 0
       ;;
     *)
-      die "unknown argument: $1 (try --help)"
+      die "unknown argument: $1 (try ./install.sh --help)"
       ;;
   esac
 done
 
-[[ -n "$PLATFORM" ]] || die "missing --platform (try --help)"
+if [[ -t 0 && -t 1 ]]; then
+  INTERACTIVE=1
+fi
+
+# --no-questionnaire is also a no-prompt mode so automation never hangs on a
+# host-selection question. Pass --platform when a non-Codex host is intended.
+if [[ "$QUESTIONNAIRE" -eq 0 ]]; then
+  INTERACTIVE=0
+fi
+
+if [[ -z "$PLATFORM" ]]; then
+  PLATFORM="$(choose_platform)"
+else
+  echo "Selected host: $PLATFORM" >&2
+fi
 
 case "$PLATFORM" in
-  cursor|cline)
-    echo "not implemented in v1" >&2
-    exit 1
-    ;;
-  codex)
-    ;;
-  *)
-    die "unknown platform: $PLATFORM (expected codex|cursor|cline)"
-    ;;
+  codex|cursor|cline) ;;
+  *) die "unsupported host '$PLATFORM'; choose codex, cursor, or cline" ;;
 esac
 
-# Default to global install when neither flag given (unless only enable/disable/refresh).
-if [[ "$DO_GLOBAL" -eq 0 && -z "$PROJECT_PATH" && "$REFRESH_MAP" -eq 0 && -z "$ENABLE_LIST" && -z "$DISABLE_LIST" ]]; then
-  DO_GLOBAL=1
-fi
-if [[ "$DO_GLOBAL" -eq 0 && -z "$PROJECT_PATH" && ( "$REFRESH_MAP" -eq 1 || -n "$ENABLE_LIST" || -n "$DISABLE_LIST" ) ]]; then
-  DO_GLOBAL=1
+if [[ "$CHECK_ONLY" -eq 1 ]]; then
+  [[ -z "$PROJECT_PATH$ENABLE_LIST$DISABLE_LIST" ]] || die "--check cannot be combined with project or addon changes"
+  exec "$ROOT/scripts/install-coding-team.sh" --check --platform "$PLATFORM"
 fi
 
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
+run_questionnaire
 
-SKILL_SRC="$ROOT/adapters/codex"
-SKILL_DST="$CODEX_HOME/skills/coding-team"
-QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
-QA_SKILL_DST="$CODEX_HOME/skills/qa-evidence-enforcement"
-QA_VALIDATOR="$ROOT/scripts/validate-qa-evidence.rb"
-DETECT="$SKILL_SRC/scripts/detect-model-pool.py"
-APPLY="$SKILL_SRC/scripts/apply-pool-map.py"
-EXAMPLE_MAP="$ROOT/examples/model-pool.map.codex.example.md"
-EXAMPLE_REFRESH="$ROOT/examples/model-pool.map.md"
-TOGGLES="$ROOT/addons/toggles.json"
+"$ROOT/scripts/install-coding-team.sh" --platform "$PLATFORM"
 
-[[ -d "$SKILL_SRC" ]] || die "missing adapter: $SKILL_SRC"
-[[ -f "$DETECT" && -f "$APPLY" ]] || die "missing pool scripts under adapters/codex/scripts/"
-[[ -f "$QA_SKILL_SRC/SKILL.md" ]] || die "missing QA enforcement skill: $QA_SKILL_SRC/SKILL.md"
-[[ -f "$QA_VALIDATOR" ]] || die "missing QA evidence validator: $QA_VALIDATOR"
+prepare_project
 
-link_path() {
-  local src="$1" dst="$2"
-  mkdir -p "$(dirname "$dst")"
-  if [[ -e "$dst" || -L "$dst" ]]; then
-    if [[ -L "$dst" ]]; then
-      local current
-      current="$(readlink "$dst")"
-      if [[ "$current" == "$src" ]]; then
-        echo "already linked: $dst → $src"
-        return 0
-      fi
-      echo "replacing symlink $dst (was → $current)"
-      rm "$dst"
-    else
-      die "refusing to overwrite non-symlink: $dst"
-    fi
-  fi
-  ln -s "$src" "$dst"
-  echo "linked: $dst → $src"
-}
-
-unlink_path() {
-  local dst="$1"
-  if [[ -L "$dst" ]]; then
-    rm "$dst"
-    echo "removed symlink: $dst"
-  elif [[ -e "$dst" ]]; then
-    die "refusing to remove non-symlink: $dst"
-  else
-    echo "not present: $dst"
-  fi
-}
-
-link_skill() {
-  link_path "$SKILL_SRC" "$SKILL_DST"
-  link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
-  echo "QA evidence enforcement: conditional skill + validator installed"
-}
-
-set_toggle() {
-  local name="$1" enabled="$2"
-  python3 - "$TOGGLES" "$name" "$enabled" <<'PY'
-import json, sys
-path, name, enabled = sys.argv[1], sys.argv[2], sys.argv[3].lower() == "true"
-data = json.loads(open(path, encoding="utf-8").read())
-addons = data.setdefault("addons", {})
-if name not in addons:
-    sys.exit(f"unknown addon: {name} (known: {', '.join(sorted(addons))})")
-addons[name]["enabled"] = enabled
-open(path, "w", encoding="utf-8").write(json.dumps(data, indent=2) + "\n")
-print(f"toggles.json: {name}.enabled = {enabled}")
-PY
-}
-
-enable_addon() {
-  local name="$1"
-  case "$name" in
-    pm-lean)
-      set_toggle pm-lean true
-      link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
-      link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
-      ;;
-    *)
-      die "unknown addon: $name (expected pm-lean)"
-      ;;
-  esac
-}
-
-disable_addon() {
-  local name="$1"
-  case "$name" in
-    pm-lean)
-      set_toggle pm-lean false
-      unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
-      unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
-      ;;
-    *)
-      die "unknown addon: $name (expected pm-lean)"
-      ;;
-  esac
-}
-
-split_csv() {
-  local csv="$1"
-  local IFS=','
-  # shellcheck disable=SC2086
-  set -- $csv
-  for item in "$@"; do
-    item="$(echo "$item" | tr -d '[:space:]')"
-    [[ -n "$item" ]] && echo "$item"
-  done
-}
-
-refresh_map() {
-  local targets=()
-  if [[ -d "$SKILL_DST" || -L "$SKILL_DST" ]]; then
-    targets+=("$SKILL_DST/model-pool.map.md")
-  else
-    targets+=("$SKILL_SRC/model-pool.map.md")
-  fi
-  targets+=("$EXAMPLE_REFRESH")
-
-  echo "detecting Codex model pool (CODEX_HOME=$CODEX_HOME)…"
-  local slugs
-  slugs="$(CODEX_HOME="$CODEX_HOME" python3 "$DETECT")"
-  echo "$slugs" | python3 "$APPLY" --stdin \
-    --out "${targets[0]}" \
-    --out "${targets[1]}" >/dev/null
-  echo "refreshed:"
-  printf '  %s\n' "${targets[@]}"
-}
-
-append_agents() {
-  local project="$1"
-  [[ -d "$project" ]] || die "project path is not a directory: $project"
-  local agents="$project/AGENTS.md"
-  local marker="<!-- coding-team:begin -->"
-  local block
-  block="$(cat <<BLOCK
-${marker}
-## Coding Team (Codex)
-
-Set \`CODING_TEAM_ROOT\` to the coding-team checkout (this install used: \`${ROOT}\`), or rely on the \`coding-team\` skill symlink under \`\$CODEX_HOME/skills/coding-team\`.
-
-When orchestrating multi-role work:
-
-1. Load the **coding-team** skill (\`\$coding-team\` / skill chip).
-2. Resolve \`CODING_TEAM_ROOT\` and read \`core/\` + skill \`model-pool.map.md\`.
-3. WIP ≤ 2; Test Engineer → Gatekeeper sequential; incomplete → ask human.
-4. Design: hallmark + awesome-design-md under \`\$CODING_TEAM_ROOT/skills/design/\`.
-5. Optional PM Lean addon (default OFF) — enable via \`./install.sh --enable pm-lean\` — see \`addons/README.md\`.
-
-Drop-in reference from the coding-team repo: see also \`${ROOT}/AGENTS.md\`.
-<!-- coding-team:end -->
-BLOCK
-)"
-
-  if [[ -f "$agents" ]] && grep -q 'coding-team:begin' "$agents"; then
-    echo "AGENTS.md already has coding-team pointer: $agents"
-    return 0
-  fi
-  if [[ -f "$agents" ]]; then
-    printf '\n%s\n' "$block" >> "$agents"
-    echo "appended coding-team pointer to $agents"
-  else
-    printf '%s\n' "$block" > "$agents"
-    echo "wrote $agents"
-  fi
-}
-
-echo "coding-team install (platform=codex)"
-echo "  repo:        $ROOT"
-echo "  CODEX_HOME:  $CODEX_HOME"
-
-if [[ "$DO_GLOBAL" -eq 1 ]]; then
-  link_skill
+if [[ -n "$ENABLE_LIST" ]]; then
+  "$ROOT/bin/ct" enable "$ENABLE_LIST"
 fi
 
 if [[ -n "$DISABLE_LIST" ]]; then
-  while IFS= read -r name; do
-    [[ -n "$name" ]] && disable_addon "$name"
-  done < <(split_csv "$DISABLE_LIST")
+  "$ROOT/bin/ct" disable "$DISABLE_LIST"
 fi
 
-if [[ -n "$ENABLE_LIST" ]]; then
-  while IFS= read -r name; do
-    [[ -n "$name" ]] && enable_addon "$name"
-  done < <(split_csv "$ENABLE_LIST")
-fi
-
-if [[ "$DO_GLOBAL" -eq 1 || "$REFRESH_MAP" -eq 1 || -n "$PROJECT_PATH" ]]; then
-  if [[ "$REFRESH_MAP" -eq 1 || "$DO_GLOBAL" -eq 1 || -n "$PROJECT_PATH" ]]; then
-    # Skip map refresh if only toggling addons and skill already linked unless --refresh-map
-    if [[ "$REFRESH_MAP" -eq 1 || -z "$ENABLE_LIST$DISABLE_LIST" || "$DO_GLOBAL" -eq 1 ]]; then
-      refresh_map
-    fi
-  fi
-fi
-
-if [[ -n "$PROJECT_PATH" ]]; then
-  append_agents "$PROJECT_PATH"
-fi
-
-if [[ ! -f "$EXAMPLE_MAP" ]]; then
-  echo "note: missing $EXAMPLE_MAP (expected in repo)" >&2
+if [[ "$PROPOSE_MAP" -eq 1 ]]; then
+  echo
+  echo "Read-only model-map suggestion (no file will be written):"
+  "$ROOT/bin/ct" map propose --platform "$PLATFORM"
 fi
 
 cat <<NEXT
 
-Next steps
-----------
-1. Confirm the coding-team skill:
-     ls -la "$SKILL_DST"
-2. Optional addons (default OFF — not injected into core):
-     ./install.sh --platform codex --global --enable pm-lean
-     ./install.sh --platform codex --global --disable pm-lean
-   State file: $TOGGLES
-3. In Codex, invoke **Coding Team**; enable addons only when you want them.
-4. Refresh the pool map after Codex model changes:
-     ./install.sh --platform codex --refresh-map
+Setup complete.
+Next:
+  1. Open or restart your AI coding host.
+  2. Describe one small change in plain English.
+  3. Keep the human review step before commit or release.
 
-Model map: $SKILL_DST/model-pool.map.md
+If your host cannot find the framework, set:
+  export CODING_TEAM_ROOT="$ROOT"
 NEXT

@@ -1,4 +1,4 @@
-# QA Operating Model (Hybrid)
+# QA Operating Model
 
 This is the active Coding Team QA policy. The previous layered operating model
 is archived at

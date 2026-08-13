@@ -1,6 +1,6 @@
 # Coding Team — AGENTS.md drop-in
 
-Paste this into a consumer project’s `AGENTS.md` (or run `./install.sh --platform codex --project <path>`).
+Paste this into a consumer project’s `AGENTS.md` (or run `./bin/ct project <path>`).
 
 ## Coding Team (Codex)
 
@@ -11,9 +11,9 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
 1. Install once (from the coding-team checkout):
 
    ```bash
-   ./install.sh --platform codex --global
+   ./scripts/install-coding-team.sh --platform codex
    # optional consumer pointer:
-   ./install.sh --platform codex --project /path/to/this/repo
+   ./bin/ct project /path/to/this/repo
    ```
 
 2. Set the checkout root (if the skill cannot infer it from the symlink):
@@ -27,10 +27,10 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
 ### Lead rules (short)
 
 - Resolve `CODING_TEAM_ROOT` (env, or parent of `adapters/` when the skill is a symlink to `adapters/codex`).
-- Read `core/model-routing.md`, concurrency/human-gates when present, role cards under `core/roles/`, and the install-time `model-pool.map.md` beside the skill.
+- Read `core/model-routing.md`, concurrency/human-gates when present, role cards under `core/roles/`, and the approved local `model-pool.map.md` only when explicitly configured.
 - **WIP ≤ 2** concurrent tool-using subagents.
 - **Test Engineer → Gatekeeper** sequential only.
 - Incomplete / non-APPROVE → **ask the human**; do not invent acceptance.
 - Design: pair **hallmark** with **awesome-design-md** under `$CODING_TEAM_ROOT/skills/design/`.
 
-Host adapters for Cursor and Cline are **not implemented in v1**.
+Codex, Cursor, and Cline are host adapters. The core remains host-neutral.

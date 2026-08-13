@@ -22,7 +22,7 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
    - `$CODING_TEAM_ROOT/core/model-routing.md`
    - `$CODING_TEAM_ROOT/core/concurrency.md`
    - `$CODING_TEAM_ROOT/core/human-gates.md`
-   - This skill’s **`model-pool.map.md`** (install-time map)
+   - This skill’s approved local **`model-pool.map.md`**, when configured
    - Role cards under `$CODING_TEAM_ROOT/core/roles/` as needed
 3. Design work: pair **hallmark** with **awesome-design-md** when the brief calls for UI/visual craft (see `skills/design/design-md-index.md`).
 
@@ -54,14 +54,15 @@ Prefer the Tier **0** mapped slug (usually `gpt-5.6-luna`) for Investigator, low
 ## Lead loop (short)
 
 1. Classify **nature** (N0–N5 / Consult / Docs)
-2. Assign lowest capable **tier**; resolve slug from `model-pool.map.md`
+2. Assign lowest capable **tier**; resolve a slug from the approved local map when configured
 3. Normalize aliases (Explorer→Investigator, etc.); never invent roles
 4. Create/update the batch task list; delegate one role per task via [runtime.md](runtime.md)
 5. Integrate → Test Engineer → bounded QA evidence validation when triggered → Gatekeeper
 6. On incomplete output: ask human; do not invent an APPROVE
 
-## Refresh map
+## Optional model map
 
 ```bash
-./install.sh --platform codex --refresh-map
+./bin/ct map propose --platform codex
+./bin/ct map approve --platform codex
 ```
