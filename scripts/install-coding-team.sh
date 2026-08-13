@@ -5,7 +5,6 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
-PROFILE_ALIAS=""
 PLATFORM=""
 CHECK_ONLY=0
 ROLLBACK_ACTIONS=()
@@ -18,10 +17,6 @@ usage() {
 Usage:
   ./scripts/install-coding-team.sh [--platform codex|cursor|cline]
   ./scripts/install-coding-team.sh --check [--platform codex|cursor|cline]
-
-Compatibility:
-  --profile hybrid|full  Accepted as a legacy alias. Both values install the
-                         same adapter + conditional QA support.
 
 Start from a clean standalone clone:
   git clone https://github.com/ericlam2k/coding-team.git
@@ -41,11 +36,6 @@ die() {
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --profile)
-      [[ $# -ge 2 ]] || die "--profile requires hybrid or full"
-      PROFILE_ALIAS="$2"
-      shift 2
-      ;;
     --platform)
       [[ $# -ge 2 ]] || die "--platform requires codex, cursor, or cline"
       PLATFORM="$2"
@@ -65,9 +55,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -n "$PROFILE_ALIAS" ]]; then
-  [[ "$PROFILE_ALIAS" == "hybrid" || "$PROFILE_ALIAS" == "full" ]] || die "profile must be hybrid or full"
-fi
 [[ -n "$PLATFORM" ]] || PLATFORM="codex"
 case "$PLATFORM" in
   codex|cursor|cline) ;;
@@ -181,9 +168,6 @@ fi
 link_path "$ADAPTER_SRC" "$ADAPTER_DST"
 link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
 echo "Canonical install active: adapter + conditional QA support."
-if [[ -n "$PROFILE_ALIAS" ]]; then
-  echo "Compatibility alias accepted: --profile $PROFILE_ALIAS (no separate mode)."
-fi
 
 check_links
 cat <<NEXT

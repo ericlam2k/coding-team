@@ -62,21 +62,12 @@ Use `--check` to inspect an existing activation without changing it:
 Set `CODEX_HOME` to a project-local directory when the host cannot read your
 global Codex home. The installer refuses to overwrite a non-symlink target.
 
-## Compatibility aliases
+## One installation contract
 
-Older commands may include a profile flag:
-
-```bash
-./scripts/install-coding-team.sh --profile hybrid --platform codex
-./scripts/install-coding-team.sh --profile full --platform codex
-```
-
-These flags are compatibility aliases only. They install the same payload,
-do not select separate modes, and do not write a model map. New scripts should
-omit `--profile`.
-
-`./bin/ct init --full` is also retained as a compatibility spelling. It has
-the same installation behavior as `./bin/ct init`.
+Every public installation command installs the selected host adapter and
+conditional QA support. The command does not select an installation variant,
+write a model map, or enable an addon. Use the explicit extension commands
+below when you need those actions.
 
 ## Optional model map
 
@@ -135,7 +126,7 @@ authority. See [Addons](addons.md).
 | Symptom | Fix |
 | --- | --- |
 | Adapter is not active | Re-run the canonical installer for the selected platform. |
-| A legacy profile command appears in a script | Keep it temporarily; `hybrid` and `full` now behave identically. |
+| An installer flag is rejected | Use the documented `--platform`, `--check`, or `--no-questionnaire` command. |
 | You want to inspect model choices | Use `./bin/ct map propose`; it is read-only. |
 | You want to write a model map | Use `./bin/ct map approve` and make the approval explicit. |
 | An addon is not available | Check `./bin/ct status`; addons are opt-in and host-specific. |

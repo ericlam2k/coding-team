@@ -24,9 +24,9 @@ It does not refresh or write a model map during setup:
 ./scripts/install-coding-team.sh --platform codex
 ```
 
-The old `--profile hybrid` and `--profile full` spellings are accepted as
-compatibility aliases. They install the same payload and are not separate
-framework modes.
+There is one public installation behavior: the selected adapter plus
+conditional QA support. Installation does not write a model map or enable an
+addon.
 
 ## Model maps are host-specific
 

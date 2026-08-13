@@ -87,9 +87,8 @@ The canonical installer links the selected adapter and conditional QA support:
 ./scripts/install-coding-team.sh --platform codex
 ```
 
-There are no separate public installation modes. Legacy `--profile hybrid` and
-`--profile full` flags are accepted as compatibility aliases only. Model maps
-and addons are explicit extensions; see [Installation](docs/installation.md).
+There is one public installation path. Model maps and addons are explicit
+extensions; see [Installation](docs/installation.md).
 
 ## What this is
 

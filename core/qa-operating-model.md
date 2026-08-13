@@ -2,7 +2,7 @@
 
 This is the active Coding Team QA policy. The previous layered operating model
 is archived at
-`docs/archive/qa-operating-model-pre-hybrid-29311de.md`; do not load it by
+`docs/archive/qa-operating-model-archive-29311de.md`; do not load it by
 default.
 
 Use the smallest flow that gives reliable evidence. Keep WIP ≤2, disjoint write

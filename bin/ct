@@ -24,8 +24,8 @@ usage() {
   cat <<'EOF'
 coding-team v2 CLI (platform-independent)
 
-  ./bin/ct init [--platform codex|cursor|cline] [--yes] [--full]
-      Detect/install adapter only. --yes and --full are compatibility flags.
+  ./bin/ct init [--platform codex|cursor|cline]
+      Detect/install the selected adapter only.
 
   ./bin/ct map propose [--platform codex|cursor|cline]
       Show a read-only host model-map suggestion. Never writes a file.
@@ -155,20 +155,12 @@ run_approve() {
 }
 
 cmd_init() {
-  local platform="" yes=0 full=0
+  local platform=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --platform)
         platform="$2"
         shift 2
-        ;;
-      --yes|-y)
-        yes=1
-        shift
-        ;;
-      --full|-f)
-        full=1
-        shift
         ;;
       -h|--help)
         usage
@@ -196,9 +188,6 @@ cmd_init() {
 
   echo "==> coding-team init (platform=$platform)"
   install_adapter "$platform"
-
-  [[ "$yes" -eq 1 ]] && echo "note: --yes is retained for compatibility; no model-map write was requested"
-  [[ "$full" -eq 1 ]] && echo "note: --full is retained for compatibility; no separate install mode exists"
 
   echo
   echo "Done. No model map was written. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
