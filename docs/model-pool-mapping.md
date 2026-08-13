@@ -1,41 +1,48 @@
-# Model pool mapping (v2)
+# Model-pool mapping
 
-## Abstract tiers (core — no host slugs)
+The core framework routes work to abstract capability tiers. A host may map
+those tiers to concrete model slugs, but that mapping is local configuration,
+not public platform policy.
+
+## Abstract tiers
 
 | Tier | Intent |
-|---|---|
-| 0 | Cheap utility |
-| 1 build | Eco implement |
-| 1 validate | Careful validate |
-| 2 | Premium plan / debate / Gatekeeper |
+| --- | --- |
+| 0 | Cheap utility for lookup or lightweight docs |
+| 1 build | Everyday implementation |
+| 1 validate | Careful validation |
+| 2 | Premium planning, debate, or Gatekeeper judgment |
 | 3 | Max-risk judgment |
 
-## Install flow
+The Lead records `planned → actual` when the runtime supplies a usable
+identity. A missing slug or unavailable receipt does not become a fabricated
+claim.
 
-```text
-detect pool → suggest map → human approve → write model-pool.map.md
-```
+## Explicit map flow
+
+Canonical installation does not create a map. When you need one, separate
+inspection from approval:
 
 ```bash
-./bin/ct init          # shows suggestion, asks [Y/n]
-./bin/ct init --yes    # approve without prompt
-./bin/ct refresh       # re-run suggestion + approval
+# Read-only suggestion. No file is written.
+./bin/ct map propose --platform codex
+
+# Human-gated write to the local host map.
+./bin/ct map approve --platform codex
 ```
 
-Proposal script: [`scripts/propose-model-map.py`](../scripts/propose-model-map.py).
+Use `--yes` only when the surrounding automation is itself the explicit
+approval gate:
 
-## Codex preference hints (not core policy)
+```bash
+./bin/ct map approve --platform codex --yes
+```
 
-| Tier | Typical suggestion |
-|---|---|
-| 0 | `gpt-5.6-luna` |
-| 1 build / validate | `gpt-5.6-terra` |
-| 2 / 3 | `gpt-5.6-sol` (+ effort) |
+## Portability rule
 
-Cursor/Cline detectors use that platform’s known pool labels; you can reject and re-run after editing prefs in the script if needed.
+`core/model-routing.md` stays free of host slugs. Codex, Cursor, and Cline may
+expose different pools, names, effort controls, and receipts. Therefore:
 
-## Rules
-
-- Never bake host slugs into `core/model-routing.md`
-- Never block task start on a missing slug — record `planned → actual`
-- Unapproved proposals must not be treated as live map
+- do not copy a concrete map from one host to another;
+- do not treat an example map as an availability guarantee; and
+- keep `UNAVAILABLE` when the host provides no trustworthy receipt.

@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `scripts/propose-model-map.py` — detect → suggest → approve → write
 - Cursor + Cline adapter skills + `runtime.md` (no longer stubs-only)
-- `./bin/ct init` interactive approval flow; `--yes`, `--platform`, `--full`
+- `./bin/ct init` and explicit model-map approval flow; `--platform`
 
 ### Changed
 

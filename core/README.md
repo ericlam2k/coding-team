@@ -9,8 +9,8 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
 | [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
 | [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
-| [qa-operating-model.md](qa-operating-model.md) | Hybrid Normal/Risky QA flow, selected layers, evidence, and promotion gates |
-| [../docs/archive/qa-operating-model-pre-hybrid-29311de.md](../docs/archive/qa-operating-model-pre-hybrid-29311de.md) | Archived pre-hybrid QA policy; reference only |
+| [qa-operating-model.md](qa-operating-model.md) | Normal/Risky QA flow, selected layers, evidence, and promotion gates |
+| [../docs/archive/qa-operating-model-archive-29311de.md](../docs/archive/qa-operating-model-archive-29311de.md) | Archived prior QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
 | [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |
@@ -61,4 +61,6 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 
 ## Install note
 
-Map abstract tiers to your host’s model pool in install-time `model-pool.map.md`. Lead classifies **nature**, assigns a **tier**, then looks up the mapped slug.
+Optionally map abstract tiers to your host’s model pool with the explicit local
+`model-pool.map.md` flow. Lead classifies **nature**, assigns a **tier**, then
+looks up the mapped slug when one is approved and available.

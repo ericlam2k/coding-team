@@ -1,29 +1,48 @@
-# Adapters (platform-independent core)
+# Adapters
 
-Core policy under `core/` has **no host model slugs**. Adapters bind runtime only.
+The `core/` directory defines host-neutral roles, templates, gates, abstract
+tiers, and evidence rules. An adapter binds that policy to a host runtime.
 
-| Adapter | Status | Install |
-|---|---|---|
-| [Codex](../adapters/codex/) | **v2 supported** | `./bin/ct init --platform codex` |
-| [Cursor](../adapters/cursor/) | **v2 supported** | `./bin/ct init --platform cursor` |
-| [Cline](../adapters/cline/) | **v2 supported** | `./bin/ct init --platform cline` |
+| Adapter | Status | Canonical install |
+| --- | --- | --- |
+| [Codex](../adapters/codex/) | Supported | `./scripts/install-coding-team.sh --platform codex` |
+| [Cursor](../adapters/cursor/) | Supported | `./scripts/install-coding-team.sh --platform cursor` |
+| [Cline](../adapters/cline/) | Supported | `./scripts/install-coding-team.sh --platform cline` |
 
-Auto-detect: `./bin/ct init` (prefers Codex if `~/.codex` exists).
+## Shared behavior
 
-## Shared install behavior (v2)
+Every adapter uses the same Lead → role-card → bounded-task shape, WIP ≤ 2,
+disjoint write ownership, Test Engineer → Gatekeeper order, and human gates
+for irreversible actions. Only runtime mechanics differ.
 
-1. Link/copy the platform adapter skill.
-2. **Detect** host model pool (or known defaults).
-3. **Show a suggested** tier → slug map.
-4. **Ask for approval** (`Y/n`) before writing `model-pool.map.md`.
-5. Pass `--yes` only for CI / non-interactive approve.
+## Installation behavior
+
+The canonical installer links the selected adapter and conditional QA support.
+It does not refresh or write a model map during setup:
 
 ```bash
-./bin/ct init                 # interactive approve
-./bin/ct init --yes           # auto-approve suggestion
-./bin/ct refresh              # re-propose map + approve again
+./scripts/install-coding-team.sh --platform codex
 ```
 
-## Binding summary
+There is one public installation behavior: the selected adapter plus
+conditional QA support. Installation does not write a model map or enable an
+addon.
 
-Same Lead / WIP ≤ 2 / TE→GK / human-gates semantics on every platform; only spawn/resume mechanics differ (see each adapter’s `runtime.md`).
+## Model maps are host-specific
+
+Core tiers describe capability intent; they do not identify a provider or
+model. If a host-specific map is useful, inspect the suggestion first:
+
+```bash
+./bin/ct map propose --platform codex
+```
+
+Write it only after explicit approval:
+
+```bash
+./bin/ct map approve --platform codex
+```
+
+An approved map belongs to the local host installation. It is not proof that a
+concrete slug is available on another host or that the public core is tied to
+that provider.

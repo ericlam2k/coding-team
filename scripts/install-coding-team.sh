@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
-# Generic Coding Team installer with mutually exclusive lightweight/full profiles.
+# Canonical Coding Team installer.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
-PROFILE="hybrid"
 PLATFORM=""
 CHECK_ONLY=0
-PROFILE_FILE="$CODEX_HOME/coding-team.profile"
+ROLLBACK_ACTIONS=()
+ROLLBACK_PATHS=()
+ROLLBACK_OLDTARGETS=()
+ROLLBACK_EXPECTED=()
 
 usage() {
   cat <<'USAGE'
 Usage:
-  ./scripts/install-coding-team.sh [--profile hybrid|full] [--platform codex|cursor|cline]
-  ./scripts/install-coding-team.sh --check [--profile hybrid|full] [--platform ...]
-
-Profiles:
-  hybrid  Lightweight default: adapter + QA skill; no model refresh or addons.
-  full    Opt-in framework: model-map setup plus full Codex addons.
+  ./scripts/install-coding-team.sh [--platform codex|cursor|cline]
+  ./scripts/install-coding-team.sh --check [--platform codex|cursor|cline]
 
 Start from a clean standalone clone:
   git clone https://github.com/ericlam2k/coding-team.git
   cd coding-team
-  ./scripts/install-coding-team.sh --profile hybrid --platform codex
+  ./scripts/install-coding-team.sh --platform codex
 
 Environment:
   CODEX_HOME  Skill/config home (default: ~/.codex). Use a project-local path
@@ -38,11 +36,6 @@ die() {
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --profile)
-      [[ $# -ge 2 ]] || die "--profile requires hybrid or full"
-      PROFILE="$2"
-      shift 2
-      ;;
     --platform)
       [[ $# -ge 2 ]] || die "--platform requires codex, cursor, or cline"
       PLATFORM="$2"
@@ -62,7 +55,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-[[ "$PROFILE" == "hybrid" || "$PROFILE" == "full" ]] || die "profile must be hybrid or full"
 [[ -n "$PLATFORM" ]] || PLATFORM="codex"
 case "$PLATFORM" in
   codex|cursor|cline) ;;
@@ -88,42 +80,84 @@ fi
 link_path() {
   local src="$1" dst="$2"
   mkdir -p "$(dirname "$dst")"
+  local prev
   if [[ -L "$dst" ]]; then
-    local current
-    current="$(readlink "$dst")"
-    if [[ "$current" == "$src" ]]; then
+    prev="$(readlink "$dst")"
+    if [[ "$prev" == "$src" ]]; then
       echo "already linked: $dst -> $src"
       return 0
     fi
-    echo "replacing symlink $dst (was -> $current)"
+    echo "replacing symlink $dst (was -> $prev)"
     rm "$dst"
+    # Record rollback fields separately so paths and link targets may contain
+    # colons without corrupting the rollback record.
+    ROLLBACK_ACTIONS+=("restore")
+    ROLLBACK_PATHS+=("$dst")
+    ROLLBACK_OLDTARGETS+=("$prev")
+    ROLLBACK_EXPECTED+=("$src")
   elif [[ -e "$dst" ]]; then
-    die "refusing to overwrite non-symlink: $dst"
+    die "refusing to overwrite non-symlink: $dst; choose another CODEX_HOME or remove the old install yourself"
+  else
+    # Record that we should remove the new symlink on failure.
+    ROLLBACK_ACTIONS+=("remove")
+    ROLLBACK_PATHS+=("$dst")
+    ROLLBACK_OLDTARGETS+=("")
+    ROLLBACK_EXPECTED+=("$src")
   fi
   ln -s "$src" "$dst"
   echo "linked: $dst -> $src"
 }
 
-remove_owned_addon_links() {
-  [[ "$PLATFORM" == "codex" ]] || return 0
-  # Hybrid owns only the core and QA links. Optional PM Lean activation is
-  # explicit and is never enabled or removed by profile switching.
-  :
+rollback() {
+  echo "installation failed — rolling back installer-owned changes..." >&2
+  # undo in reverse order
+  for ((i=${#ROLLBACK_ACTIONS[@]}-1; i>=0; i--)); do
+    action="${ROLLBACK_ACTIONS[i]}"
+    path="${ROLLBACK_PATHS[i]}"
+    oldtarget="${ROLLBACK_OLDTARGETS[i]}"
+    expected="${ROLLBACK_EXPECTED[i]}"
+
+    if [[ "$action" == "remove" ]]; then
+      # remove only if it's still a symlink that points to the expected installed source
+      if [[ -L "$path" ]]; then
+        cur="$(readlink "$path")"
+        if [[ -n "$expected" && "$cur" == "$expected" ]]; then
+          rm "$path" && echo "removed $path"
+        else
+          echo "warning: not removing $path because it points to '$cur' (expected '$expected')" >&2
+        fi
+      else
+        echo "warning: not removing $path because it is not a symlink" >&2
+      fi
+
+    elif [[ "$action" == "restore" ]]; then
+      # do not overwrite a non-symlink
+      if [[ -e "$path" && ! -L "$path" ]]; then
+        echo "warning: cannot restore $path because a non-symlink now exists" >&2
+        continue
+      fi
+      # restore only if current symlink still points to the installed source we created
+      if [[ -L "$path" ]]; then
+        cur="$(readlink "$path")"
+        if [[ -n "$expected" && "$cur" != "$expected" ]]; then
+          echo "warning: not restoring $path because it points to '$cur' (expected installed source '$expected')" >&2
+          continue
+        fi
+        rm "$path"
+      fi
+      ln -s "$oldtarget" "$path" && echo "restored $path -> $oldtarget"
+    fi
+  done
 }
 
-write_profile() {
-  mkdir -p "$(dirname "$PROFILE_FILE")"
-  printf '%s\n' "$PROFILE" > "$PROFILE_FILE"
-  echo "active profile: $PROFILE ($PROFILE_FILE)"
-}
+# Rollback on any non-zero exit; on success do nothing.
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then rollback; fi; exit "$rc"' EXIT
 
 check_links() {
   [[ -f "$ADAPTER_DST/SKILL.md" ]] || die "adapter is not active: $ADAPTER_DST"
   [[ -f "$QA_SKILL_DST/SKILL.md" ]] || die "QA skill is not active: $QA_SKILL_DST"
   [[ -f "$ROOT/core/qa-operating-model.md" ]] || die "QA policy is missing: $ROOT/core/qa-operating-model.md"
-  [[ -f "$PROFILE_FILE" ]] || die "profile marker is missing: $PROFILE_FILE"
-  [[ "$(<"$PROFILE_FILE")" == "$PROFILE" ]] || die "active profile is $(<"$PROFILE_FILE"), requested $PROFILE"
-  echo "activation check: PASS ($PROFILE/$PLATFORM)"
+  echo "activation check: PASS ($PLATFORM)"
 }
 
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
@@ -131,18 +165,9 @@ if [[ "$CHECK_ONLY" -eq 1 ]]; then
   exit 0
 fi
 
-if [[ "$PROFILE" == "hybrid" ]]; then
-  remove_owned_addon_links
-  link_path "$ADAPTER_SRC" "$ADAPTER_DST"
-  link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
-  write_profile
-  echo "Hybrid profile active: no model-map refresh and no addons enabled."
-else
-  [[ -x "$ROOT/bin/ct" ]] || die "missing executable: $ROOT/bin/ct"
-  "$ROOT/bin/ct" init --platform "$PLATFORM" --yes --full
-  write_profile
-  echo "Full profile active: model-map setup completed; optional addons remain explicit-only."
-fi
+link_path "$ADAPTER_SRC" "$ADAPTER_DST"
+link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
+echo "Canonical install active: adapter + conditional QA support."
 
 check_links
 cat <<NEXT
@@ -151,5 +176,5 @@ Next session:
   export CODING_TEAM_ROOT="$ROOT"
   export CODEX_HOME="$CODEX_HOME"
   Load the coding-team skill for $PLATFORM.
-  Hybrid is the default; switch profiles by rerunning this script.
+  Model maps are optional; use ./bin/ct map propose or ./bin/ct map approve.
 NEXT

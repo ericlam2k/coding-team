@@ -180,7 +180,7 @@ def render(platform: str, available: list[str], rows: list[dict[str, object]], a
         "## Usage",
         "",
         "Lead assigns a tier, then uses **Mapped slug** + **Effort** when spawning specialists.",
-        "Refresh with approval: `./bin/ct refresh`",
+        "Inspect: `./bin/ct map propose`; approve/write: `./bin/ct map approve`",
         "",
     ]
     return "\n".join(lines)

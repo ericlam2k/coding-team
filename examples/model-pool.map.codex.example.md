@@ -1,6 +1,6 @@
 # model-pool.map.md (Codex) — example
 
-Generated: `2026-07-21T00:00:00Z` (example only — run `./install.sh --platform codex --refresh-map` for a live map)
+Generated: `2026-07-21T00:00:00Z` (example only — run `./bin/ct map propose --platform codex` for a current suggestion)
 
 Abstract tiers from `core/model-routing.md` → closest available GPT slug.
 Tiers are non-binding; record planned → actual in briefs. Never block start on missing identity.
@@ -27,4 +27,5 @@ Tiers are non-binding; record planned → actual in briefs. Never block start on
 ## Usage
 
 Lead assigns a tier, then uses **Actual slug** + **Effort** when spawning Codex subagents.
-Refresh: `./install.sh --platform codex --refresh-map`
+Inspect: `./bin/ct map propose --platform codex`
+Approve/write: `./bin/ct map approve --platform codex`

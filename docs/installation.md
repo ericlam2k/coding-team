@@ -1,97 +1,132 @@
-# Installation (v2)
+# Installation
 
-## Clone and activate
+## Quick start: one friendly command
+
+For a normal local setup, use the top-level installer:
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./install.sh
 ```
 
-The default **Hybrid** profile is the low-cost, platform-independent activation:
+The installer detects Codex, Cursor, or Cline when possible. If it finds more
+than one host, it asks which one to use. If it cannot detect a host, it offers
+Codex as the default. In an interactive session, it can ask for an optional
+first project folder.
 
-- links only the selected platform adapter and the conditional QA evidence
-  skill;
-- keeps the active hybrid QA policy, WIP ≤2, disjoint writes, and TE →
-  Gatekeeper sequencing;
-- does not refresh a model map or enable optional addons.
+The project path is used only to add the normal
+`coding-team` pointer to that project's `AGENTS.md`. A missing or unwritable
+project is reported and skipped; it does not make the framework installation
+look successful by silently changing another folder.
 
-The optional **Full** profile is a separate install mode:
+Use `--no-questionnaire` for CI or scripts. Combine it with an explicit host
+when needed:
 
 ```bash
-./scripts/install-coding-team.sh --profile full --platform codex
+./install.sh --platform codex --no-questionnaire
+./install.sh --platform cursor --no-questionnaire
 ```
 
-Full delegates to `bin/ct init --full`, including model-map approval. Optional
-addons remain explicit-only. Switch back explicitly:
+The no-questionnaire path never waits for host or communication input. It uses
+the safe defaults and does not write a model map. If more than one host is
+installed, pass `--platform` to resolve that choice explicitly.
+
+## Advanced: one canonical install
+
+Clone the repository and install the adapter for your host:
 
 ```bash
-./scripts/install-coding-team.sh --profile hybrid --platform codex
-./scripts/install-coding-team.sh --check --profile hybrid --platform codex
-./bin/ct status
+git clone https://github.com/ericlam2k/coding-team.git
+cd coding-team
+./scripts/install-coding-team.sh --platform codex
 ```
 
-Profiles are mutually exclusive at activation time. The installer records the
-active value in `$CODEX_HOME/coding-team.profile` and Hybrid removes only
-addon symlinks that point into this checkout; it never deletes unrelated user
-files. Use a project-local `CODEX_HOME` when the host sandbox cannot read the
-global Codex home.
-
-Both profiles load the same core task-size policy: split work expected to
-exceed 120 seconds or cross the width limits, checkpoint at 180 seconds, and
-hard-stop at 240 seconds with one bounded handoff. Full mode does not bypass
-WIP ≤2, disjoint writes, or TE → Gatekeeper sequencing.
-
-For direct interactive model-map management without profile switching, the
-advanced commands remain available:
+The same command supports `cursor` and `cline`:
 
 ```bash
-./bin/ct init
-./bin/ct init --yes              # skip prompt (CI)
-./bin/ct init --platform cursor
-./bin/ct refresh                 # new suggestion + approve again
+./scripts/install-coding-team.sh --platform cursor
+./scripts/install-coding-team.sh --platform cline
 ```
 
-## Why approve the map?
+The installer links the selected host adapter and conditional QA support. It
+does not write a model map, enable addons, or create a second installation
+mode. Core policy remains the same on every host.
 
-Core is **platform-independent** (abstract tiers only). Host slugs differ (Codex GPT Luna/Terra/Sol vs Cursor pool vs Cline). The installer **suggests** a mapping; you confirm so a bad auto-pick never silently becomes policy.
-
-## Activate
-
-Set `CODING_TEAM_ROOT` to this clone, load the coding-team skill for your platform, then:
-
-```text
-You are Lead. Read core/orchestration.md, core/model-routing.md, human-gates.md,
-and the approved model-pool.map.md. Classify N0–N5, assign tier, use mapped slug.
-WIP ≤ 2. TE → Gatekeeper sequential. Incomplete → ask me.
-
-For Risky QA batches, installation also exposes the conditional
-`qa-evidence-enforcement` skill and the
-`scripts/validate-qa-evidence.rb` promotion validator. It is activated only
-when the batch declares `qa_required=true` or `qa_mode=bounded`. The bounded
-pass is timeboxed at 120 seconds target / 240 seconds hard stop; timeout is a
-blocked evidence result, not an automatic retry.
-
-For a no-dependency activation of only the adapter, core policy, and QA skill,
-use the generic installer (the old Codex name remains a compatibility wrapper):
-
-```text
-Set CODING_TEAM_ROOT to this clone and load the coding-team skill for your
-platform. The installer links the adapter and conditional QA skill.
-```
+Use `--check` to inspect an existing activation without changing it:
 
 ```bash
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./scripts/install-coding-team.sh --check --platform codex
 ```
 
-This does not refresh model maps or enable addons. Use `--check` to verify an
-existing activation without changing links. `scripts/activate-codex-team.sh`
-continues to invoke the same Hybrid Codex path for existing automation.
+Set `CODEX_HOME` to a project-local directory when the host cannot read your
+global Codex home. The installer refuses to overwrite a non-symlink target.
+
+## One installation contract
+
+Every public installation command installs the selected host adapter and
+conditional QA support. The command does not select an installation variant,
+write a model map, or enable an addon. Use the explicit extension commands
+below when you need those actions.
+
+## Optional model map
+
+A model map is host-specific configuration, not portable core policy. It is
+optional and deliberately separated into a read step and a human-gated write
+step:
+
+```bash
+# Read-only: show a suggestion and write nothing.
+./bin/ct map propose --platform codex
+
+# Explicit approval: prompt, then write the local host map if approved.
+./bin/ct map approve --platform codex
+```
+
+For a non-interactive environment, `--yes` is an explicit approval signal:
+
+```bash
+./bin/ct map approve --platform codex --yes
+```
+
+Do not copy a concrete map between hosts. Record the planned tier and actual
+host/model choice in the task handoff when the runtime supplies that
+information. Missing model telemetry stays unavailable.
+
+## Activate the framework
+
+Set `CODING_TEAM_ROOT` to this checkout and load the adapter skill for your
+host. A first task should name one outcome, one boundary, the proof to collect,
+and the stop condition.
+
+The shared operating rules are WIP ≤ 2, disjoint writes, Test Engineer →
+Gatekeeper sequencing, and a human decision before irreversible actions.
+
+## Conditional QA
+
+Normal work uses the ordinary focused checks for the task. Risky or bounded QA
+work can load the `qa-evidence-enforcement` skill and its validator. A bounded
+pass targets 120 seconds, checkpoints at 180 seconds, and hard-stops at 240
+seconds. A timeout is `BLOCKED` evidence, not an automatic retry.
+
+## Addons
+
+Addons are separate and default OFF. Enable one only when you need it:
+
+```bash
+./bin/ct enable pm-lean
+./bin/ct disable pm-lean
+```
+
+Addons do not change core routing, role ownership, human gates, or acceptance
+authority. See [Addons](addons.md).
 
 ## Troubleshooting
 
 | Symptom | Fix |
-|---|---|
-| Map not written | Hybrid does not write maps; choose `--profile full` or run `./bin/ct refresh` |
-| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --profile <profile> --platform <name>` |
-| Non-interactive refused | Add `--yes` to the advanced `bin/ct` command |
+| --- | --- |
+| Adapter is not active | Re-run the canonical installer for the selected platform. |
+| An installer flag is rejected | Use the documented `--platform`, `--check`, or `--no-questionnaire` command. |
+| You want to inspect model choices | Use `./bin/ct map propose`; it is read-only. |
+| You want to write a model map | Use `./bin/ct map approve` and make the approval explicit. |
+| An addon is not available | Check `./bin/ct status`; addons are opt-in and host-specific. |

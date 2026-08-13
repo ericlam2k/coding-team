@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# coding-team CLI v2 — platform-independent init with model-map approval.
+# coding-team CLI — platform-independent install with explicit model-map control.
 #
-#   ./bin/ct init                 # auto-detect platform, propose map, ask approve
-#   ./bin/ct init --yes           # non-interactive approve
+#   ./bin/ct init                 # install adapter only
 #   ./bin/ct init --platform codex|cursor|cline
-#   ./bin/ct init --full          # legacy compatibility; no addon auto-enable
+#   ./bin/ct map propose         # read-only model-map suggestion
+#   ./bin/ct map approve         # explicit model-map write
 #   ./bin/ct status | refresh | enable | disable | project | help
 set -euo pipefail
 
@@ -24,11 +24,17 @@ usage() {
   cat <<'EOF'
 coding-team v2 CLI (platform-independent)
 
-  ./bin/ct init [--platform codex|cursor|cline] [--yes] [--full]
-      Detect/install adapter, suggest model map, ask you to approve, then write.
+  ./bin/ct init [--platform codex|cursor|cline]
+      Detect/install the selected adapter only.
+
+  ./bin/ct map propose [--platform codex|cursor|cline]
+      Show a read-only host model-map suggestion. Never writes a file.
+
+  ./bin/ct map approve [--platform codex|cursor|cline] [--yes]
+      Show the suggestion and explicitly approve a local model-map write.
 
   ./bin/ct status
-  ./bin/ct refresh [--yes] [--platform ...]
+  ./bin/ct refresh [--platform ...]       (legacy alias for map propose)
   ./bin/ct enable pm-lean                (optional PM addon)
   ./bin/ct disable pm-lean
   ./bin/ct project <path>
@@ -36,7 +42,8 @@ coding-team v2 CLI (platform-independent)
 
 Notes
   • Core policy has no host slugs — only abstract tiers.
-  • Model map is a SUGGESTION until you approve (or pass --yes).
+  • Installation does not write a model map.
+  • map propose is read-only; map approve is the only write path.
   • Default platform: auto-detect (Codex if ~/.codex exists, else ask).
 EOF
 }
@@ -48,6 +55,10 @@ detect_platform() {
   fi
   if [[ -d "$HOME/.cursor" ]] || [[ -d "$ROOT/../../.cursor" ]]; then
     echo cursor
+    return
+  fi
+  if [[ -n "${CLINE_HOME:-}" ]] || [[ -d "$HOME/.cline" ]]; then
+    echo cline
     return
   fi
   echo ""
@@ -89,6 +100,7 @@ install_adapter() {
     cursor)
       mkdir -p "$ROOT/.cursor-install"
       link_path "$ROOT/adapters/cursor" "$ROOT/.cursor-install/coding-team"
+      link_path "$QA_SKILL_SRC" "$ROOT/.cursor-install/qa-evidence-enforcement"
       echo "Cursor: symlink ready at $ROOT/.cursor-install/coding-team"
       echo "Copy/link into your project: .cursor/skills/coding-team → that path"
       echo "  or: ln -s \"$ROOT/adapters/cursor\" \"/path/to/project/.cursor/skills/coding-team\""
@@ -96,6 +108,7 @@ install_adapter() {
     cline)
       mkdir -p "$ROOT/.cline-install"
       link_path "$ROOT/adapters/cline" "$ROOT/.cline-install/coding-team"
+      link_path "$QA_SKILL_SRC" "$ROOT/.cline-install/qa-evidence-enforcement"
       echo "Cline: symlink ready at $ROOT/.cline-install/coding-team"
       echo "Point Cline skills/rules at CODING_TEAM_ROOT=$ROOT"
       ;;
@@ -127,6 +140,12 @@ map_outs() {
 run_propose() {
   local platform="$1"
   shift
+  python3 "$PROPOSE" --platform "$platform" --codex-home "$CODEX_HOME" --propose-only "$@"
+}
+
+run_approve() {
+  local platform="$1"
+  shift
   local outs=()
   local o
   while IFS= read -r o; do
@@ -136,20 +155,12 @@ run_propose() {
 }
 
 cmd_init() {
-  local platform="" yes=0 full=0
+  local platform=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --platform)
         platform="$2"
         shift 2
-        ;;
-      --yes|-y)
-        yes=1
-        shift
-        ;;
-      --full|-f)
-        full=1
-        shift
         ;;
       -h|--help)
         usage
@@ -175,29 +186,11 @@ cmd_init() {
     fi
   fi
 
-  echo "==> coding-team v2 init (platform=$platform)"
+  echo "==> coding-team init (platform=$platform)"
   install_adapter "$platform"
 
-  local extra=()
-  [[ "$yes" -eq 1 ]] && extra+=(--yes)
-
-  echo "==> Model map suggestion (approve to write)"
-  if ! run_propose "$platform" "${extra[@]}"; then
-    local rc=$?
-    if [[ "$rc" -eq 2 ]]; then
-      echo "Install linked, but model map was NOT approved/written."
-      echo "Re-run: ./bin/ct refresh --platform $platform"
-      exit 0
-    fi
-    exit "$rc"
-  fi
-
-  if [[ "$full" -eq 1 ]]; then
-    echo "note: --full is retained for compatibility; no addon is enabled automatically"
-  fi
-
   echo
-  echo "Done. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
+  echo "Done. No model map was written. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
   echo "Check: ./bin/ct status"
 }
 
@@ -246,9 +239,45 @@ cmd_refresh() {
   done
   [[ -n "$platform" ]] || platform="$(detect_platform)"
   [[ -n "$platform" ]] || die "pass --platform"
-  local extra=()
-  [[ "$yes" -eq 1 ]] && extra+=(--yes)
-  run_propose "$platform" "${extra[@]}"
+  [[ "$yes" -eq 1 ]] && echo "note: --yes is ignored; refresh is read-only"
+  run_propose "$platform"
+}
+
+cmd_map() {
+  local action="${1:-}"
+  shift || true
+  case "$action" in
+    propose)
+      local platform=""
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --platform) platform="$2"; shift 2 ;;
+          *) die "unknown map propose flag: $1" ;;
+        esac
+      done
+      [[ -n "$platform" ]] || platform="$(detect_platform)"
+      [[ -n "$platform" ]] || die "pass --platform"
+      run_propose "$platform"
+      ;;
+    approve)
+      local platform="" yes=0
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --platform) platform="$2"; shift 2 ;;
+          --yes|-y) yes=1; shift ;;
+          *) die "unknown map approve flag: $1" ;;
+        esac
+      done
+      [[ -n "$platform" ]] || platform="$(detect_platform)"
+      [[ -n "$platform" ]] || die "pass --platform"
+      local extra=()
+      [[ "$yes" -eq 1 ]] && extra+=(--yes)
+      run_approve "$platform" "${extra[@]}"
+      ;;
+    *)
+      die "usage: ./bin/ct map propose|approve [--platform ...]"
+      ;;
+  esac
 }
 
 set_toggle() {
@@ -317,7 +346,7 @@ ${marker}
 \`CODING_TEAM_ROOT=${ROOT}\`
 
 1. Load coding-team skill for your platform (Codex / Cursor / Cline adapter).
-2. Read \`core/\` + approved \`model-pool.map.md\`.
+2. Read \`core/\` + the approved local \`model-pool.map.md\` when configured.
 3. WIP ≤ 2; TE → Gatekeeper sequential; incomplete → ask human.
 4. PM Lean is default OFF — \`./bin/ct enable pm-lean\` only when needed.
 <!-- coding-team:end -->
@@ -332,7 +361,8 @@ main() {
     ""|help|-h|--help) usage ;;
     init|install|setup) cmd_init "$@" ;;
     status|st) cmd_status ;;
-    refresh|map) cmd_refresh "$@" ;;
+    refresh) cmd_refresh "$@" ;;
+    map) cmd_map "$@" ;;
     enable|on) cmd_enable "$@" ;;
     disable|off) cmd_disable "$@" ;;
     project) cmd_project "$@" ;;
