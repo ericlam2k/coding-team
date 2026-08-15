@@ -15,33 +15,32 @@ from pathlib import Path
 
 
 # Preferred candidates per abstract tier (first match wins among available).
+# Tier 1 build prefers Luna Pro Max; Test Engineer validation prefers Terra
+# High and falls back to Luna Pro Max when Terra is unavailable.
 TIER_PREFS: dict[str, list[dict[str, str]]] = {
     "0": [
         {"slug": "gpt-5.6-luna", "effort": "medium", "label": "luna"},
         {"slug": "gpt-5.4-mini", "effort": "medium", "label": "5.4-mini"},
         {"slug": "gpt-5.4", "effort": "low", "label": "5.4 low"},
         {"slug": "gpt-5.5", "effort": "low", "label": "5.5 low"},
-        {"slug": "gpt-5.6-terra", "effort": "low", "label": "terra low"},
         {"slug": "gpt-5.6-sol", "effort": "low", "label": "sol low"},
     ],
     "1 build": [
-        {"slug": "gpt-5.6-terra", "effort": "medium", "label": "terra"},
+        {"slug": "openai/gpt-5.6-luna-pro", "effort": "max", "label": "luna pro max"},
         {"slug": "gpt-5.4", "effort": "medium", "label": "5.4"},
         {"slug": "gpt-5.5", "effort": "medium", "label": "5.5"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
-        {"slug": "gpt-5.6-luna", "effort": "high", "label": "luna high"},
         {"slug": "gpt-5.4-mini", "effort": "high", "label": "5.4-mini high"},
     ],
     "1 validate": [
         {"slug": "gpt-5.6-terra", "effort": "high", "label": "terra high"},
+        {"slug": "openai/gpt-5.6-luna-pro", "effort": "max", "label": "luna pro max"},
         {"slug": "gpt-5.4", "effort": "high", "label": "5.4 high"},
         {"slug": "gpt-5.5", "effort": "high", "label": "5.5 high"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
-        {"slug": "gpt-5.6-terra", "effort": "medium", "label": "terra medium"},
     ],
     "2": [
         {"slug": "gpt-5.6-sol", "effort": "high", "label": "sol high"},
-        {"slug": "gpt-5.6-terra", "effort": "xhigh", "label": "terra xhigh"},
         {"slug": "gpt-5.5", "effort": "xhigh", "label": "5.5 xhigh"},
         {"slug": "gpt-5.6-sol", "effort": "medium", "label": "sol medium"},
         {"slug": "gpt-5.4", "effort": "xhigh", "label": "5.4 xhigh"},
@@ -50,15 +49,14 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
         {"slug": "gpt-5.6-sol", "effort": "xhigh", "label": "sol xhigh"},
         {"slug": "gpt-5.6-sol", "effort": "max", "label": "sol max"},
         {"slug": "gpt-5.6-sol", "effort": "high", "label": "sol high"},
-        {"slug": "gpt-5.6-terra", "effort": "max", "label": "terra max"},
         {"slug": "gpt-5.5", "effort": "xhigh", "label": "5.5 xhigh"},
     ],
 }
 
 PLANNED: dict[str, str] = {
     "0": "gpt-5.6-luna (or gpt-5.4-mini)",
-    "1 build": "gpt-5.6-terra (or gpt-5.4)",
-    "1 validate": "gpt-5.6-terra + effort high",
+    "1 build": "openai/gpt-5.6-luna-pro + effort max",
+    "1 validate": "gpt-5.6-terra + effort high (openai/gpt-5.6-luna-pro fallback)",
     "2": "gpt-5.6-sol + effort high",
     "3": "gpt-5.6-sol + effort xhigh/max",
 }

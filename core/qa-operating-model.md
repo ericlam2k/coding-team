@@ -5,6 +5,12 @@ is archived at
 `docs/archive/qa-operating-model-pre-hybrid-29311de.md`; do not load it by
 default.
 
+Timing bounds come from the approved profile in
+[`adaptive-timing.md`](adaptive-timing.md): resolve `T_target`,
+`T_checkpoint`, `T_hard`, and `T_reserve` (with `T_hard ≤ max_hard_cap_s`). If
+the profile is stale or invalid, use a labeled versioned fallback and record
+its version, provenance, status, and remediation.
+
 Use the smallest flow that gives reliable evidence. Keep WIP ≤2, disjoint write
 scopes, and Test Engineer (TE) → Gatekeeper (GK) sequential. Do not create a
 standing QA meeting or a second router.
@@ -57,10 +63,11 @@ only when that decision can change the expected behavior, contract, or risk.
 
 ## Timebox and stop rules
 
-For Risky batches, target 120 seconds and hard-stop at 240 seconds. At the
-target, stop scheduling new cases. At 180 seconds without a complete artifact,
-emit a checkpoint; at the hard stop, cancel the active command and record
-`BLOCKED` with the timeout reason, evidence collected, and one next action. A
+For Risky batches, use `T_target` and hard-stop at `T_hard`, preserving
+`T_reserve` for handoff and evidence. At `T_target`, stop scheduling new cases.
+At `T_checkpoint` without a complete artifact, emit a checkpoint; at `T_hard`,
+cancel the active command and record `BLOCKED` with the timeout reason, evidence
+collected, and one next action. A
 Task is too wide when it has multiple owners/independent concerns, non-disjoint
 writes, no single acceptance artifact, or cannot fit the 250-word run-prompt /
 150-word handoff caps. If the remaining work is too wide or long, hand off one

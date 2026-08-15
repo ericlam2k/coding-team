@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# coding-team CLI v2 — platform-independent init with model-map approval.
+# coding-team CLI v2 — platform-independent setup with explicit model-map actions.
 #
-#   ./bin/ct init                 # auto-detect platform, propose map, ask approve
-#   ./bin/ct init --yes           # non-interactive approve
+#   ./bin/ct init                 # auto-detect platform and link adapter only
+#   ./bin/ct map propose          # print a model-map proposal (no writes)
+#   ./bin/ct map approve --yes    # explicitly approve and write declared outputs
+#   ./bin/ct map decline          # record no map write (safe no-op)
 #   ./bin/ct init --platform codex|cursor|cline
-#   ./bin/ct init --full          # + enable caveman,ponytail (Codex)
+#   ./bin/ct init --full          # full Codex profile setup
 #   ./bin/ct status | refresh | enable | disable | project | help
 set -euo pipefail
 
@@ -25,13 +27,25 @@ usage() {
 coding-team v2 CLI (platform-independent)
 
   ./bin/ct init [--platform codex|cursor|cline] [--yes] [--full]
-      Detect/install adapter, suggest model map, ask you to approve, then write.
+      Detect/install the adapter/QA skill only. Never reads or writes a map.
+      --yes is accepted for compatibility but has no setup-side map authority.
 
   ./bin/ct status
+  ./bin/ct map propose [--platform ...]
+      Print a model-map proposal. Never writes a map.
+  ./bin/ct map approve [--yes] [--platform ...]
+      Explicitly approve the current proposal and write declared map outputs.
+  ./bin/ct map decline [--platform ...]
+      Decline mapping. Never writes or deletes a map.
   ./bin/ct refresh [--yes] [--platform ...]
-  ./bin/ct enable caveman[,ponytail]     (Codex addons)
-  ./bin/ct disable caveman[,ponytail]
+      Compatibility alias for explicit map approval.
+  ./bin/ct enable pm-lean[,agentic-worker]      (Codex addons)
+  ./bin/ct disable pm-lean[,agentic-worker]
   ./bin/ct project <path>
+  ./bin/ct tools terminal --timeout-s N -- argv...
+  ./bin/ct tools skeleton --allowed-root ROOT [--max-bytes N] -- PATH
+  ./bin/ct tools quantize --request-file PATH|-
+  ./bin/ct tools guard --request-file PATH|- --authoritative-token-count N
   ./bin/ct help
 
 Notes
@@ -130,9 +144,18 @@ run_propose() {
   local outs=()
   local o
   while IFS= read -r o; do
-    [[ -n "$o" ]] && outs+=(--out "$o")
+    [[ -n "$o" ]] && outs+=("$o")
   done < <(map_outs "$platform")
-  python3 "$PROPOSE" --platform "$platform" --codex-home "$CODEX_HOME" "${outs[@]}" "$@"
+  local args=(--platform "$platform" --codex-home "$CODEX_HOME")
+  if [[ "${#outs[@]}" -gt 0 ]]; then
+    for o in "${outs[@]}"; do
+      args+=(--out "$o")
+    done
+  fi
+  if [[ "$#" -gt 0 ]]; then
+    args+=("$@")
+  fi
+  python3 "$PROPOSE" "${args[@]}"
 }
 
 cmd_init() {
@@ -178,30 +201,21 @@ cmd_init() {
   echo "==> coding-team v2 init (platform=$platform)"
   install_adapter "$platform"
 
-  local extra=()
-  [[ "$yes" -eq 1 ]] && extra+=(--yes)
-
-  echo "==> Model map suggestion (approve to write)"
-  if ! run_propose "$platform" "${extra[@]}"; then
-    local rc=$?
-    if [[ "$rc" -eq 2 ]]; then
-      echo "Install linked, but model map was NOT approved/written."
-      echo "Re-run: ./bin/ct refresh --platform $platform"
-      exit 0
-    fi
-    exit "$rc"
+  if [[ "$yes" -eq 1 ]]; then
+    echo "note: --yes does not approve a model map during setup; use './bin/ct map approve --yes' explicitly."
   fi
 
   if [[ "$full" -eq 1 ]]; then
     if [[ "$platform" != "codex" ]]; then
       echo "note: --full addons currently Codex-only; skipped for $platform"
     else
-      cmd_enable "caveman,ponytail"
+      echo "Full profile does not enable addons automatically. Use './bin/ct enable …' explicitly."
     fi
   fi
 
   echo
   echo "Done. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
+  echo "Model map: NOT_STARTED (run './bin/ct map propose' then './bin/ct map approve')."
   echo "Check: ./bin/ct status"
 }
 
@@ -210,7 +224,7 @@ cmd_status() {
   echo "CODEX_HOME:       $CODEX_HOME"
   echo
   echo "Adapters / skills:"
-  for name in coding-team qa-evidence-enforcement caveman ponytail; do
+  for name in coding-team qa-evidence-enforcement; do
     local p="$CODEX_HOME/skills/$name"
     if [[ -L "$p" ]]; then
       echo "  Codex $name → $(readlink "$p")"
@@ -250,9 +264,72 @@ cmd_refresh() {
   done
   [[ -n "$platform" ]] || platform="$(detect_platform)"
   [[ -n "$platform" ]] || die "pass --platform"
-  local extra=()
-  [[ "$yes" -eq 1 ]] && extra+=(--yes)
-  run_propose "$platform" "${extra[@]}"
+  if [[ "$yes" -eq 1 ]]; then
+    run_propose "$platform" --yes
+  else
+    run_propose "$platform"
+  fi
+}
+
+cmd_map_propose() {
+  local platform=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --platform) [[ $# -ge 2 ]] || die "--platform requires a value"; platform="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "unknown map propose flag: $1" ;;
+    esac
+  done
+  [[ -n "$platform" ]] || platform="$(detect_platform)"
+  [[ -n "$platform" ]] || die "pass --platform"
+  echo "==> Model map proposal (no files will be written)"
+  run_propose "$platform" --propose-only
+}
+
+cmd_map_approve() {
+  local platform="" yes=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --platform) [[ $# -ge 2 ]] || die "--platform requires a value"; platform="$2"; shift 2 ;;
+      --yes|-y) yes=1; shift ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "unknown map approve flag: $1" ;;
+    esac
+  done
+  [[ -n "$platform" ]] || platform="$(detect_platform)"
+  [[ -n "$platform" ]] || die "pass --platform"
+  echo "==> Explicit model map approval (declared outputs only)"
+  if [[ "$yes" -eq 1 ]]; then
+    run_propose "$platform" --yes
+  else
+    run_propose "$platform"
+  fi
+}
+
+cmd_map_decline() {
+  local platform=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --platform) [[ $# -ge 2 ]] || die "--platform requires a value"; platform="$2"; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "unknown map decline flag: $1" ;;
+    esac
+  done
+  [[ -n "$platform" ]] || platform="$(detect_platform)"
+  [[ -n "$platform" ]] || die "pass --platform"
+  echo "Model map declined for $platform; no files written or deleted."
+}
+
+cmd_map() {
+  local action="${1:-propose}"
+  if [[ $# -gt 0 ]]; then shift; fi
+  case "$action" in
+    propose) cmd_map_propose "$@" ;;
+    approve) cmd_map_approve "$@" ;;
+    decline) cmd_map_decline "$@" ;;
+    status) cmd_status "$@" ;;
+    *) die "unknown map action: $action (use propose, approve, decline, or status)" ;;
+  esac
 }
 
 set_toggle() {
@@ -272,20 +349,19 @@ PY
 
 cmd_enable() {
   local csv="${1:-}"
-  [[ -n "$csv" ]] || die "usage: ct enable caveman[,ponytail]"
+  [[ -n "$csv" ]] || die "usage: ct enable pm-lean[,agentic-worker]"
   IFS=',' read -ra names <<<"$csv"
   for name in "${names[@]}"; do
     name="$(echo "$name" | tr -d '[:space:]')"
     case "$name" in
-      caveman)
-        set_toggle caveman true
-        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
-          [[ -d "$ROOT/addons/caveman/skills/$s" ]] && link_path "$ROOT/addons/caveman/skills/$s" "$CODEX_HOME/skills/$s"
-        done
+      pm-lean)
+        set_toggle pm-lean true
+        link_path "$ROOT/addons/pm-lean/skills/pm-lean-assumption-triage" "$CODEX_HOME/skills/pm-lean-assumption-triage"
+        link_path "$ROOT/addons/pm-lean/skills/pm-lean-experiment-design" "$CODEX_HOME/skills/pm-lean-experiment-design"
         ;;
-      ponytail)
-        set_toggle ponytail true
-        link_path "$ROOT/addons/ponytail" "$CODEX_HOME/skills/ponytail"
+      agentic-worker)
+        set_toggle agentic-worker true
+        link_path "$ROOT/addons/agentic-worker/skills/agentic-worker" "$CODEX_HOME/skills/agentic-worker"
         ;;
       *) die "unknown addon: $name" ;;
     esac
@@ -294,20 +370,19 @@ cmd_enable() {
 
 cmd_disable() {
   local csv="${1:-}"
-  [[ -n "$csv" ]] || die "usage: ct disable caveman[,ponytail]"
+  [[ -n "$csv" ]] || die "usage: ct disable pm-lean[,agentic-worker]"
   IFS=',' read -ra names <<<"$csv"
   for name in "${names[@]}"; do
     name="$(echo "$name" | tr -d '[:space:]')"
     case "$name" in
-      caveman)
-        set_toggle caveman false
-        for s in caveman caveman-commit caveman-review caveman-compress caveman-stats caveman-help cavecrew; do
-          unlink_path "$CODEX_HOME/skills/$s"
-        done
+      pm-lean)
+        set_toggle pm-lean false
+        unlink_path "$CODEX_HOME/skills/pm-lean-assumption-triage"
+        unlink_path "$CODEX_HOME/skills/pm-lean-experiment-design"
         ;;
-      ponytail)
-        set_toggle ponytail false
-        unlink_path "$CODEX_HOME/skills/ponytail"
+      agentic-worker)
+        set_toggle agentic-worker false
+        unlink_path "$CODEX_HOME/skills/agentic-worker"
         ;;
       *) die "unknown addon: $name" ;;
     esac
@@ -339,6 +414,15 @@ BLOCK
   echo "updated $agents"
 }
 
+cmd_tools() {
+  local action="${1:-}"
+  [[ $# -gt 0 ]] && shift
+  case "$action" in
+    terminal|skeleton|quantize|guard) python3 "$ROOT/adapters/codex/tool_cli.py" "$action" "$@" ;;
+    *) die "unknown tools action (use terminal, skeleton, quantize, or guard)" ;;
+  esac
+}
+
 main() {
   local cmd="${1:-}"
   shift || true
@@ -346,10 +430,15 @@ main() {
     ""|help|-h|--help) usage ;;
     init|install|setup) cmd_init "$@" ;;
     status|st) cmd_status ;;
-    refresh|map) cmd_refresh "$@" ;;
+    refresh) cmd_refresh "$@" ;;
+    map) cmd_map "$@" ;;
+    map.propose) cmd_map_propose "$@" ;;
+    map.approve) cmd_map_approve "$@" ;;
+    map.decline) cmd_map_decline "$@" ;;
     enable|on) cmd_enable "$@" ;;
     disable|off) cmd_disable "$@" ;;
     project) cmd_project "$@" ;;
+    tools) cmd_tools "$@" ;;
     *) die "unknown command: $cmd (try ./bin/ct help)" ;;
   esac
 }

@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Generic capability prefs — host detectors may return any slug set.
 # Codex GPT prefs first; Cursor/Cline pools match by substring heuristics later.
+# WYSY's approved Codex route keeps Terra available for Test Engineer
+# validation; Tier 1 build remains Luna Max and validation keeps Luna as fallback.
 TIER_PREFS: dict[str, list[dict[str, str]]] = {
     "0": [
         {"slug": "gpt-5.6-luna", "effort": "medium"},
@@ -27,7 +29,7 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
         {"slug": "gpt-5.6-terra", "effort": "low"},
     ],
     "1 build": [
-        {"slug": "gpt-5.6-terra", "effort": "medium"},
+        {"slug": "gpt-5.6-luna", "effort": "max"},
         {"slug": "claude-sonnet-5-thinking-high", "effort": "high"},
         {"slug": "gpt-5.4", "effort": "medium"},
         {"slug": "gpt-5.5", "effort": "medium"},
@@ -35,7 +37,7 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
     ],
     "1 validate": [
         {"slug": "gpt-5.6-terra", "effort": "high"},
-        {"slug": "gpt-5.6-terra-medium", "effort": "medium"},
+        {"slug": "gpt-5.6-luna", "effort": "max"},
         {"slug": "gpt-5.4", "effort": "high"},
         {"slug": "gpt-5.5", "effort": "high"},
     ],
@@ -55,8 +57,8 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
 
 PLANNED = {
     "0": "cheap utility (Luna / mini / composer-fast)",
-    "1 build": "eco implement (Terra / Sonnet)",
-    "1 validate": "careful validate (Terra high)",
+    "1 build": "Luna Max implement",
+    "1 validate": "Terra High validate (Luna Max fallback)",
     "2": "premium plan/debate (Sol / Opus)",
     "3": "max-risk judgment (Sol xhigh / Fable)",
 }

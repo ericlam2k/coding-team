@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "mode": "optional_prompt_overlay",
+  "routingAuthority": "coding-team-core",
+  "runtimeIntegrated": false,
+  "selection": {
+    "startsUnloaded": true,
+    "selectedBy": "lead-after-core-routing",
+    "maxOptionalWorkflows": 1,
+    "requireWorkflowCompatibilityWithRoutedTask": true,
+    "maxAdditionalModelCalls": 0,
+    "automaticProfileCalls": false,
+    "automaticStageCalls": false,
+    "automaticGuardCalls": false,
+    "profilesFollowActualModelPoolSelection": true
+  },
+  "profiles": [
+    { "id": "sol", "path": "prompts/profiles/sol.md", "kind": "matching-model-overlay" },
+    { "id": "terra", "path": "prompts/profiles/terra.md", "kind": "matching-model-overlay" },
+    { "id": "luna", "path": "prompts/profiles/luna.md", "kind": "matching-model-overlay" },
+    { "id": "guard", "path": "prompts/profiles/guard.md", "kind": "in-call-checklist" }
+  ],
+  "workflows": [
+    { "id": "prompt-audit", "path": "skills/prompt-audit.md", "load": "lead-explicit-after-core-routing" },
+    { "id": "prompt-compression", "path": "skills/prompt-compression.md", "load": "lead-explicit-after-core-routing" },
+    { "id": "safety-policy-extraction", "path": "skills/safety-policy-extraction.md", "load": "lead-explicit-after-core-routing" }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "rolling-feature-inventory/1",
+  "feature_id": "compact-terminal",
+  "feature_version": "1.0.0",
+  "title": "Compact terminal",
+  "summary": "Run one explicit argv command without a shell and return only its exit code and bounded output tail.",
+  "change_type": "NEW_FEATURE",
+  "proposed_bump": "MAJOR",
+  "feature_owner_role": "backend-engineer",
+  "state": "GK_REVIEWED",
+  "classification": "PUBLIC",
+  "surface": "HOST_ADAPTER",
+  "public_dependency_ranges": [],
+  "coupled_feature_refs": [],
+  "compatibility": {
+    "prior_version": null,
+    "backward_compatible": true,
+    "notes": "New dependency-free explicit CLI and adapter callable; ordinary commands never invoke it."
+  },
+  "migration": {"required": false, "notes": "No persisted state or data migration."},
+  "rollback": {
+    "supported": true,
+    "notes": "Disable the explicit terminal route and terminate/reap any live child; restore a prior approved adapter pin if one exists."
+  },
+  "evidence": {
+    "release_contract": "implementation/architecture-contracts/sprint-2-versioned-feature-release-v1.md",
+    "feature_contract": "implementation/architecture-contracts/sprint-2-compact-terminal-v1.md",
+    "artifact": "coding-team/adapters/codex/compact_terminal.py",
+    "tests": "coding-team/adapters/codex/tests/test_compact_terminal.py",
+    "integration_tests": "coding-team/adapters/codex/tests/test_tool_cli.py",
+    "test_engineer": ".coding-team/handoffs/s2-token-opt-te-safety-sol-20260812.md",
+    "gatekeeper": ".coding-team/handoffs/s2-token-opt-gatekeeper-closeout-sol-20260812.md",
+    "documentation": "coding-team/docs/token-optimization-tools.md"
+  },
+  "release_eligible": false,
+  "eligibility_blockers": [
+    "NON_POSIX_PROCESS_GROUP_CONTAINMENT_UNVERIFIED",
+    "COMMIT_EVIDENCE_MISSING",
+    "IMMUTABLE_MANIFEST_MISSING",
+    "HUMAN_RELEASE_APPROVAL_MISSING"
+  ],
+  "release_owner_id": null,
+  "approval_ref": null
+}

@@ -5,56 +5,66 @@
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./scripts/install-coding-team.sh --platform codex
 ```
 
-The default **Hybrid** profile is the low-cost, platform-independent activation:
+The installer has one profile-free, platform-independent activation:
 
 - links only the selected platform adapter and the conditional QA evidence
   skill;
-- keeps the active hybrid QA policy, WIP ≤2, disjoint writes, and TE →
+- keeps the QA policy, WIP ≤2, disjoint writes, and TE →
   Gatekeeper sequencing;
-- does not refresh a model map or enable caveman/ponytail addons.
+- does not refresh a model map or enable addons.
 
-The optional **Full** profile is a separate install mode:
+There is no separate Hybrid/Full installation. Legacy commands are accepted as
+deprecated aliases, and both produce the same links and no map/addon changes:
 
 ```bash
-./scripts/install-coding-team.sh --profile full --platform codex
+./scripts/install-coding-team.sh --profile hybrid --platform codex  # deprecated
+./scripts/install-coding-team.sh --profile full --platform codex    # deprecated
 ```
 
-Full delegates to `bin/ct init --full`, including model-map approval and
-supported Codex addons. Switch back explicitly:
+Optional addons are explicit and independent of installation:
 
 ```bash
-./scripts/install-coding-team.sh --profile hybrid --platform codex
-./scripts/install-coding-team.sh --check --profile hybrid --platform codex
+./bin/ct enable agentic-worker
+./bin/ct enable pm-lean
+./scripts/install-coding-team.sh --check --platform codex
 ./bin/ct status
 ```
 
-Profiles are mutually exclusive at activation time. The installer records the
-active value in `$CODEX_HOME/coding-team.profile` and Hybrid removes only
-addon symlinks that point into this checkout; it never deletes unrelated user
-files. Use a project-local `CODEX_HOME` when the host sandbox cannot read the
-global Codex home.
+The installer is idempotent and refuses to overwrite unrelated files. It does
+not write a profile marker, model map, or addon state. Use a project-local
+`CODEX_HOME` when the host sandbox cannot read the global Codex home.
 
-Both profiles load the same core task-size policy: split work expected to
+The install loads the core task-size policy: split work expected to
 exceed 120 seconds or cross the width limits, checkpoint at 180 seconds, and
-hard-stop at 240 seconds with one bounded handoff. Full mode does not bypass
-WIP ≤2, disjoint writes, or TE → Gatekeeper sequencing.
+hard-stop at 240 seconds with one bounded handoff. Addons never bypass WIP ≤2,
+disjoint writes, or TE → Gatekeeper sequencing.
 
-For direct interactive model-map management without profile switching, the
-advanced commands remain available:
+Model-map suggestions are a separate, rerunnable user action. Re-run the
+proposal whenever the provider, API proxy, available models, or credentials
+change; approval remains explicit:
 
 ```bash
-./bin/ct init
-./bin/ct init --yes              # skip prompt (CI)
-./bin/ct init --platform cursor
-./bin/ct refresh                 # new suggestion + approve again
+./bin/ct init                    # adapter/QA setup only; no map write
+./bin/ct init --yes              # compatibility flag; still no map write
+./bin/ct map propose             # rerunnable proposal; no write
+./bin/ct map approve --yes       # explicit approval; write declared outputs
+./bin/ct map decline             # no write
+./bin/ct refresh --yes           # compatibility alias for explicit approval
 ```
 
 ## Why approve the map?
 
-Core is **platform-independent** (abstract tiers only). Host slugs differ (Codex GPT Luna/Terra/Sol vs Cursor pool vs Cline). The installer **suggests** a mapping; you confirm so a bad auto-pick never silently becomes policy.
+Core is **platform-independent** (abstract tiers only). Host slugs differ by
+adapter. For this WYSY Codex installer, the approved map includes Terra and
+prefers `gpt-5.6-terra` at `high` for Tier 1 validate (Test Engineer). Tier 1
+build remains `gpt-5.6-luna` at `max`, with Luna Max as the validation fallback
+when Terra is unavailable. Cursor/Cline pools remain separate adapter
+suggestions. Mapping is optional metadata; you
+explicitly propose and approve it so a bad auto-pick never silently becomes
+policy. Missing or declined mapping does not block planning.
 
 ## Activate
 
@@ -81,17 +91,17 @@ platform. The installer links the adapter and conditional QA skill.
 ```
 
 ```bash
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./scripts/install-coding-team.sh --platform codex
 ```
 
 This does not refresh model maps or enable addons. Use `--check` to verify an
 existing activation without changing links. `scripts/activate-codex-team.sh`
-continues to invoke the same Hybrid Codex path for existing automation.
+continues to invoke the same single-install Codex path for existing automation.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| Map not written | Hybrid does not write maps; choose `--profile full` or run `./bin/ct refresh` |
-| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --profile <profile> --platform <name>` |
-| Non-interactive refused | Add `--yes` to the advanced `bin/ct` command |
+| Map not written | Run `./bin/ct map propose` after provider/API-proxy/model changes, then review and explicitly approve |
+| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --platform <name>` |
+| Non-interactive map approval refused | Add `--yes` to `bin/ct map approve` or `bin/ct refresh`; `init --yes` never approves a map |

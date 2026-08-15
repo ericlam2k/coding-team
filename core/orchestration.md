@@ -14,7 +14,7 @@ Standard Lean/Kanban/Agile names the management ideas; this framework remains th
 | Batch | Small batch | One integrable slice with known acceptance |
 | Task | Work item / story slice | Spec-ready brief with stop condition |
 | Sprint | Cadence / planning box | Coordination window — not story-point theater |
-| PDCA + experiments + performance log | Kaizen | Root cause + named PIC → plan → observe → re-evaluate → **consolidate** (bake or close) |
+| PDCA + experiments + performance log | Kaizen | Root cause + named PIC → plan → observe → re-evaluate → **consolidate** (bake or close); see [learning-and-distillation.md](learning-and-distillation.md) |
 | Gatekeeper after TE | Quality gate / Definition of Done | Evidence first; TE → Gatekeeper sequential |
 | Human gates | Pull / stop-the-line | Irreversible actions need explicit human approval |
 
@@ -46,6 +46,43 @@ The **Lead** (parent orchestrator) is the only role that:
 
 Incomplete or non-APPROVE outputs → **stop for human** ([human-gates.md](human-gates.md)).
 
+### Scoped WYSY request intake
+
+For a WYSY feature, function, or project-work request, the first accountable
+owner is always **Lead**. This does not reclassify ordinary questions or
+unrelated conversation. Lead records a serial consistency screen with:
+
+1. **Product Manager** — problem, audience, outcome, scope, acceptance,
+   success measure, and product risk; and
+2. **System Architect** — architecture/state impact, shared-contract and
+   migration/auth/privacy triggers, or an explicit no-contract reason.
+
+The PM and System Architect remain canonical roles, not a standing panel. Their
+checks are user-invoked and evidence-linked; Lead decides the route and may add
+Advisor, Contradictor, Domain Advisor, UX, Investigator, Test Engineer, Docs
+Steward, or Gatekeeper only when the existing concern/router policy triggers
+them. A consistency screen never invokes a role, advances a stage, changes a
+model map, or approves implementation automatically.
+
+The intake relation is:
+
+```text
+scoped WYSY request → Lead → Product Manager → System Architect → Lead admission
+```
+
+The Project Graph records this relation. Monitor records the resulting
+alignment, policy-cache, context-compaction, evidence, and gate observations;
+it is not a router or authority source.
+
+### Decision rule of thumb
+
+Prioritize **user usability and practical usefulness** first. Then balance
+**stability, reliability, and performance** for the admitted scope. A faster or
+more elaborate path is not an improvement if people cannot use it safely or if
+it makes the flow less dependable. Performance/cost claims remain measured,
+estimated, or unavailable with named provenance; they are never inferred from
+response length, elapsed time, or model tier.
+
 ### Lead cost discipline — emit judgment, not volume
 
 The Lead runs the most expensive context in the system. Its output is classification, briefs, routing, verdicts on evidence, and short reports — never implementation code.
@@ -65,6 +102,93 @@ frozen contract, TE validates, and Gatekeeper decides. Material drift routes
 **FIO → Lead → System Architect**. The Architect does not allocate, assemble,
 implement, validate, or accept.
 
+## Assignment fit and bounded execution
+
+Apply this rule to every canonical role in this file. Before dispatch, Lead
+checks that the task verb, evidence boundary, and reasoning fit the role
+card's Purpose, Access, Duties, Stop conditions, and Never rules. A model,
+free WIP slot, or manager's ability does not expand role capacity. If one task
+mixes execution and synthesis, split it into two tasks. Give each task one
+owner and one acceptance artifact. If no canonical role fits, return
+`HUMAN_DECISION_REQUIRED`.
+
+Every new or corrected Task brief must record these fields before dispatch:
+
+| Field | Required value |
+|---|---|
+| `execution_scope` | One bounded verb, named paths/query/source set, output artifact, and explicit exclusions |
+| `reasoning_depth` | `MECHANICAL`, `RECONCILE`, or `JUDGMENT` |
+| `enumeration_required` | `true` or `false` |
+| `synthesis_input_ref` | A completed Investigator packet path, or `NONE` |
+
+`MECHANICAL` means locate, list, count, extract, or normalize without deciding
+meaning. `RECONCILE` means follow bounded evidence or label a conflict without
+choosing policy. `JUDGMENT` means decide, design, synthesize, validate, or
+accept within the role. Set the field for the work that runs. Do not promote
+mechanical work because its final decision is important.
+
+Legacy briefs remain readable when these fields are absent. Treat each absent
+field as `UNSPECIFIED`. Before a new policy-sensitive enumeration, Lead must
+materialize all four fields. An `UNSPECIFIED` field with apparent enumeration
+blocks dispatch and requires a corrected brief.
+
+### Manager execution boundary
+
+Manager roles are `lead`, `product-manager`, `system-architect`, `advisor`,
+`contradictor`, and any `{domain}-advisor`. They may frame a question, name a
+bounded source and query, state acceptance, compare supplied evidence, resolve
+meaning, and emit a decision or contract. They must stop before they locate,
+list, count, copy, or normalize source facts. Incidental reading of a named
+excerpt is allowed. Expanding the source set or producing an enumeration is
+not allowed.
+
+Lead alone reconciles role outputs into the decision, owner, acceptance
+artifact, and next gate. Lead may reject an insufficient packet or request a
+corrected brief. Lead must not repeat the search. Investigator supplies facts
+and conflicts. Investigator does not make policy, architecture, product,
+validation, or acceptance decisions.
+
+### Investigator routing and escalation
+
+When `enumeration_required=true`, Lead creates a separate `investigator` Task
+with a named path or query before manager synthesis. The packet states its
+source boundary, requested fields, provenance format, stop condition, and
+evidence artifact. A manager session is not an enumeration fallback. The
+manager may synthesize enumerated facts only from the completed packet named by
+`synthesis_input_ref`.
+
+Use the existing escalation route for the next admitted Task. Keep a bounded
+single-module mechanical lookup at Investigator / Tier 0. Return to Lead for a
+corrected Investigator / Tier 1 brief when evidence conflicts, cross-file
+tracing is needed, or a behavior or stateful trace is needed. Use a fitting judgment role
+at Tier 2 only for a completed packet that raises a contract, architecture,
+security, privacy, migration, release, or decision-changing conflict. Stop for
+the existing human gate when no canonical role fits or scope needs secrets,
+production, privacy, legal choice, irreversible action, or external provider
+access. Context growth and missing telemetry do not cause a model hop.
+
+### Checkpoint and telemetry boundary
+
+Record `lookup_session_count`, `inspected_source_count`, and receipt input,
+cached, and output fields when supplied. Set every missing receipt field to
+`TELEMETRY_UNAVAILABLE` and record its source. Missing telemetry is not zero,
+an estimate, or a cost claim.
+
+Before a second lookup session, evidence-boundary expansion, a second
+follow-up, the 75% artifact review trigger, `T_checkpoint` without a complete
+artifact, or unexplained receipt growth without accepted evidence, stop and
+write a bounded checkpoint. Include completed facts, evidence references,
+unavailable fields, one unresolved item, and exactly one next Task. At the 75%
+trigger, compress only the handoff packet or stop. At `T_hard` set the Task
+to `BLOCKED`. Do not silently continue, retry, expand scope, or change model.
+
+Monitor records an observational projection of the assignment fields, parent
+and worker task/role IDs, planned-to-actual tier/model/effort, bounded source
+set, inspected-source count, lookup-session count, checkpoint or escalation
+reason, evidence reference, result, and receipt input/cached/output or
+`TELEMETRY_UNAVAILABLE` with source. Monitor records compliance. It does not
+route, act, or become a competing fact source.
+
 ## Canonical role IDs
 
 Use only these IDs (see `roles/`):
@@ -78,6 +202,7 @@ Use only these IDs (see `roles/`):
 | `contradictor` | Contradictor |
 | `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
 | `investigator` | Investigator |
+| `monitor-agent` | Monitor Agent (run trace and cost visibility) |
 | `backend-engineer` | Backend Engineer |
 | `frontend-ux-lead` | Frontend UX Lead |
 | `frontend-builder` | Frontend Builder |
@@ -118,14 +243,67 @@ If no predefined role or Domain Advisor instance can safely own the task → `HU
 
 Prefer path/line evidence pointers over pasted dumps. Shrink the packet before escalating tier. Default each specialist run to a **fresh** session; continue only for one immediate follow-up that depends on unpersisted local reasoning and still fits the cap.
 
+### Context-compaction sweet point (provisional)
+
+Context compaction is a Lead-owned packet rewrite, not a role, router, retry,
+or permission to drop evidence. Keep the smallest packet that preserves the
+objective, identity, scope/owned paths, acceptance, evidence refs and status,
+unresolved unknowns, last decision, and exactly one next action. Do not paste
+raw transcripts or reproduce source dumps.
+
+Use these bounded targets while `EXP-S2-CONTEXT-COMPACT-001` is open:
+
+| Artifact | Hard cap | Sweet-point target (60%) | Review trigger (75%) |
+|---|---:|---:|---:|
+| Sprint brief | 600 | 360 | 450 |
+| Batch brief | 450 | 270 | 338 |
+| Batch checkpoint | 300 | 180 | 225 |
+| Task run prompt | 250 | 150 | 188 |
+| Handoff | 150 | 90 | 113 |
+
+The 60% value is an explicit operating hypothesis, not measured token
+efficiency. At the 75% review trigger, Lead either compresses the packet into
+the target band or stops with a bounded checkpoint; it never silently extends
+the context or discards unresolved evidence. A host compaction or new
+conversation requires a fresh policy-cache identity and policy read before a
+policy-sensitive action; rotate the context fingerprint as specified by
+`core/policy-cache.md`.
+
+The compact packet must carry `packet_revision`, `source_refs`,
+`verified_facts`, `reasoned_or_unknown`, `decision`, `next_action`, and
+`compaction_status=PROVISIONAL|VALIDATED|REJECTED`. `PROVISIONAL` remains local
+until five independent observations satisfy the experiment's retention,
+correction, and re-read measures. No compact packet changes role ownership,
+model routing, workflow stage, gate state, or `auto_action=none`.
+
 ## Task-size metric: when to split instead of waiting
 
-“Long” is an operational threshold, not a feeling. Measure from role start to
-the first complete artifact or stop reason (excluding human approval or queue
-wait). A Task is **too long** when it is expected to exceed the 120-second
-target, reaches 180 seconds without a complete artifact, or needs a second
-follow-up after its one permitted immediate handoff. At 240 seconds it is
-`BLOCKED` and must stop.
+Task timing uses the active approved profile defined by
+[adaptive-timing.md](adaptive-timing.md): `T_target = target_s`,
+`T_checkpoint = checkpoint_s`, `T_hard = hard_stop_s`, and
+`T_reserve = reserve_s`, with
+`T_target < T_checkpoint < T_hard`. If the profile is invalid or unavailable,
+select its versioned fallback and state remediation; no timing value below is
+a universal cap.
+
+“Long” is an operational threshold, not a feeling. Before allocation, price
+the plan as `T_plan = T_setup,p95 + ΣT_mutation-unit,p95 +
+ΣT_validation-command,p95 + T_handoff,p95`; every duration must carry exactly
+one provenance label: `MEASURED`, `ESTIMATED`, or `UNKNOWN`, plus its source,
+class, and conditions. If any mandatory duration is `UNKNOWN`, `MEASURE` it
+within a bounded package before dispatch. Use the action set
+`ADMIT|MEASURE|SPLIT|BLOCK` with this precedence: mandatory `UNKNOWN` →
+`MEASURE`; validation beyond `T_hard - T_reserve` or failed checks → `BLOCK`;
+then `T_plan <= T_target` → `ADMIT`, otherwise → `SPLIT`. An atomic,
+measured-p95 plan may exceptionally be admitted only when
+`T_plan + T_reserve < T_hard`.
+
+Measure from role start to the first complete artifact or stop reason
+(excluding human approval or queue wait). A Task is **too long** when it is
+expected to exceed `T_target`, reaches `T_checkpoint` without a
+complete artifact, or needs a second follow-up after its one permitted
+immediate handoff. At `T_hard` it is `BLOCKED` and must stop; `T_checkpoint`
+is checkpoint-only and `T_hard` is safety-stop-only.
 
 A Task is **too wide** when any of these is true:
 
@@ -137,10 +315,17 @@ A Task is **too wide** when any of these is true:
 
 Before starting, split a too-long/too-wide Task into dependency-safe slices
 with exclusive files, one owner, one acceptance artifact, and one stop
-condition. During a run, emit a checkpoint at 180 seconds or when a metric is
-crossed: completed work, evidence, unresolved question, and exactly one next
-bounded Task. The Lead hands that slice off; it does not silently extend the
-context, retry the same mutation loop, or leave the original Task frozen.
+condition. Concurrent branches are permitted only for frozen scenarios,
+disjoint resources, and recorded independence evidence; otherwise price them
+sequentially. During a run, emit a checkpoint at `T_checkpoint` or when a metric
+is crossed: completed work, evidence, unresolved question, and exactly one
+next bounded Task. On timeout, record plan/elapsed time, phase,
+completed/pending work, result, environment/resources, and one next owner:
+workload → builder; validation → TE; environment/dependency → Lead;
+ambiguity → Lead → Architect. The Lead hands that slice off; it does not
+silently extend the context, retry the same mutation loop, or leave the
+original Task frozen. A retry must change scope, dependency, tool route, or
+environment; an unchanged retry is `BLOCK`/`SPLIT`.
 
 ## Skill loading
 
@@ -148,6 +333,14 @@ context, retry the same mutation loop, or leave the original Task frozen.
 - Paths are relative to this repo: `skills/engineering/…`, `skills/quality/…`, `skills/process/…`, `skills/design/…`.
 - One primary skill per task; a second requires a separately recorded unresolved question.
 - Do not auto-load every skill because Lead or multi-agent work is happening.
+- The stable policy bundle is a separate session/context concern. The Codex
+  adapter may reuse an unchanged policy manifest after a verified cache `HIT`,
+  but this does not cache task facts, role-card bytes, system instructions, or
+  host tools. A missing/changed policy file, new session, context loss or
+  compaction, high-risk/learning trigger, or human refresh request requires a
+  fresh policy read. `BYPASSED`/`UNAVAILABLE` fails closed for policy-sensitive
+  delegation. Record cache/timing/token provenance in the local Monitor
+  receipt; never infer provider savings from a cache hit.
 
 ### Skill overrides
 
@@ -167,14 +360,40 @@ Prefer the host’s **Tier 0** mapped slug (Codex often maps this to a Luna-clas
 
 **Do not** use cheap-utility as the accountable default for Lead, PM, Backend, Frontend/UX contract ownership, Test Engineer validation synthesis, Docs Steward governed docs, or Gatekeeper. Escalate Tier 0 → Tier 1 build/validate when evidence conflicts, scope crosses modules, behavior is statefully complex, validation fails, or accessibility/security/privacy/public-contract implications appear. Escalate to Tier 2/3 only under recorded high-risk triggers in [model-routing.md](model-routing.md).
 
-## Functional Integration Owner (FIO)
+## Functional Integration Owner (FIO) overlay
 
-Each batch names one **Functional Integration Owner**: the role accountable for the integrated behavior after individual tasks land (usually Backend or Frontend Builder for that surface). FIO:
+**FIO is a temporary responsibility overlay on one existing canonical
+implementation role, not a role ID.** The role registry, role cards, model map,
+and adapter delegation table must never contain `fio`. The Lead records the
+overlay in the Batch brief before build:
 
-- Owns cross-task seams inside the batch
-- Does not replace Test Engineer evidence or Gatekeeper accept/block
-- Surfaces integration gaps in the checkpoint before TE runs
-- Does not manage teammates, expand scope, or issue Gatekeeper decisions
+- `scope`: `frontend`, `backend`, `cross-layer`, `ux-contract`, or `none`
+- one `integration_seam` and one canonical `fio_role_id` plus its task ID, or
+  `NONE` when no seam exists
+- the FIO's exclusive paths, frozen `contract_ref` and hash when applicable,
+  and `fio_status`
+
+Assignment follows the primary seam. A Frontend Builder carries a frontend
+seam, a Backend Engineer carries an API/data seam, and the role owning the
+primary seam carries a cross-layer overlay. A single-task Batch may set the
+task owner as FIO without creating another task or ceremony. Docs,
+consultation, architecture-only, evidence-only, and no-seam Batches use
+`FIO = NONE`. A Batch must never name two FIOs; split independent seams or
+return to Lead for a new decision.
+
+FIO owns only the admitted seam: it may read the frozen contract and named
+handoffs, and may write only its own exclusive paths. It does not manage or
+reassign teammates, broaden scope, amend the architecture contract, edit
+another owner's paths, replace the System Architect, or issue TE/Gatekeeper
+decisions. Material contract or invariant drift routes **FIO → Lead → System
+Architect**; an ordinary defect returns as a corrected brief to its canonical
+owner. FIO reports `NOT_ASSIGNED`, `IN_PROGRESS`, `READY_FOR_TE`,
+`DRIFT_REPORTED`, or `BLOCKED` and hands the seam to an independent TE. FIO
+`READY_FOR_TE` is never TE evidence or acceptance.
+
+There is no FIO skill or model tier. The overlay inherits the canonical
+owner's named skills and planned→actual model/effort. It must not auto-load
+skills or escalate a model merely because the assignment is called FIO.
 
 ## Default batch shape
 
@@ -213,6 +432,16 @@ For the full participant, artifact, and PDCA rules, use
 [meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
 Batch matrix, not an unbounded repository-wide rerun.
 
+### Learning and distillation
+
+At material Batch and Sprint close, Lead records an evidence-linked learning
+disposition using [learning-and-distillation.md](learning-and-distillation.md).
+Monitor Agent capture is observational only. A single observation remains a
+candidate; durable policy, routing, skill, template, security, privacy, or
+public-contract promotion requires the validation and human-gate rules in that
+policy. Never create a standing learning/consolidation role or silently mutate
+core policy from a run.
+
 ## WIP, rotation, and context economy
 
 Default WIP:
@@ -237,10 +466,10 @@ Urgent work uses an explicit **expedite batch** after checkpointing the active b
 
 ## Time budget and semantic status
 
-- Target ~120s when practical
-- At ~180s → `PARTIAL` with evidence, unresolved question, next bounded step
-- At ~240s → cancel or split rather than waiting out the provider
-- Bounded QA uses a 120s target / 240s hard stop. A timed-out validation
+- Target `T_target` when practical
+- At `T_checkpoint` → `PARTIAL` with evidence, unresolved question, next bounded step
+- At `T_hard` → cancel or split rather than waiting out the provider
+- Bounded QA uses the active profile's `T_target` / `T_hard`. A timed-out validation
   records `BLOCKED` evidence and one next action; Lead hands off one smaller
   follow-up Task instead of leaving the batch frozen. It never auto-retries or
   starts Gatekeeper.

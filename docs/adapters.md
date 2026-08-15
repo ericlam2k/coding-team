@@ -2,6 +2,11 @@
 
 Core policy under `core/` has **no host model slugs**. Adapters bind runtime only.
 
+`--platform` selects the host adapter (Codex/Cursor/Cline). Installation has
+one profile-free scope: adapter plus conditional QA support. Legacy
+`--profile hybrid|full` flags are deprecated aliases for the same install and
+never enable addons or write a model map.
+
 | Adapter | Status | Install |
 |---|---|---|
 | [Codex](../adapters/codex/) | **v2 supported** | `./bin/ct init --platform codex` |
@@ -12,16 +17,20 @@ Auto-detect: `./bin/ct init` (prefers Codex if `~/.codex` exists).
 
 ## Shared install behavior (v2)
 
-1. Link/copy the platform adapter skill.
-2. **Detect** host model pool (or known defaults).
-3. **Show a suggested** tier → slug map.
-4. **Ask for approval** (`Y/n`) before writing `model-pool.map.md`.
-5. Pass `--yes` only for CI / non-interactive approve.
+1. Link/copy the platform adapter skill and QA support.
+2. Leave `model_map_status: NOT_STARTED`; setup never writes a map.
+3. Optionally **show a suggested** tier → slug map with an explicit proposal;
+   rerun it after provider, API-proxy, model, or credential changes.
+4. Approve only through the separate map action; pass `--yes` only to that
+   approval in CI/non-interactive use.
 
 ```bash
-./bin/ct init                 # interactive approve
-./bin/ct init --yes           # auto-approve suggestion
-./bin/ct refresh              # re-propose map + approve again
+./bin/ct init                 # adapter/QA setup only; map-free
+./bin/ct map propose          # proposal only; no write
+./bin/ct map approve          # explicit approval (prompted)
+./bin/ct map approve --yes    # explicit non-interactive approval
+./bin/ct map decline          # decline without writing
+./bin/ct refresh --yes        # explicit approval alias
 ```
 
 ## Binding summary

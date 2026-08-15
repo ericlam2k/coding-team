@@ -1,42 +1,64 @@
-# coding-team
+# WYSY + coding-team
 
-**Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
+**WYSY = What You See, You Ship.**
 
-[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+Vibe-code, but don't build blind.
+
+WYSY is the visible AI coding control layer for repo-based delivery. Describe a
+change in plain English, see the plan and file scope, confirm it, then review
+model routing, cost, Test Engineer evidence, and the Gatekeeper decision.
+
+The underlying `coding-team` framework remains platform-independent and keeps
+its Sprint → Batch → Task workflow, role cards, WIP ≤ 2, human gates, and
+Test Engineer → Gatekeeper sequence. Plain Mode hides backend taxonomy;
+Expert Mode exposes it for technical operators.
+
+Current WYSY scaffolding records runs, cost, evidence, and Project Graph facts.
+The Codex adapter also has a session/context policy-manifest cache and local
+telemetry receipt ([policy-cache](core/policy-cache.md)); it does not claim a
+host token meter or provider KV-cache savings. It does not claim a hosted
+dashboard, full GraphRAG indexing, or implemented Cursor/Cline runtimes.
 
 ---
 
-## v2 notes
+**Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
+
+[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Learning, experiments, and distillation](core/learning-and-distillation.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+
+---
+
+## Installation notes
 
 - **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
-- **Installation:** `scripts/install-coding-team.sh` activates the lightweight Hybrid profile by default. The optional Full profile uses `bin/ct init --full` and is mutually exclusive with Hybrid.
+- **One install:** `scripts/install-coding-team.sh` links the selected adapter
+  and conditional QA support. It does not write a model map or enable addons.
+- Legacy `--profile hybrid|full` flags are deprecated compatibility aliases.
+  They produce the same profile-free installation.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
 cd coding-team
-./scripts/install-coding-team.sh --profile hybrid --platform codex
+./scripts/install-coding-team.sh --platform codex
 ```
 
-Hybrid links only the platform adapter and conditional QA skill. It does not
-refresh model maps or enable addons. To opt into the full framework:
+Installation is idempotent and activates the adapter plus conditional QA
+support. Optional addons and model mapping are separate explicit actions:
 
 ```bash
-./scripts/install-coding-team.sh --profile full --platform codex
-```
-
-```bash
-./scripts/install-coding-team.sh --profile hybrid --platform cursor
-./scripts/install-coding-team.sh --profile full --platform codex
-./scripts/install-coding-team.sh --check --profile hybrid --platform codex
+./scripts/install-coding-team.sh --platform cursor
+./scripts/install-coding-team.sh --check --platform codex
 ./bin/ct status
+./bin/ct enable pm-lean
+./bin/ct map propose
+./bin/ct map approve --yes
 ```
 
-Profiles are toggled by rerunning the installer. The marker at
-`$CODEX_HOME/coding-team.profile` records the active profile; switching back to
-Hybrid removes only addon links owned by this checkout. `bin/ct init` remains
-available for advanced, interactive model-map setup.
+Run `ct map propose` again when the provider, API proxy, available models, or
+credentials change. A proposal is read-only; only explicit approval writes the
+declared map outputs. `--profile hybrid|full` remains accepted for older
+automation, but neither alias changes links, addons, or model-map state.
 
 ## What this is
 
@@ -45,14 +67,15 @@ available for advanced, interactive model-map setup.
 | **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
-| **Addons** | Caveman + Ponytail — default OFF, toggleable |
+| **Addons** | PM Lean — default OFF, toggleable |
 
 ## How routing works
 
 1. Lead classifies **nature** (N0–N5 / Consult / Docs).
 2. Nature selects an abstract **tier**.
 3. Lead uses the **approved** `model-pool.map.md` slug for that tier.
-4. Missing slug → next best; record `planned → actual` (never block start).
+4. If the planned slug is unavailable, return to Lead for an approved route;
+   record `planned → actual` and never hop models automatically.
 
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
 

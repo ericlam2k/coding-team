@@ -10,7 +10,7 @@ Human goal
   → Delegate Tasks (WIP ≤ 2)
   → Integrate → complete TE pass → correlate → one corrective Batch if needed
   → fresh Test Engineer → Gatekeeper
-  → Checkpoint / next Batch or Sprint close
+  → Checkpoint / learning disposition / next Batch or Sprint close
 ```
 
 Incomplete or non-`APPROVE` output → **stop and ask the human**. Do not auto-chain.
@@ -58,6 +58,8 @@ Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.
 | Checkpoint | 300 |
 
 On context pressure: checkpoint ≤300 words → shrink → fresh session → reload checkpoint + brief + named paths only.
+
+Learning capture and governed distillation: [`core/learning-and-distillation.md`](../core/learning-and-distillation.md).
 
 Full policy: [`core/orchestration.md`](../core/orchestration.md).
 Material defect and mutation concerns: [`core/meeting-policy.md`](../core/meeting-policy.md).
