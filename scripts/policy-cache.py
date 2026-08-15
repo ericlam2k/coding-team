@@ -34,13 +34,11 @@ BASE_POLICY_FILES = (
     "adapters/codex/SKILL.md",
     "adapters/codex/runtime.md",
     "adapters/codex/model-pool.map.md",
-    "adapters/codex/role-model-lock.json",
     "core/orchestration.md",
     "core/model-routing.md",
     "core/concurrency.md",
     "core/human-gates.md",
     "core/policy-cache.md",
-    "core/adaptive-timing.md",
 )
 LEARNING_POLICY_FILE = "core/learning-and-distillation.md"
 LOCAL_DATA_BOUNDARY = {

@@ -5,7 +5,7 @@ These packs live **outside** coding-team core. They are **default OFF** and must
 | Addon | What | License |
 |---|---|---|
 | [pm-lean/](pm-lean/) | Explicit-only PM assumption triage and experiment-design support | MIT — see `pm-lean/LICENSE` |
-| [agentic-worker/](agentic-worker/) | Explicit-only bounded app-development worker returning an A11 evidence bundle | External extension; see `agentic-worker/SOURCE.md` |
+| [agentic-worker/](agentic-worker/) | Explicit bounded-task implementation and A11 evidence overlay | External supplied pack — see `agentic-worker/SOURCE.md` |
 
 ## Toggle state
 
@@ -21,7 +21,6 @@ See [toggles.json](toggles.json). Defaults:
 ```bash
 ./bin/ct status
 ./install.sh --platform codex --global --enable pm-lean
-./install.sh --platform codex --global --disable pm-lean
 ./install.sh --platform codex --global --enable agentic-worker
 ./install.sh --platform codex --global --disable agentic-worker
 ```
@@ -35,4 +34,5 @@ When enabled, install symlinks the addon into `$CODEX_HOME/skills/<name>` (or th
 1. Core orchestration / roles / human gates never require an addon.
 2. Do not paste addon bodies into `core/` or force them in every Task brief.
 3. User (or install toggle) turns them on; user turns them off.
-4. PM Lean and Agentic Worker are explicit-only. Agentic Worker adds no routing, approval authority, or auto-chain, and cannot replace Test Engineer or Gatekeeper.
+4. PM Lean is explicit-only, stays inside the existing Product Manager call, and adds no routing, agents, approval authority, or auto-chain.
+5. Agentic Worker is explicit-only for bounded app-development tasks and adds no routing, agents, approval authority, or auto-chain.

@@ -193,7 +193,7 @@ enable_addon() {
       link_path "$ROOT/addons/agentic-worker/skills/agentic-worker" "$CODEX_HOME/skills/agentic-worker"
       ;;
     *)
-      die "unknown addon: $name (expected pm-lean or agentic-worker)"
+      die "unknown addon: $name (expected pm-lean|agentic-worker)"
       ;;
   esac
 }
@@ -211,7 +211,7 @@ disable_addon() {
       unlink_path "$CODEX_HOME/skills/agentic-worker"
       ;;
     *)
-      die "unknown addon: $name (expected pm-lean or agentic-worker)"
+      die "unknown addon: $name (expected pm-lean|agentic-worker)"
       ;;
   esac
 }
@@ -326,7 +326,9 @@ Next steps
      ls -la "$SKILL_DST"
 2. Optional addons (default OFF — not injected into core):
      ./install.sh --platform codex --global --enable pm-lean
+     ./install.sh --platform codex --global --enable agentic-worker
      ./install.sh --platform codex --global --disable pm-lean
+     ./install.sh --platform codex --global --disable agentic-worker
    State file: $TOGGLES
 3. In Codex, invoke **Coding Team**; enable addons only when you want them.
 4. Explicitly refresh/approve the pool map after Codex model changes:

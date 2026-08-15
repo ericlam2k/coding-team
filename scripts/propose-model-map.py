@@ -18,8 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Generic capability prefs — host detectors may return any slug set.
 # Codex GPT prefs first; Cursor/Cline pools match by substring heuristics later.
-# WYSY's approved Codex route keeps Terra available for Test Engineer
-# validation; Tier 1 build remains Luna Max and validation keeps Luna as fallback.
+# WYSY's Codex policy intentionally excludes Terra. Tier 1 work uses Luna Max;
+# the detector's raw Terra entry must not re-enter an approved map on refresh.
+CODEX_POLICY_EXCLUDED = {"gpt-5.6-terra"}
 TIER_PREFS: dict[str, list[dict[str, str]]] = {
     "0": [
         {"slug": "gpt-5.6-luna", "effort": "medium"},
@@ -36,7 +37,6 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
         {"slug": "cursor-grok-4.5-high-fast", "effort": "medium"},
     ],
     "1 validate": [
-        {"slug": "gpt-5.6-terra", "effort": "high"},
         {"slug": "gpt-5.6-luna", "effort": "max"},
         {"slug": "gpt-5.4", "effort": "high"},
         {"slug": "gpt-5.5", "effort": "high"},
@@ -58,7 +58,7 @@ TIER_PREFS: dict[str, list[dict[str, str]]] = {
 PLANNED = {
     "0": "cheap utility (Luna / mini / composer-fast)",
     "1 build": "Luna Max implement",
-    "1 validate": "Terra High validate (Luna Max fallback)",
+    "1 validate": "Luna Max validate",
     "2": "premium plan/debate (Sol / Opus)",
     "3": "max-risk judgment (Sol xhigh / Fable)",
 }
@@ -247,6 +247,7 @@ def main() -> int:
 
     if args.platform == "codex":
         available = detect_codex(Path(args.codex_home).expanduser())
+        available = [slug for slug in available if slug not in CODEX_POLICY_EXCLUDED]
     elif args.platform == "cursor":
         available = detect_cursor()
     else:

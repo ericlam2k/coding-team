@@ -9,7 +9,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
-PROFILE_ALIAS=""
+PROFILE="hybrid"
+PROFILE_EXPLICIT=0
 PLATFORM=""
 CHECK_ONLY=0
 
@@ -19,9 +20,10 @@ Usage:
   ./scripts/install-coding-team.sh [--platform codex|cursor|cline]
   ./scripts/install-coding-team.sh --check [--platform ...]
 
-Compatibility:
-  --profile hybrid|full  Deprecated aliases for the same single install.
-                         Neither alias enables addons or writes a model map.
+Profiles:
+  hybrid  Lightweight default: adapter + QA skill; no model refresh or addons.
+  full    Opt-in framework: adapter + QA skill plus full Codex addons.
+          Model mapping remains a separate, explicit user action.
 
 Start from a clean standalone clone:
   git clone https://github.com/ericlam2k/coding-team.git
@@ -43,7 +45,8 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
       [[ $# -ge 2 ]] || die "--profile requires hybrid or full"
-      PROFILE_ALIAS="$2"
+      PROFILE="$2"
+      PROFILE_EXPLICIT=1
       shift 2
       ;;
     --platform)
@@ -112,14 +115,33 @@ link_path() {
 
 remove_owned_addon_links() {
   [[ "$PLATFORM" == "codex" ]] || return 0
-  # Public profile switching does not own private extension links.
+  for name in agentic-worker; do
+    local dst="$CODEX_HOME/skills/$name"
+    if [[ -L "$dst" && "$(readlink "$dst")" == "$ROOT/addons/"* ]]; then
+      rm "$dst"
+      echo "removed full-profile addon link: $dst"
+    fi
+  done
+}
+
+write_profile() {
+  mkdir -p "$(dirname "$PROFILE_FILE")"
+  printf '%s\n' "$PROFILE" > "$PROFILE_FILE"
+  echo "active profile: $PROFILE ($PROFILE_FILE)"
 }
 
 check_links() {
   [[ -f "$ADAPTER_DST/SKILL.md" ]] || die "adapter is not active: $ADAPTER_DST"
   [[ -f "$QA_SKILL_DST/SKILL.md" ]] || die "QA skill is not active: $QA_SKILL_DST"
   [[ -f "$ROOT/core/qa-operating-model.md" ]] || die "QA policy is missing: $ROOT/core/qa-operating-model.md"
-  echo "activation check: PASS (single-install/$PLATFORM)"
+  [[ -f "$PROFILE_FILE" ]] || die "profile marker is missing: $PROFILE_FILE"
+  [[ "$(<"$PROFILE_FILE")" == "$PROFILE" ]] || die "active profile is $(<"$PROFILE_FILE"), requested $PROFILE"
+  echo "activation check: PASS ($PROFILE/$PLATFORM)"
+  if [[ "$PROFILE_EXPLICIT" -eq 1 ]]; then
+    echo "scope_selected: $PROFILE"
+  else
+    echo "scope_assumed: $PROFILE (compatibility default; pass --profile explicitly for internal/CI runs)"
+  fi
 }
 
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
@@ -127,9 +149,20 @@ if [[ "$CHECK_ONLY" -eq 1 ]]; then
   exit 0
 fi
 
-link_path "$ADAPTER_SRC" "$ADAPTER_DST"
-link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
-echo "Single install active: adapter + QA skill linked; model map unchanged; addons remain OFF."
+if [[ "$PROFILE" == "hybrid" ]]; then
+  remove_owned_addon_links
+  link_path "$ADAPTER_SRC" "$ADAPTER_DST"
+  link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
+  write_profile
+  echo "Hybrid profile active: no model-map refresh and no addons enabled."
+else
+  [[ -x "$ROOT/bin/ct" ]] || die "missing executable: $ROOT/bin/ct"
+  # Setup is deliberately map-free. Addons are explicit through --full;
+  # mapping is approved separately with `bin/ct map approve`.
+  "$ROOT/bin/ct" init --platform "$PLATFORM" --full
+  write_profile
+  echo "Full profile active: model map unchanged; Codex full addons enabled where supported."
+fi
 
 check_links
 cat <<NEXT

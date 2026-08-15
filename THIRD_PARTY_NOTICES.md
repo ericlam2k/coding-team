@@ -4,15 +4,6 @@ This repository vendors third-party skills and reference libraries. Framework fi
 
 ---
 
-## PM Lean (Pawel Huryn)
-
-- Path: `addons/pm-lean/`
-- License: MIT — see `addons/pm-lean/LICENSE`
-- Upstream attribution and pinned source: `addons/pm-lean/UPSTREAM.md`
-
-
----
-
 ## awesome-design-md (VoltAgent)
 
 - Path: `skills/design/awesome-design-md/`

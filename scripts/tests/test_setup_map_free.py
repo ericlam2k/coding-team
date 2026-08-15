@@ -107,44 +107,27 @@ class SetupMapFreeTests(unittest.TestCase):
         self.assertTrue((home / ".codex/skills/coding-team").is_symlink())
         self.assertTrue((home / ".codex/skills/qa-evidence-enforcement").is_symlink())
 
-    def test_single_install_and_legacy_aliases_are_identical_and_map_free(self) -> None:
-        outputs: dict[str, str] = {}
-        for label, args in (
-            ("default", ()),
-            ("hybrid", ("--profile", "hybrid")),
-            ("full", ("--profile", "full")),
-        ):
-            with self.subTest(alias=label):
+    def test_profile_installers_do_not_start_mapping(self) -> None:
+        for profile in ("hybrid", "full"):
+            with self.subTest(profile=profile):
                 temp, root, home = self.fixture()
                 try:
                     result = self.run_cmd(
-                        root, home, "bash", str(root / "scripts/install-coding-team.sh"),
-                        *args, "--platform", "codex",
+                        root,
+                        home,
+                        "bash",
+                        str(root / "scripts/install-coding-team.sh"),
+                        "--profile",
+                        profile,
+                        "--platform",
+                        "codex",
                     )
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(self.map_files(root, home), set())
-                    self.assertTrue((home / ".codex/skills/coding-team").is_symlink())
-                    self.assertTrue((home / ".codex/skills/qa-evidence-enforcement").is_symlink())
-                    # Temporary fixture paths differ, so compare normalized
-                    # output to prove aliases have identical behavior.
-                    outputs[label] = result.stdout.replace(str(home), "<HOME>").replace(str(root), "<ROOT>")
-                    if label != "default":
-                        self.assertIn("deprecation", result.stderr.lower())
+                    self.assertIn("map", result.stdout.lower())
+                    self.assertIn(f"scope_selected: {profile}", result.stdout)
                 finally:
                     temp.cleanup()
-        for alias in ("hybrid", "full"):
-            self.assertEqual(outputs[alias], outputs["default"])
-
-    def test_single_install_is_idempotent(self) -> None:
-        temp, root, home = self.fixture()
-        self.addCleanup(temp.cleanup)
-        command = ("bash", str(root / "scripts/install-coding-team.sh"), "--platform", "codex")
-        first = self.run_cmd(root, home, *command)
-        second = self.run_cmd(root, home, *command)
-        self.assertEqual(first.returncode, 0, first.stderr)
-        self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertIn("already linked", second.stdout)
-        self.assertEqual(self.map_files(root, home), set())
 
         temp, root, home = self.fixture()
         self.addCleanup(temp.cleanup)

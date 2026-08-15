@@ -63,12 +63,8 @@ Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles fr
 - When `qa_required=true` or `qa_mode=bounded`, load
   `$CODING_TEAM_ROOT/skills/quality/qa-evidence-enforcement/` after TE
   execution and run the evidence validator before Gatekeeper. Bounded TE
-  passes resolve `T_target`, `T_checkpoint`, and `T_hard` from the active
-  approved timing profile described in [the adaptive timing policy](../../core/adaptive-timing.md);
-  when no valid profile matches, use a labeled versioned fallback and state
-  remediation. Stop scheduling at `T_target`, record checkpoint evidence at
-  `T_checkpoint`, and at `T_hard` stop safely; timeout returns `BLOCKED` and
-  queues one smaller next step rather than retrying.
+  passes use a 120-second target / 240-second hard stop; timeout returns
+  `BLOCKED` and queues one smaller next step rather than retrying.
 - **Addons default OFF:** do **not** load optional addons unless enabled (`./bin/ct enable`) or the human asks. Packs live under `$CODING_TEAM_ROOT/addons/` — never inject into core briefs
 - Platform independence: core has no host slugs; this file is the Codex adapter only
 - **Lead receipt:** every Lead handoff/status must show the policy-cache state,

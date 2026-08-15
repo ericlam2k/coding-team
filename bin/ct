@@ -39,7 +39,7 @@ coding-team v2 CLI (platform-independent)
       Decline mapping. Never writes or deletes a map.
   ./bin/ct refresh [--yes] [--platform ...]
       Compatibility alias for explicit map approval.
-  ./bin/ct enable pm-lean[,agentic-worker]      (Codex addons)
+  ./bin/ct enable pm-lean[,agentic-worker]     (Codex addons)
   ./bin/ct disable pm-lean[,agentic-worker]
   ./bin/ct project <path>
   ./bin/ct tools terminal --timeout-s N -- argv...
@@ -224,7 +224,7 @@ cmd_status() {
   echo "CODEX_HOME:       $CODEX_HOME"
   echo
   echo "Adapters / skills:"
-  for name in coding-team qa-evidence-enforcement; do
+  for name in coding-team qa-evidence-enforcement agentic-worker; do
     local p="$CODEX_HOME/skills/$name"
     if [[ -L "$p" ]]; then
       echo "  Codex $name → $(readlink "$p")"
@@ -250,6 +250,9 @@ cmd_status() {
     echo "Addons:"
     python3 -c "import json;d=json.load(open('$ROOT/addons/toggles.json'));
 [print(f\"  {k}: {'ON' if v.get('enabled') else 'OFF'}\") for k,v in d.get('addons',{}).items()]"
+    if [[ -f "$ROOT/addons/agentic-worker/VERSION" ]]; then
+      echo "  agentic-worker version: $(tr -d '[:space:]' < "$ROOT/addons/agentic-worker/VERSION")"
+    fi
   fi
 }
 

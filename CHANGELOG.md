@@ -15,11 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bounded `EXP-*`/PDCA records, fallback-mode capture, performance evidence,
   and governed distillation templates for assistant operation.
 
-### Removed
-
-- Removed the unused legacy addon set and its contribution experiment records;
-  neither is part of the public installer or addon index.
-
 ## [2.1.0] — 2026-07-31
 
 ### Added

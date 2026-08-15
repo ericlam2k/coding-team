@@ -24,7 +24,9 @@ deprecated aliases, and both produce the same links and no map/addon changes:
 ./scripts/install-coding-team.sh --profile full --platform codex    # deprecated
 ```
 
-Optional addons are explicit and independent of installation:
+Full delegates to `bin/ct init --full` for full Codex setup. Addons remain
+explicit and setup is still model-map-free; mapping is a separate explicit
+action. Switch back explicitly:
 
 ```bash
 ./bin/ct enable agentic-worker
@@ -42,14 +44,13 @@ exceed 120 seconds or cross the width limits, checkpoint at 180 seconds, and
 hard-stop at 240 seconds with one bounded handoff. Addons never bypass WIP ≤2,
 disjoint writes, or TE → Gatekeeper sequencing.
 
-Model-map suggestions are a separate, rerunnable user action. Re-run the
-proposal whenever the provider, API proxy, available models, or credentials
-change; approval remains explicit:
+For direct setup and model-map management without profile switching, the
+advanced commands remain available:
 
 ```bash
 ./bin/ct init                    # adapter/QA setup only; no map write
 ./bin/ct init --yes              # compatibility flag; still no map write
-./bin/ct map propose             # rerunnable proposal; no write
+./bin/ct map propose             # print a proposal; no write
 ./bin/ct map approve --yes       # explicit approval; write declared outputs
 ./bin/ct map decline             # no write
 ./bin/ct refresh --yes           # compatibility alias for explicit approval
@@ -58,11 +59,10 @@ change; approval remains explicit:
 ## Why approve the map?
 
 Core is **platform-independent** (abstract tiers only). Host slugs differ by
-adapter. For this WYSY Codex installer, the approved map includes Terra and
-prefers `gpt-5.6-terra` at `high` for Tier 1 validate (Test Engineer). Tier 1
-build remains `gpt-5.6-luna` at `max`, with Luna Max as the validation fallback
-when Terra is unavailable. Cursor/Cline pools remain separate adapter
-suggestions. Mapping is optional metadata; you
+adapter. For this WYSY Codex installer, the approved map excludes Terra and
+uses `gpt-5.6-luna` at `max` for Tier 1 build and validate (the current
+frontend, backend, and Test Engineer build/validate path). Cursor/Cline pools
+remain separate adapter suggestions. Mapping is optional metadata; you
 explicitly propose and approve it so a bad auto-pick never silently becomes
 policy. Missing or declined mapping does not block planning.
 
@@ -102,6 +102,6 @@ continues to invoke the same single-install Codex path for existing automation.
 
 | Symptom | Fix |
 |---|---|
-| Map not written | Run `./bin/ct map propose` after provider/API-proxy/model changes, then review and explicitly approve |
-| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --platform <name>` |
+| Map not written | Both profiles are map-free; run `./bin/ct map propose` then `./bin/ct map approve` (or `./bin/ct refresh --yes`) |
+| Wrong platform symlink | Rerun `./scripts/install-coding-team.sh --profile <profile> --platform <name>` |
 | Non-interactive map approval refused | Add `--yes` to `bin/ct map approve` or `bin/ct refresh`; `init --yes` never approves a map |

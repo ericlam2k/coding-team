@@ -9,7 +9,7 @@
     },
     "agentic-worker": {
       "enabled": true,
-      "path": "addons/agentic-worker/skills/agentic-worker",
+      "path": "addons/agentic-worker",
       "kind": "skill-pack"
     }
   }

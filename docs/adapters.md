@@ -2,10 +2,8 @@
 
 Core policy under `core/` has **no host model slugs**. Adapters bind runtime only.
 
-`--platform` selects the host adapter (Codex/Cursor/Cline). Installation has
-one profile-free scope: adapter plus conditional QA support. Legacy
-`--profile hybrid|full` flags are deprecated aliases for the same install and
-never enable addons or write a model map.
+`--platform` selects the host adapter (Codex/Cursor/Cline); `--profile`
+selects the Coding Team scope (`hybrid`/`full`). They are separate choices.
 
 | Adapter | Status | Install |
 |---|---|---|
@@ -17,10 +15,9 @@ Auto-detect: `./bin/ct init` (prefers Codex if `~/.codex` exists).
 
 ## Shared install behavior (v2)
 
-1. Link/copy the platform adapter skill and QA support.
+1. Link/copy the platform adapter skill.
 2. Leave `model_map_status: NOT_STARTED`; setup never writes a map.
-3. Optionally **show a suggested** tier → slug map with an explicit proposal;
-   rerun it after provider, API-proxy, model, or credential changes.
+3. Optionally **show a suggested** tier → slug map with an explicit proposal.
 4. Approve only through the separate map action; pass `--yes` only to that
    approval in CI/non-interactive use.
 

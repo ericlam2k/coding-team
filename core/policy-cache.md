@@ -78,7 +78,6 @@ The helper fingerprints these files by default:
 - `core/concurrency.md`
 - `core/human-gates.md`
 - `core/policy-cache.md`
-- `core/adaptive-timing.md`
 
 Use `--include-learning` when the task includes learning, experiments,
 performance evidence, fallback correction, or distillation; this adds
@@ -143,9 +142,6 @@ source revision changes, a file set or digest changes, the active context was
 compacted, a high-risk or learning trigger requires the full bundle, or the
 user asks for refresh. A failed check or a missing context fingerprint stops
 policy-sensitive delegation until refresh with a valid identity.
-
-Changes to the adaptive timing contract invalidate the cache and require a
-refresh, like any other core policy drift.
 
 This cache does not relax WIP ≤2, sequential TE → Gatekeeper, human gates,
 model-map approval, FIO boundaries, or learning-promotion rules.

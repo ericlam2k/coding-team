@@ -21,6 +21,12 @@ dashboard, full GraphRAG indexing, or implemented Cursor/Cline runtimes.
 
 ---
 
+**WYSY = What You See, You Ship.**
+
+[Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Learning, experiments, and distillation](core/learning-and-distillation.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+
+---
+
 **Platform-independent multi-agent coding team** — Sprint → Batch → Task, role cards, human gates, abstract model tiers. Adapters for Codex, Cursor, and Cline.
 
 [Installation](docs/installation.md) · [Definitions](docs/definitions.md) · [Workflow](docs/workflow.md) · [Learning, experiments, and distillation](core/learning-and-distillation.md) · [Roles](docs/roles.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
@@ -30,10 +36,9 @@ dashboard, full GraphRAG indexing, or implemented Cursor/Cline runtimes.
 ## Installation notes
 
 - **Platform independent:** `core/` has no host model slugs. Codex / Cursor / Cline are adapters only.
-- **One install:** `scripts/install-coding-team.sh` links the selected adapter
-  and conditional QA support. It does not write a model map or enable addons.
-- Legacy `--profile hybrid|full` flags are deprecated compatibility aliases.
-  They produce the same profile-free installation.
+- **Installation:** `scripts/install-coding-team.sh` exposes Hybrid/Full as the
+  host scope choice. Both profiles are map-free; Full uses `bin/ct init --full`
+  only to enable supported addons and remains mutually exclusive with Hybrid.
 
 ## Quick start
 
@@ -55,10 +60,11 @@ support. Optional addons and model mapping are separate explicit actions:
 ./bin/ct map approve --yes
 ```
 
-Run `ct map propose` again when the provider, API proxy, available models, or
-credentials change. A proposal is read-only; only explicit approval writes the
-declared map outputs. `--profile hybrid|full` remains accepted for older
-automation, but neither alias changes links, addons, or model-map state.
+Profiles are toggled by rerunning the installer. The marker at
+`$CODEX_HOME/coding-team.profile` records the active profile; switching back to
+Hybrid removes only addon links owned by this checkout. `bin/ct init` remains
+available for adapter setup, while `bin/ct map propose|approve|decline` are the
+explicit model-map actions.
 
 ## What this is
 
@@ -67,7 +73,7 @@ automation, but neither alias changes links, addons, or model-map state.
 | **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
-| **Addons** | PM Lean — default OFF, toggleable |
+| **Addons** | PM Lean + Agentic Worker — default OFF, toggleable |
 
 ## How routing works
 
