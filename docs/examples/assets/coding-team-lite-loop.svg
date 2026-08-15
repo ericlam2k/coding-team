@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 430" role="img" aria-labelledby="title desc">
   <title id="title">The coding-team lite delivery loop</title>
   <desc id="desc">A plain-English goal becomes scoped work, implementation, independent evidence, and a human ship decision.</desc>
   <style>
@@ -15,44 +15,46 @@
       <path d="M0,0 L10,4 L0,8 Z" fill="#d56b42" />
     </marker>
   </defs>
-  <rect class="bg" width="1200" height="430" rx="24" />
+  <rect class="bg" width="1300" height="430" rx="24" />
   <text class="ink label" x="50" y="55">A small path from idea to a human ship decision</text>
-  <g transform="translate(45 105)">
+  <g transform="translate(46 105)">
     <rect class="card" width="205" height="160" rx="18" />
     <rect class="accent" width="205" height="12" rx="6" />
     <text class="ink label" x="22" y="58">Say it</text>
     <text class="ink note" x="22" y="94">Plain-English</text>
     <text class="ink note" x="22" y="120">goal</text>
   </g>
-  <path class="arrow" d="M260 185 H305" />
-  <g transform="translate(315 105)">
+  <path class="arrow" d="M251 185 H297" />
+  <g transform="translate(297 105)">
     <rect class="card" width="205" height="160" rx="18" />
     <rect class="accent" width="205" height="12" rx="6" />
     <text class="ink label" x="22" y="58">Scope it</text>
     <text class="ink note" x="22" y="94">Lead + role</text>
     <text class="ink note" x="22" y="120">card</text>
   </g>
-  <path class="arrow" d="M530 185 H575" />
-  <g transform="translate(585 105)">
+  <path class="arrow" d="M502 185 H548" />
+  <g transform="translate(548 105)">
     <rect class="card" width="205" height="160" rx="18" />
     <rect class="accent" width="205" height="12" rx="6" />
     <text class="ink label" x="22" y="58">Build it</text>
     <text class="ink note" x="22" y="94">Bounded files</text>
     <text class="ink note" x="22" y="120">and stop rule</text>
   </g>
-  <path class="arrow" d="M800 185 H845" />
-  <g transform="translate(855 105)">
+  <path class="arrow" d="M753 185 H799" />
+  <g transform="translate(799 105)">
     <rect class="card" width="205" height="160" rx="18" />
     <rect class="accent" width="205" height="12" rx="6" />
     <text class="ink label" x="22" y="58">Prove it</text>
     <text class="ink note" x="22" y="94">Test evidence</text>
     <text class="ink note" x="22" y="120">before review</text>
   </g>
-  <path class="arrow" d="M1065 185 H1110" />
-  <g transform="translate(1050 300)">
-    <rect class="card" width="110" height="75" rx="16" />
-    <text class="ink note" x="18" y="33">Human</text>
-    <text class="ink note" x="18" y="57">ships</text>
+  <path class="arrow" d="M1004 185 H1050" />
+  <g transform="translate(1050 105)">
+    <rect class="card" width="205" height="160" rx="18" />
+    <rect class="accent" width="205" height="12" rx="6" />
+    <text class="ink label" x="22" y="58">Ship it</text>
+    <text class="ink note" x="22" y="94">Human calls</text>
+    <text class="ink note" x="22" y="120">the decision</text>
   </g>
   <text class="ink note" x="50" y="345">If evidence is missing: stop, report BLOCKED, and ask for the next decision.</text>
 </svg>
