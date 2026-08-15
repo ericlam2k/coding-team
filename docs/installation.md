@@ -104,10 +104,24 @@ Gatekeeper sequencing, and a human decision before irreversible actions.
 
 ## Conditional QA
 
-Normal work uses the ordinary focused checks for the task. Risky or bounded QA
-work can load the `qa-evidence-enforcement` skill and its validator. A bounded
-pass targets 120 seconds, checkpoints at 180 seconds, and hard-stops at 240
-seconds. A timeout is `BLOCKED` evidence, not an automatic retry.
+| QA path | Public status | Runtime behavior |
+|---|---|---|
+| **Normal QA** | `AVAILABLE` | Default for ordinary, bounded changes |
+| **Risky QA** | `EXPERIMENTAL` | Uses the existing high-risk workflow and evidence rules |
+
+Normal work uses the ordinary focused checks for the task. Risky QA is
+implemented and available for careful trial use when a change affects state,
+security, privacy, shared contracts, migration/rollback, or has repeated
+failures.
+
+Risky or bounded work can load the `qa-evidence-enforcement` skill and its
+validator. A bounded pass targets 120 seconds, checkpoints at 180 seconds, and
+hard-stops at 240 seconds. A timeout is `BLOCKED` evidence, not an automatic
+retry. When a risky trigger applies, do not continue under Normal QA.
+
+`EXPERIMENTAL` is a maturity label, not an enable/disable switch. This update
+does not change the installer, trigger policy, validator, or human gates. See
+the [basic Risky QA example](examples/risky-qa-trial.md).
 
 ## Addons
 

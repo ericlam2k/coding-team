@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+
+- Mark Normal QA as `AVAILABLE` and Risky QA as `EXPERIMENTAL` while its
+  public guidance is evaluated.
+- Add a basic Risky QA example without changing runtime behavior, installers,
+  trigger policy, evidence requirements, or human gates.
+
 ## [2.1.0] — 2026-07-31
 
 ### Added

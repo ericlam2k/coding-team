@@ -39,6 +39,18 @@ evidence → your decision. The [communication guide](docs/communication-style.m
 keeps the language clear without changing the underlying constraints or
 evidence.
 
+## QA maturity
+
+| QA path | Public status | When to use it |
+|---|---|---|
+| **Normal QA** | `AVAILABLE` | Default for ordinary, bounded changes |
+| **Risky QA** | `EXPERIMENTAL` | Required when an existing high-risk trigger applies |
+
+Risky QA is implemented and available for careful trial use. Its public
+guidance is still being evaluated. It does not silently fall back to Normal QA
+when a risky trigger is present, and it does not change the human approval
+gates. See the [basic example](docs/examples/risky-qa-trial.md).
+
 ## A first bounded task
 
 ```text
