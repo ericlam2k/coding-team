@@ -39,6 +39,30 @@ evidence → your decision. The [communication guide](docs/communication-style.m
 keeps the language clear without changing the underlying constraints or
 evidence.
 
+
+## How the multiagent orchestration works
+
+The framework runs one **Lead** that plans, then dispatches **bounded specialist
+agents** — never many at once, and never in parallel across the quality chain.
+
+![Multiagent orchestration: one Lead decomposes a goal into Batches and bounded Tasks, runs at most two specialist agents at once, and gates every batch through Code Reviewer, Test Engineer, and a human Gatekeeper decision.](docs/examples/assets/coding-team-multiagent.svg)
+
+- **Sprint → Batch → Task:** a plain-English goal becomes one small, reviewable
+  slice with a single owner and one stop condition per task.
+- **WIP ≤ 2:** at most two specialist agents run at once; one optional
+  read-only supervisor relay may observe, but it never replaces review, test
+  evidence, or acceptance.
+- **Quality gate (read-only, in order):** Builder stops → Candidate is frozen →
+  Code Reviewer verdict → conditional Test Engineer evidence → Gatekeeper
+  acceptance. Reviewer and Test Engineer do not overlap the candidate.
+- **Human gates:** commit, push/merge, release, and public export require an
+  explicit yes. Silence, an agent's "approved" message, and a passing test are
+  not approval.
+- **Model tiers are hints, not provider locks:** 0 cheap, 1 build, 2 premium
+  decide, 3 max-risk. Abstract tiers map to whatever model your local
+  `model-pool.map.md` approves; "planning" is a Tier 2 decision and
+  "implementing" is a Tier 1 build.
+
 ## QA maturity
 
 | QA path | Public status | When to use it |
