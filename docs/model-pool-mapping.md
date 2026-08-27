@@ -1,48 +1,57 @@
-# Model-pool mapping
+# Model map
 
-The core framework routes work to abstract capability tiers. A host may map
-those tiers to concrete model slugs, but that mapping is local configuration,
-not public platform policy.
+Core uses task tiers, not fixed model names. A model map connects those tiers
+to models available on one host.
 
-## Abstract tiers
+## Simple rule
 
-| Tier | Intent |
+**Premium decide. Eco build. Cheap search/docs. Human gate for irreversible
+risk.**
+
+| Tier | Use |
 | --- | --- |
-| 0 | Cheap utility for lookup or lightweight docs |
-| 1 build | Everyday implementation |
+| 0 | Cheap search/docs |
+| 1 build | Eco build |
 | 1 validate | Careful validation |
-| 2 | Premium planning, debate, or Gatekeeper judgment |
+| 2 | Premium decision, debate, or review |
 | 3 | Max-risk judgment |
 
-The Lead records `planned → actual` when the runtime supplies a usable
-identity. A missing slug or unavailable receipt does not become a fabricated
-claim.
+## How the proposal works
 
-## Explicit map flow
+The installer:
 
-Canonical installation does not create a map. When you need one, separate
-inspection from approval:
+1. reads the selected host's model list and configuration;
+2. lists every valid model ID it finds; and
+3. suggests one model for each tier.
+
+GPT names in the example map are references only. The proposer does not require
+a gpt-* prefix or a specific provider. Names such as ecobuild and
+frontier-think are simple hints, not proof of model quality. The full pool is
+shown so you can correct the suggestion.
+
+If a tier hint is missing, the proposer chooses a fallback from the detected
+pool and labels it as a heuristic. A missing model or runtime receipt remains
+unavailable; it is never invented.
+
+## Commands
+
+Preview the map without writing a file:
 
 ```bash
-# Read-only suggestion. No file is written.
 ./bin/ct map propose --platform codex
+```
 
-# Human-gated write to the local host map.
+Approve and write the local host map:
+
+```bash
 ./bin/ct map approve --platform codex
 ```
 
-Use `--yes` only when the surrounding automation is itself the explicit
-approval gate:
+Use --yes only when the surrounding automation is the explicit approval:
 
 ```bash
 ./bin/ct map approve --platform codex --yes
 ```
 
-## Portability rule
-
-`core/model-routing.md` stays free of host slugs. Codex, Cursor, and Cline may
-expose different pools, names, effort controls, and receipts. Therefore:
-
-- do not copy a concrete map from one host to another;
-- do not treat an example map as an availability guarantee; and
-- keep `UNAVAILABLE` when the host provides no trustworthy receipt.
+The map is host-specific. Do not copy it between Codex, Cursor, and Cline.
+Record planned → actual when the runtime provides the model identity.

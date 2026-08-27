@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -16,52 +17,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Generic capability prefs — host detectors may return any slug set.
-# Codex GPT prefs first; Cursor/Cline pools match by substring heuristics later.
-TIER_PREFS: dict[str, list[dict[str, str]]] = {
-    "0": [
-        {"slug": "gpt-5.6-luna", "effort": "medium"},
-        {"slug": "gpt-5.4-mini", "effort": "medium"},
-        {"slug": "composer-2.5-fast", "effort": "low"},
-        {"slug": "gpt-5.4", "effort": "low"},
-        {"slug": "gpt-5.6-terra", "effort": "low"},
-    ],
-    "1 build": [
-        {"slug": "gpt-5.6-terra", "effort": "medium"},
-        {"slug": "claude-sonnet-5-thinking-high", "effort": "high"},
-        {"slug": "gpt-5.4", "effort": "medium"},
-        {"slug": "gpt-5.5", "effort": "medium"},
-        {"slug": "cursor-grok-4.5-high-fast", "effort": "medium"},
-    ],
-    "1 validate": [
-        {"slug": "gpt-5.6-terra", "effort": "high"},
-        {"slug": "gpt-5.6-terra-medium", "effort": "medium"},
-        {"slug": "gpt-5.4", "effort": "high"},
-        {"slug": "gpt-5.5", "effort": "high"},
-    ],
-    "2": [
-        {"slug": "gpt-5.6-sol", "effort": "high"},
-        {"slug": "gpt-5.6-sol-medium", "effort": "medium"},
-        {"slug": "claude-opus-4-8-thinking-high", "effort": "high"},
-        {"slug": "gpt-5.5", "effort": "xhigh"},
-    ],
-    "3": [
-        {"slug": "gpt-5.6-sol", "effort": "xhigh"},
-        {"slug": "claude-fable-5-thinking-high", "effort": "high"},
-        {"slug": "gpt-5.6-sol", "effort": "max"},
-        {"slug": "gpt-5.6-sol", "effort": "high"},
-    ],
-}
+SELECTION_RULE = "Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk."
 
 PLANNED = {
-    "0": "cheap utility (Luna / mini / composer-fast)",
-    "1 build": "eco implement (Terra / Sonnet)",
-    "1 validate": "careful validate (Terra high)",
-    "2": "premium plan/debate (Sol / Opus)",
-    "3": "max-risk judgment (Sol xhigh / Fable)",
+    "0": "cheap search/docs",
+    "1 build": "eco build",
+    "1 validate": "careful validate",
+    "2": "premium decide",
+    "3": "max-risk judgment",
 }
 
 TIER_ORDER = ["0", "1 build", "1 validate", "2", "3"]
+TIER_EFFORT = {
+    "0": "medium",
+    "1 build": "medium",
+    "1 validate": "high",
+    "2": "high",
+    "3": "max",
+}
 
 
 def detect_codex(codex_home: Path) -> list[str]:
@@ -107,36 +80,165 @@ def detect_cline() -> list[str]:
     ]
 
 
-def pick(available: set[str], prefs: list[dict[str, str]]) -> tuple[str, str, list[str]]:
-    notes: list[str] = []
-    for pref in prefs:
-        if pref["slug"] in available:
-            return pref["slug"], pref["effort"], notes
-    # substring soft match
-    for pref in prefs:
-        for a in available:
-            if pref["slug"].split("-")[0] in a or pref["slug"] in a:
-                notes.append(f"soft-matched {pref['slug']} → {a}")
-                return a, pref["effort"], notes
-    if available:
-        fb = sorted(available)[0]
-        notes.append(f"no preferred slug; fell back to {fb}")
-        return fb, "medium", notes
-    notes.append("empty pool — placeholder; edit after approve")
-    return prefs[0]["slug"], prefs[0]["effort"], notes
+# Markers are hints only. They do not prove model quality or capability.
+CHEAP_MARKERS = (
+    "cheap", "fast", "flash", "mini", "luna", "lite", "air", "nano",
+    "small", "haiku", "swift", "search", "docs", "utility",
+)
+ECO_BUILD_MARKERS = (
+    "eco", "build", "builder", "code", "coder", "codex", "dev", "developer",
+    "ecobuild", "ecobuilder",
+)
+REASONING_MARKERS = ("think", "reason", "reasoning", "deep", "pro", "plus", "sonnet")
+PREMIUM_MARKERS = ("max", "ultra", "opus", "premium", "flagship", "frontier", "large")
+
+_NUM_RE = re.compile(r"(\d+(?:\.\d+)?)")
+_TOKEN_RE = re.compile(r"[^a-z0-9]+")
+CREDENTIAL_VALUE_RE = re.compile(
+    r"^(?:sk[-_]|key[-_]|token[-_]|secret[-_]|bearer\s+|password[-_])",
+    re.IGNORECASE,
+)
+
+
+def looks_like_slug(value: object) -> bool:
+    """Accept a printable model ID without assuming a provider prefix."""
+    if not isinstance(value, str):
+        return False
+    slug = value.strip()
+    if not (2 <= len(slug) <= 80):
+        return False
+    if slug.lower() in {"true", "false", "null", "none"}:
+        return False
+    if CREDENTIAL_VALUE_RE.search(slug):
+        return False
+    return all(32 <= ord(char) < 127 for char in slug)
+
+
+def _tokens(slug: str) -> set[str]:
+    return {token for token in _TOKEN_RE.split(slug.lower()) if token}
+
+
+def model_family(slug: str) -> str:
+    name = slug.split("/", 1)[-1].strip().lower()
+    return name.split("-", 1)[0] if "-" in name else name
+
+
+def _matches_any(slug: str, markers: tuple[str, ...]) -> bool:
+    return any(marker in _tokens(slug) for marker in markers)
+
+
+def _version_proxy(slug: str) -> float:
+    numbers = [float(number) for number in _NUM_RE.findall(slug)]
+    return max(numbers) if numbers else -1.0
+
+
+def _pool_key(slug: str) -> tuple:
+    return (_version_proxy(slug), len(slug), slug)
+
+
+def _pick(pool: list[str], predicate, prefer_family: str | None = None) -> str | None:
+    candidates = [slug for slug in pool if predicate(slug)]
+    if not candidates:
+        return None
+    if prefer_family is not None:
+        other_family = [slug for slug in candidates if model_family(slug) != prefer_family]
+        if other_family:
+            candidates = other_family
+    return candidates[0]
+
+
+def propose_slugs(pool: list[str]) -> dict[str, tuple[str | None, list[str]]]:
+    """Map a detected pool to abstract tiers without fixed provider names."""
+    pool = sorted(set(pool), key=_pool_key)
+    result: dict[str, tuple[str | None, list[str]]] = {}
+    if not pool:
+        for tier in TIER_ORDER:
+            result[tier] = (None, ["empty pool — no runtime slug detected; edit after approve"])
+        return result
+
+    t0 = _pick(pool, lambda slug: _matches_any(slug, CHEAP_MARKERS)) or pool[0]
+    result["0"] = (t0, ["heuristic: cheap/utility markers or lowest-cost-looking slug"])
+
+    t1b = _pick(pool, lambda slug: _matches_any(slug, ECO_BUILD_MARKERS) and slug != t0)
+    t1b_notes = ["heuristic: eco/build/code markers"]
+    if t1b is None:
+        t1b = _pick(pool, lambda slug: _matches_any(slug, ECO_BUILD_MARKERS))
+    if t1b is None:
+        t1b = _pick(
+            pool,
+            lambda slug: not _matches_any(slug, PREMIUM_MARKERS) and slug != t0,
+        )
+        t1b_notes = ["heuristic: non-premium fallback (no eco/code marker)"]
+    if t1b is None:
+        t1b = _pick(pool, lambda slug: not _matches_any(slug, PREMIUM_MARKERS)) or t0
+        t1b_notes = ["heuristic: fallback slug (no eco/code marker)"]
+    result["1 build"] = (t1b, t1b_notes)
+
+    build_family = model_family(t1b)
+    t1v = _pick(
+        pool,
+        lambda slug: _matches_any(slug, REASONING_MARKERS) and slug != t1b,
+        prefer_family=build_family,
+    )
+    if t1v is not None:
+        notes = ["heuristic: strong reasoning slug"]
+        notes.append(
+            "different family than 1 build"
+            if model_family(t1v) != build_family
+            else "same family as 1 build (pool has no other capable family)"
+        )
+    else:
+        t1v = next((slug for slug in pool if slug != t1b), t1b)
+        notes = ["heuristic: fallback slug (no reasoning markers detected)"]
+        if model_family(t1v) == build_family:
+            notes.append("same family as 1 build (single-family pool)")
+    result["1 validate"] = (t1v, notes)
+
+    t2 = _pick(
+        pool,
+        lambda slug: _matches_any(slug, PREMIUM_MARKERS) and slug != t1b,
+        prefer_family=build_family,
+    )
+    if t2 is not None:
+        notes = ["heuristic: premium markers"]
+    else:
+        candidates = [slug for slug in pool if slug not in (t1b, t1v)] or [
+            slug for slug in pool if slug != t1b
+        ] or pool
+        other_family = [slug for slug in candidates if model_family(slug) != build_family]
+        t2 = (other_family or candidates)[-1]
+        notes = ["heuristic: highest numeric version / longest slug as premium proxy"]
+    notes.append(
+        "different family than 1 build"
+        if model_family(t2) != build_family
+        else "same family as 1 build (pool has no other premium family)"
+    )
+    result["2"] = (t2, notes)
+
+    premium = [slug for slug in pool if _matches_any(slug, PREMIUM_MARKERS)]
+    candidates = [slug for slug in pool if slug != t2] or pool
+    t3 = premium[-1] if premium else candidates[-1]
+    notes = ["heuristic: most premium/flagship slug available"]
+    if t3 == t2:
+        notes.append("same slug as tier 2 (pool has only one premium candidate)")
+    result["3"] = (t3, notes)
+    return result
 
 
 def build_rows(available: list[str]) -> list[dict[str, object]]:
-    aset = set(available)
+    pool = sorted(set(available))
+    proposed = propose_slugs(pool)
     rows = []
     for tier in TIER_ORDER:
-        slug, effort, notes = pick(aset, TIER_PREFS[tier])
+        slug, notes = proposed.get(tier, (None, ["no heuristic match — edit after approve"]))
+        if slug is None:
+            slug = "none"
         rows.append(
             {
                 "tier": tier,
                 "planned": PLANNED[tier],
                 "suggested": slug,
-                "effort": effort,
+                "effort": TIER_EFFORT[tier],
                 "notes": notes,
             }
         )
@@ -153,6 +255,7 @@ def render(platform: str, available: list[str], rows: list[dict[str, object]], a
         f"Status: **{status}**",
         "",
         "Abstract tiers from `core/model-routing.md` → host pool slugs.",
+        f"Selection rule: **{SELECTION_RULE}**",
         "Tiers are non-binding. Record planned → actual in briefs. Never block start on missing identity.",
         "",
         "## Available pool",

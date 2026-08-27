@@ -2,6 +2,14 @@
 
 Paste this into a consumer project’s `AGENTS.md` (or run `./bin/ct project <path>`).
 
+## Public repository boundary
+
+This checkout is the public Coding Team framework and the source for a fresh
+install. Keep updates generic and customer-neutral. Do not copy or sync a
+private in-house lab, product code, customer data, internal evidence, secrets,
+or local project overlay into this repository. Private projects may consume
+this framework, but they do not become part of it.
+
 ## Coding Team (Codex)
 
 This project may use the **coding-team** orchestration skill for Sprint → Batch → Task multi-role work.

@@ -2,7 +2,8 @@
 
 Generated: `2026-07-21T00:00:00Z` (example only — run `./bin/ct map propose --platform codex` for a current suggestion)
 
-Abstract tiers from `core/model-routing.md` → closest available GPT slug.
+Abstract tiers from `core/model-routing.md` → closest available host slug.
+Selection rule: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
 Tiers are non-binding; record planned → actual in briefs. Never block start on missing identity.
 
 ## Available pool
@@ -18,11 +19,11 @@ Tiers are non-binding; record planned → actual in briefs. Never block start on
 
 | Tier | Planned | Actual slug | Effort | Notes |
 |---|---|---|---|---|
-| **0** | gpt-5.6-luna (or gpt-5.4-mini) | `gpt-5.6-luna` | `medium` | — |
-| **1 build** | gpt-5.6-terra (or gpt-5.4) | `gpt-5.6-terra` | `medium` | — |
-| **1 validate** | gpt-5.6-terra + effort high | `gpt-5.6-terra` | `high` | — |
-| **2** | gpt-5.6-sol + effort high | `gpt-5.6-sol` | `high` | — |
-| **3** | gpt-5.6-sol + effort xhigh/max | `gpt-5.6-sol` | `xhigh` | — |
+| **0** | cheap search/docs | `gpt-5.6-luna` | `medium` | — |
+| **1 build** | eco build | `gpt-5.6-terra` | `medium` | — |
+| **1 validate** | careful validation | `gpt-5.6-terra` | `high` | — |
+| **2** | premium decide | `gpt-5.6-sol` | `high` | — |
+| **3** | max-risk judgment | `gpt-5.6-sol` | `xhigh` | — |
 
 ## Usage
 
