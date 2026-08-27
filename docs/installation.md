@@ -76,9 +76,10 @@ copy a map from one host to another.
 
 ## Simple safety
 
-For ordinary work, use up to 2 tool-using lanes. A read-only supervisor can
-make 3 total child lanes. Use Code Reviewer → conditional Test Engineer → Gatekeeper
-before acceptance. Human approval is still required for irreversible actions.
+Lead checks task size and proof before assigning work. Builders use focused
+local checks for low-risk changes. Material or risky work uses Test Engineer →
+Gatekeeper, in that order. Run at most two non-conflicting tasks at once.
+Human approval is still required for irreversible actions.
 
 ## Direct installer
 

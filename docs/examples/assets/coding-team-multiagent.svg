@@ -1,134 +1,94 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
-  <title id="title">Coding Team multiagent orchestration</title>
-  <desc id="desc">One Lead decomposes a goal into Sprint, Batches, and bounded Tasks, dispatches at most two specialist agents at once, and gates every batch through Code Reviewer, Test Engineer, and a human Gatekeeper decision. Model tiers are abstract hints, never provider locks.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">How Coding Team roles work together</title>
+  <desc id="desc">You give the goal. Lead checks size and asks other roles only when needed. Lead assigns Backend Engineer or Frontend Builder. Test Engineer checks material work, Gatekeeper decides, and you approve publishing.</desc>
   <style>
-    .bg { fill: #f7f4ed; }
-    .card { fill: #fffdf8; stroke: #17324d; stroke-width: 3; }
-    .lead { fill: #1e4b7d; }
-    .agent { fill: #fff; stroke: #2a6d9f; stroke-width: 4; }
-    .gate { fill: #fff9e6; stroke: #b8860b; stroke-width: 3; }
-    .human { fill: #ffe8e8; stroke: #c0392b; stroke-width: 3; }
-    .label { fill: #17324d; font-family: Arial, sans-serif; font-weight: 700; }
-    .note { fill: #333; font-family: Arial, sans-serif; }
-    .small { font-size: 15px; }
-    .xsmall { font-size: 13px; }
-    .arrow { fill: none; stroke: #2a6d9f; stroke-width: 4; marker-end: url(#arrowhead); }
-    .gatearrow { fill: none; stroke: #b8860b; stroke-width: 4; marker-end: url(#gatehead); }
-    .humanarrow { fill: none; stroke: #c0392b; stroke-width: 4; stroke-dasharray: 12,8; marker-end: url(#humanhead); }
-    .constraint { fill: none; stroke: #17324d; stroke-width: 2; stroke-dasharray: 6,5; }
+    .bg{fill:#f7f4ed}.box{fill:#fffdf8;stroke:#17324d;stroke-width:3}.lead{fill:#1e4b7d}.build{fill:#eef7ff;stroke:#2a6d9f}.check{fill:#fff9e6;stroke:#b8860b}.human{fill:#ffe8e8;stroke:#c0392b}.team{fill:#f4f0ff;stroke:#7354a3;stroke-width:3;stroke-dasharray:7 6}.title{font:700 30px Arial,sans-serif;fill:#17324d}.head{font:700 21px Arial,sans-serif;fill:#17324d}.body{font:15px Arial,sans-serif;fill:#333}.small{font:13px Arial,sans-serif;fill:#333}.white{fill:#fffdf8}.arrow{fill:none;stroke:#2a6d9f;stroke-width:4;marker-end:url(#blue)}.gate{fill:none;stroke:#b8860b;stroke-width:4;marker-end:url(#gold)}.decision{fill:none;stroke:#c0392b;stroke-width:4;marker-end:url(#red)}.consult{fill:none;stroke:#7354a3;stroke-width:3;stroke-dasharray:7 6;marker-end:url(#purple)}
   </style>
   <defs>
-    <marker id="arrowhead" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
-      <path d="M0,0 L12,5 L0,10 Z" fill="#2a6d9f" />
-    </marker>
-    <marker id="gatehead" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
-      <path d="M0,0 L12,5 L0,10 Z" fill="#b8860b" />
-    </marker>
-    <marker id="humanhead" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto">
-      <path d="M0,0 L12,5 L0,10 Z" fill="#c0392b" />
-    </marker>
+    <marker id="blue" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#2a6d9f"/></marker>
+    <marker id="gold" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#b8860b"/></marker>
+    <marker id="red" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#c0392b"/></marker>
+    <marker id="purple" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 10 4 0 8Z" fill="#7354a3"/></marker>
   </defs>
-  <rect class="bg" width="1400" height="760" rx="24" />
-  <text class="label" x="40" y="52" font-size="30">One Lead. Bounded specialists. Visible evidence.</text>
-  <text class="small" x="40" y="80">A plain-English goal becomes a Sprint, Batches, and Tasks. Only two specialist agents run at once.</text>
+  <rect class="bg" width="1200" height="720" rx="24"/>
+  <text class="title" x="40" y="50">How the roles work together</text>
+  <text class="body" x="40" y="78">Lead checks the work before assigning it. Extra roles join only when their answer can change the task.</text>
 
-  <text class="note" x="40" y="118" font-size="16">Sprint 0</text>
-  <g transform="translate(40 128)">
-    <rect class="card lead" width="280" height="170" rx="18" />
-    <text class="label" x="140" y="36" text-anchor="middle" font-size="26" fill="#fffdf8">LEAD</text>
-    <text class="note" x="110" y="70" font-size="18">Classify nature → tier</text>
-    <text class="note" x="110" y="100" font-size="18">Plan Sprint/Batch/Task</text>
-    <text class="note" x="110" y="130" font-size="18">Dispatch one owner per task</text>
+  <g transform="translate(35 125)">
+    <rect class="box human" width="180" height="150" rx="18"/>
+    <text class="head" x="90" y="36" text-anchor="middle">You</text>
+    <text class="body" x="20" y="72">Explain the goal</text>
+    <text class="body" x="20" y="100">Set limits</text>
+    <text class="body" x="20" y="128">Keep ship decisions</text>
+  </g>
+  <path class="arrow" d="M215 200H255"/>
+
+  <g transform="translate(255 105)">
+    <rect class="box lead" width="350" height="190" rx="18"/>
+    <text class="head white" x="175" y="38" text-anchor="middle">Lead</text>
+    <text class="body white" x="24" y="75">1. Check the goal and what proves done</text>
+    <text class="body white" x="24" y="108">2. Estimate size; split work if too large</text>
+    <text class="body white" x="24" y="141">3. Ask the needed roles to check open questions</text>
+    <text class="body white" x="24" y="174">4. Create and assign Sprint → Batch → Task</text>
   </g>
 
-  <path class="arrow" d="M320 190 H355" />
-  <path class="arrow" d="M320 255 H355" />
-  <g font-family="Arial" font-size="15" fill="#333">
-    <text x="325" y="185">Batch A</text>
-    <text x="325" y="260">Batch B</text>
+  <g transform="translate(255 345)">
+    <rect class="box team" width="350" height="115" rx="18"/>
+    <text class="head" x="175" y="34" text-anchor="middle">Team check — only if needed</text>
+    <text class="body" x="18" y="68">Product Manager · System Architect · Advisor</text>
+    <text class="body" x="18" y="94">Contradictor · Domain Advisor · Investigator</text>
+  </g>
+  <path class="consult" d="M430 305V345"/>
+
+  <path class="arrow" d="M605 165H650"/>
+  <path class="arrow" d="M605 235H625V300H650"/>
+  <g transform="translate(650 105)">
+    <rect class="box build" width="250" height="120" rx="18"/>
+    <text class="head" x="125" y="38" text-anchor="middle">Backend Engineer</text>
+    <text class="body" x="20" y="75">Build the backend task</text>
+    <text class="small" x="20" y="101">Run the agreed checks</text>
+  </g>
+  <g transform="translate(650 255)">
+    <rect class="box build" width="250" height="120" rx="18"/>
+    <text class="head" x="125" y="38" text-anchor="middle">Frontend Builder</text>
+    <text class="body" x="20" y="75">Build the frontend task</text>
+    <text class="small" x="20" y="101">Run the agreed checks</text>
+  </g>
+  <text class="small" x="650" y="402">At most two tasks at once, only when they do not conflict.</text>
+
+  <text class="small" x="940" y="105">For material or risky work</text>
+  <path class="gate" d="M900 165H955"/>
+  <path class="gate" d="M900 315H925V165H955"/>
+  <g transform="translate(955 125)">
+    <rect class="box check" width="210" height="105" rx="18"/>
+    <text class="head" x="105" y="36" text-anchor="middle">Test Engineer</text>
+    <text class="body" x="20" y="70">Check the result</text>
+    <text class="small" x="20" y="92">Report pass, fail, or block</text>
+  </g>
+  <path class="gate" d="M1060 230V270"/>
+  <g transform="translate(955 270)">
+    <rect class="box check" width="210" height="105" rx="18"/>
+    <text class="head" x="105" y="36" text-anchor="middle">Gatekeeper</text>
+    <text class="body" x="20" y="70">Accept, revise, or block</text>
+    <text class="small" x="20" y="92">Uses the same tested work</text>
+  </g>
+  <path class="decision" d="M1060 375V415"/>
+  <g transform="translate(955 415)">
+    <rect class="box human" width="210" height="105" rx="18"/>
+    <text class="head" x="105" y="36" text-anchor="middle">You</text>
+    <text class="body" x="20" y="70">Approve or stop publishing</text>
+    <text class="small" x="20" y="92">Commit and push need your yes</text>
   </g>
 
-  <g transform="translate(355 165)">
-    <rect class="agent" width="260" height="130" rx="14" />
-    <text class="note" x="130" y="30" text-anchor="middle" font-size="20">Backend Engineer</text>
-    <text class="note xsmall" x="15" y="58">Owned: files A</text>
-    <text class="note xsmall" x="15" y="78">Stop: focused check</text>
-    <text class="note xsmall" x="15" y="98">Frozen candidate</text>
+  <g transform="translate(35 540)">
+    <rect class="box" width="865" height="130" rx="18"/>
+    <text class="head" x="20" y="34">Size and learning loop</text>
+    <text class="body" x="20" y="68">Before assigning: Lead checks one owner, one job, one result, and a clear stop.</text>
+    <text class="body" x="20" y="94">Use actual time from similar completed work when available; otherwise say the estimate is unknown.</text>
+    <text class="body" x="20" y="120">After the task: record actual time, result, and blocker. Today this comparison is manual, not automatic.</text>
   </g>
-
-  <g transform="translate(355 260)">
-    <rect class="agent" width="260" height="130" rx="14" />
-    <text class="note" x="130" y="30" text-anchor="middle" font-size="20">Frontend Builder</text>
-    <text class="note xsmall" x="15" y="58">Owned: files B</text>
-    <text class="note xsmall" x="15" y="78">Stop: focused check</text>
-    <text class="note xsmall" x="15" y="98">Frozen candidate</text>
-  </g>
-
-  <g transform="translate(635 175)">
-    <rect class="card gate" width="200" height="100" rx="14" />
-    <text class="note" x="100" y="32" text-anchor="middle" font-size="18">WIP ≤ 2</text>
-    <text class="note xsmall" x="20" y="58">ordinary agents max</text>
-    <text class="note xsmall" x="20" y="76">parallel; +1 read-only</text>
-    <text class="note xsmall" x="20" y="94">supervisor when admitted</text>
-  </g>
-
-  <path class="arrow" d="M615 230 H645" />
-  <path class="arrow" d="M615 320 H645 V245" />
-
-  <g transform="translate(875 190)">
-    <rect class="card gate" width="220" height="120" rx="14" />
-    <text class="note" x="110" y="32" text-anchor="middle" font-size="20">Code Reviewer</text>
-    <text class="note xsmall" x="20" y="64">Read-only diff first</text>
-    <text class="note xsmall" x="20" y="84">Decide route for evidence</text>
-    <text class="note xsmall" x="20" y="104">Never accepts</text>
-  </g>
-
-  <path class="gatearrow" d="M1095 250 H1135 V260" />
-
-  <g transform="translate(1135 230)">
-    <rect class="card gate" width="220" height="120" rx="14" />
-    <text class="note" x="110" y="32" text-anchor="middle" font-size="20">Test Engineer</text>
-    <text class="note xsmall" x="20" y="64">Independent evidence</text>
-    <text class="note xsmall" x="20" y="84">PASS / FAIL / BLOCKED</text>
-    <text class="note xsmall" x="20" y="104">No parallel with Gatekeeper</text>
-  </g>
-
-  <g transform="translate(720 420)">
-    <rect class="card human" width="320" height="130" rx="18" />
-    <text class="note" x="160" y="36" text-anchor="middle" font-size="24">Gatekeeper</text>
-    <text class="note xsmall" x="25" y="70">Final accept / revise / block</text>
-    <text class="note xsmall" x="25" y="100">After evidence for the same candidate</text>
-    <text class="note xsmall" x="25" y="120">Never edits code</text>
-  </g>
-
-  <path class="humanarrow" d="M880 485 V515" />
-  <g font-family="Arial" font-size="15" fill="#c0392b" font-weight="700">
-    <text x="860" y="485">evidence</text>
-    <text x="860" y="525">decision</text>
-  </g>
-
-  <g transform="translate(720 530)">
-    <rect class="card human" width="320" height="100" rx="18" />
-    <text class="note" x="160" y="36" text-anchor="middle" font-size="24">You</text>
-    <text class="note xsmall" x="25" y="70">Approve or block — silence is not approval</text>
-    <text class="note xsmall" x="25" y="90">Commit / push / release need explicit yes</text>
-  </g>
-
-  <g transform="translate(40 600)">
-    <rect class="card" width="540" height="130" rx="14" />
-    <text class="note" x="10" y="28" font-size="18">Tiers (non-binding hints):</text>
-    <text class="note xsmall" x="10" y="60">0 cheap/search/docs · 1 build/validate · 2 premium decide · 3 max-risk</text>
-    <text class="note xsmall" x="10" y="84">GPT names in the example map are references only. Record planned → actual.</text>
-    <text class="note xsmall" x="10" y="108">Detector accepts any valid model ID, not only gpt-*; fallback is labeled heuristic.</text>
-  </g>
-
-  <g transform="translate(620 600)">
-    <rect class="card" width="740" height="130" rx="14" />
-    <text class="note" x="10" y="28" font-size="18">Canonical roles (no invented roles):</text>
-    <text class="note xsmall" x="10" y="60">Lead · PM · System Architect · Advisor · Contradictor · Domain Advisor · Investigator · Backend · Frontend UX Lead · Frontend Builder · Code Reviewer · Test Engineer · Docs Steward · Gatekeeper</text>
-    <text class="note xsmall" x="10" y="84">Debate is serial (Inv → Adv → Con → Lead). Different model family for Contradictor vs Advisor and Gatekeeper vs implementer when the pool allows.</text>
-    <text class="note xsmall" x="10" y="108">A supervisor relay may observe one run only; it never replaces review, test evidence, or acceptance.</text>
-  </g>
-
-  <text class="note xsmall" x="40" y="740">Lite, public framework. Private project features, Customer-0 evidence, and hosted behavior are excluded; see Project scope.</text>
+  <text class="small" x="955" y="570">Low-risk work can stop</text>
+  <text class="small" x="955" y="592">after the builder's checks.</text>
+  <text class="small" x="955" y="632">No repeated blind retries.</text>
+  <text class="small" x="955" y="654">Split or change approach.</text>
 </svg>

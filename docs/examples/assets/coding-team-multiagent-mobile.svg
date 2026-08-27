@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="1330" viewBox="0 0 420 1330" role="img" aria-labelledby="title desc">
+  <title id="title">How Coding Team roles work together on mobile</title>
+  <desc id="desc">You give the goal. Lead checks size, asks other roles only when needed, and assigns builders. Test Engineer checks material work, Gatekeeper decides, and you approve publishing.</desc>
+  <style>
+    .bg{fill:#f7f4ed}.box{fill:#fffdf8;stroke:#17324d;stroke-width:3}.lead{fill:#1e4b7d}.build{fill:#eef7ff;stroke:#2a6d9f}.check{fill:#fff9e6;stroke:#b8860b}.human{fill:#ffe8e8;stroke:#c0392b}.team{fill:#f4f0ff;stroke:#7354a3;stroke-width:3;stroke-dasharray:7 6}.title{font:700 24px Arial,sans-serif;fill:#17324d}.head{font:700 20px Arial,sans-serif;fill:#17324d}.body{font:15px Arial,sans-serif;fill:#333}.small{font:13px Arial,sans-serif;fill:#333}.white{fill:#fffdf8}.arrow{fill:none;stroke:#2a6d9f;stroke-width:4;marker-end:url(#blue)}.gate{fill:none;stroke:#b8860b;stroke-width:4;marker-end:url(#gold)}.decision{fill:none;stroke:#c0392b;stroke-width:4;marker-end:url(#red)}.consult{fill:none;stroke:#7354a3;stroke-width:3;stroke-dasharray:7 6;marker-end:url(#purple)}
+  </style>
+  <defs>
+    <marker id="blue" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#2a6d9f"/></marker>
+    <marker id="gold" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#b8860b"/></marker>
+    <marker id="red" markerWidth="12" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0 0 12 5 0 10Z" fill="#c0392b"/></marker>
+    <marker id="purple" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 10 4 0 8Z" fill="#7354a3"/></marker>
+  </defs>
+  <rect class="bg" width="420" height="1330" rx="22"/>
+  <text class="title" x="22" y="38">How the roles work together</text>
+  <text class="small" x="22" y="62">Lead checks the work before assigning it.</text>
+
+  <g transform="translate(22 88)">
+    <rect class="box human" width="376" height="82" rx="16"/>
+    <text class="head" x="188" y="32" text-anchor="middle">You</text>
+    <text class="body" x="188" y="60" text-anchor="middle">Give the goal, limits, and ship decisions</text>
+  </g>
+  <path class="arrow" d="M210 170V202"/>
+
+  <g transform="translate(22 202)">
+    <rect class="box lead" width="376" height="190" rx="16"/>
+    <text class="head white" x="188" y="34" text-anchor="middle">Lead</text>
+    <text class="body white" x="20" y="69">1. Check goal and proof of done</text>
+    <text class="body white" x="20" y="101">2. Estimate size; split if too large</text>
+    <text class="body white" x="20" y="133">3. Ask needed roles about open questions</text>
+    <text class="body white" x="20" y="165">4. Create and assign Sprint → Batch → Task</text>
+  </g>
+  <path class="consult" d="M210 392V425"/>
+
+  <g transform="translate(22 425)">
+    <rect class="box team" width="376" height="105" rx="16"/>
+    <text class="head" x="188" y="32" text-anchor="middle">Team check — only if needed</text>
+    <text class="small" x="188" y="61" text-anchor="middle">PM · Architect · Advisor · Contradictor</text>
+    <text class="small" x="188" y="84" text-anchor="middle">Domain Advisor · Investigator</text>
+  </g>
+  <path class="arrow" d="M210 530V562"/>
+
+  <g transform="translate(22 562)">
+    <rect class="box build" width="180" height="115" rx="16"/>
+    <text class="head" x="90" y="32" text-anchor="middle">Backend</text>
+    <text class="body" x="90" y="64" text-anchor="middle">Build task</text>
+    <text class="small" x="90" y="89" text-anchor="middle">Run checks</text>
+  </g>
+  <g transform="translate(218 562)">
+    <rect class="box build" width="180" height="115" rx="16"/>
+    <text class="head" x="90" y="32" text-anchor="middle">Frontend</text>
+    <text class="body" x="90" y="64" text-anchor="middle">Build task</text>
+    <text class="small" x="90" y="89" text-anchor="middle">Run checks</text>
+  </g>
+  <text class="small" x="210" y="704" text-anchor="middle">Two at once only when work does not conflict.</text>
+  <text class="small" x="210" y="728" text-anchor="middle">Low-risk work can stop after these checks.</text>
+  <text class="small" x="210" y="762" text-anchor="middle">For material or risky work:</text>
+  <path class="gate" d="M210 677V790"/>
+
+  <g transform="translate(22 790)">
+    <rect class="box check" width="376" height="82" rx="16"/>
+    <text class="head" x="188" y="32" text-anchor="middle">Test Engineer</text>
+    <text class="body" x="188" y="60" text-anchor="middle">Check and report the result</text>
+  </g>
+  <path class="gate" d="M210 872V904"/>
+  <g transform="translate(22 904)">
+    <rect class="box check" width="376" height="82" rx="16"/>
+    <text class="head" x="188" y="32" text-anchor="middle">Gatekeeper</text>
+    <text class="body" x="188" y="60" text-anchor="middle">Accept, revise, or block</text>
+  </g>
+  <path class="decision" d="M210 986V1018"/>
+  <g transform="translate(22 1018)">
+    <rect class="box human" width="376" height="82" rx="16"/>
+    <text class="head" x="188" y="32" text-anchor="middle">You</text>
+    <text class="body" x="188" y="60" text-anchor="middle">Approve or stop publishing</text>
+  </g>
+
+  <g transform="translate(22 1135)">
+    <rect class="box" width="376" height="165" rx="16"/>
+    <text class="head" x="20" y="32">Size and learning</text>
+    <text class="small" x="20" y="61">Before: one owner, one job, one result, one stop.</text>
+    <text class="small" x="20" y="88">Use similar measured work when available.</text>
+    <text class="small" x="20" y="115">Otherwise say the estimate is unknown and split.</text>
+    <text class="small" x="20" y="142">After: record actual time, result, and blocker.</text>
+  </g>
+  <text class="small" x="22" y="1322">No automatic estimator and no repeated blind retries.</text>
+</svg>

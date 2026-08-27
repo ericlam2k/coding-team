@@ -42,26 +42,40 @@ evidence.
 
 ## How the multiagent orchestration works
 
-The framework runs one **Lead** that plans, then dispatches **bounded specialist
-agents** — never many at once, and never in parallel across the quality chain.
+The framework has one **Lead**. The Lead first checks the goal, the size of the
+work, and what will prove it is done. Then the Lead assigns small tasks to the
+right roles.
 
-![Multiagent orchestration: one Lead decomposes a goal into Batches and bounded Tasks, runs at most two specialist agents at once, and gates every batch through Code Reviewer, Test Engineer, and a human Gatekeeper decision.](docs/examples/assets/coding-team-multiagent.svg)
+<picture>
+  <source media="(max-width: 640px)" srcset="docs/examples/assets/coding-team-multiagent-mobile.svg">
+  <img src="docs/examples/assets/coding-team-multiagent.svg" alt="Coding Team role flow: you give the goal, Lead checks size and assigns work, builders implement, Test Engineer checks material work, Gatekeeper decides, and you approve publishing.">
+</picture>
 
-- **Sprint → Batch → Task:** a plain-English goal becomes one small, reviewable
-  slice with a single owner and one stop condition per task.
-- **WIP ≤ 2:** at most two specialist agents run at once; one optional
-  read-only supervisor relay may observe, but it never replaces review, test
-  evidence, or acceptance.
-- **Quality gate (read-only, in order):** Builder stops → Candidate is frozen →
-  Code Reviewer verdict → conditional Test Engineer evidence → Gatekeeper
-  acceptance. Reviewer and Test Engineer do not overlap the candidate.
+- **You give the goal:** outcome, limits, and the decisions that must stay with
+  you.
+- **Lead checks before assigning:** Is the task clear? Can one role own it? Is
+  it small enough? What check will prove it works? If not, Lead asks the team
+  or splits the work into Sprint → Batch → Task.
+- **Team input is optional:** Product Manager, System Architect, Advisor,
+  Contradictor, or a Domain Advisor joins only when their answer can change the
+  task.
+- **Builders implement:** Backend Engineer and Frontend Builder can work at the
+  same time only when their files and dependencies do not conflict.
+- **Tests match the risk:** builders run focused checks. For material or risky
+  work, Test Engineer checks the result, then Gatekeeper accepts, revises, or
+  blocks it.
 - **Human gates:** commit, push/merge, release, and public export require an
   explicit yes. Silence, an agent's "approved" message, and a passing test are
   not approval.
-- **Model tiers are hints, not provider locks:** 0 cheap, 1 build, 2 premium
-  decide, 3 max-risk. Abstract tiers map to whatever model your local
-  `model-pool.map.md` approves; "planning" is a Tier 2 decision and
-  "implementing" is a Tier 1 build.
+
+### How Lead estimates task size
+
+The public framework uses a rule-based check, not an automatic estimator.
+Before assigning work, Lead checks for one owner, one concern, one result, and
+a short run with a clear stop. If similar completed work has measured time,
+Lead may use it as an estimate. If not, Lead says the estimate is unknown and
+splits the task or runs a small fact-finding step. After the task, record the
+actual time, outcome, and blocker so the next estimate has evidence.
 
 ## QA maturity
 
