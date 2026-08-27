@@ -11,6 +11,9 @@ Use this skill only for the **Risky** QA mode: a batch marked
 policy and validator are the authority; this skill does not create roles,
 change WIP, fix product code, or approve release.
 
+The validator is an internal Test Engineer command. It is not a role or a
+separate approval gate.
+
 ## Workflow
 
 1. Resolve `CODING_TEAM_ROOT` from the host adapter, then read the batch brief,
