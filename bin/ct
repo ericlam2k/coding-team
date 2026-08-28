@@ -6,6 +6,7 @@
 #   ./bin/ct map propose         # read-only model-map suggestion
 #   ./bin/ct map approve         # explicit model-map write
 #   ./bin/ct status | refresh | enable | disable | project | help
+#   ./bin/ct tools <terminal|quantize|guard|integrate> ...
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -38,6 +39,9 @@ coding-team v2 CLI (platform-independent)
   ./bin/ct enable pm-lean                (optional PM addon)
   ./bin/ct disable pm-lean
   ./bin/ct project <path>
+  ./bin/ct tools <terminal|quantize|guard|integrate> ...
+      Run one explicit local token-tool operation. `integrate` checkpoints
+      the prior candidate state and restores it on a blocked run.
   ./bin/ct help
 
 Notes
@@ -354,6 +358,11 @@ BLOCK
   echo "updated $agents"
 }
 
+cmd_tools() {
+  [[ $# -gt 0 ]] || die "usage: ./bin/ct tools <action> ..."
+  exec python3 "$ROOT/adapters/codex/tool_cli.py" "$@"
+}
+
 main() {
   local cmd="${1:-}"
   shift || true
@@ -366,6 +375,7 @@ main() {
     enable|on) cmd_enable "$@" ;;
     disable|off) cmd_disable "$@" ;;
     project) cmd_project "$@" ;;
+    tools) cmd_tools "$@" ;;
     *) die "unknown command: $cmd (try ./bin/ct help)" ;;
   esac
 }
