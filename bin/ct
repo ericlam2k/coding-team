@@ -6,7 +6,7 @@
 #   ./bin/ct map propose         # read-only model-map suggestion
 #   ./bin/ct map approve         # explicit model-map write
 #   ./bin/ct status | refresh | enable | disable | project | help
-#   ./bin/ct tools <terminal|quantize|guard|integrate> ...
+#   ./bin/ct tools terminal ...
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,9 +39,9 @@ coding-team v2 CLI (platform-independent)
   ./bin/ct enable pm-lean                (optional PM addon)
   ./bin/ct disable pm-lean
   ./bin/ct project <path>
-  ./bin/ct tools <terminal|quantize|guard|integrate> ...
-      Run one explicit local token-tool operation. `integrate` checkpoints
-      the prior candidate state and restores it on a blocked run.
+  ./bin/ct tools terminal --timeout-s <seconds> -- <command> [args...]
+      Run the retained bounded compact-terminal tool. Quantizer, guard, and
+      rollback integration were disposed after no net token benefit.
   ./bin/ct help
 
 Notes
