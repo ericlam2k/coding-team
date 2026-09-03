@@ -8,6 +8,18 @@
 - **Batch ID:**
 - **Role ID:** (canonical only)
 - **Nature:**
+- **`quantized_class`:** `Q0` | `Q1` | `Q2` | `Q3` | `Q4`
+- **`context_level`:** `C0` | `C1` | `C2` | `C3` | `C4` | `C5`
+- **`context_budget_tokens`:** nonnegative integer
+- **`model_tier`:** `NONE` | `0` | `1-build` | `1-validate` | `2` | `3` (abstract only)
+- **`escalation_rules`:** explicit escalation and stop conditions
+- **`quantization_status`:** `ROUTED` | `BLOCKED`
+- **`quantization_confidence`:** `HIGH` | `MEDIUM` | `LOW`
+- **`quantization_evidence_ref`:** input digest and evidence reference
+
+Lead first resolves nature, canonical role, and the minimum abstract model tier. The dependency-free quantizer may raise that floor but never lower it; only afterward may the adapter map the model pool. Q0 uses no model. Context overflow returns compress/checkpoint and cannot cause a model hop.
+
+Legacy briefs remain `UNSPECIFIED`; every new/corrected brief requires these fields or a `BLOCKED` quantization receipt.
 - **Tier planned → actual:**
 - **Stage:** pre-build | build | code-review | targeted-TE | gatekeeper | docs
 - **`timing_profile_ref`:** `../adaptive-timing.md` (approved versioned profile or labeled fallback)
@@ -20,7 +32,10 @@
 
 ## Scope
 
+- **Task scope:** `frontend` | `backend` | `cross-layer` | `ux-contract` | `none`
 - **Owned files (exclusive):**
+- **Owned integration seam (if this task carries the FIO overlay):**
+- **FIO overlay:** `this task` | `none` — never create a separate FIO task
 - **Read-only inputs:**
 - **Do not touch:**
 
@@ -40,7 +55,7 @@ selection and does not change the existing Sprint → Batch → Task flow.
 
 ## Skills (named or none)
 
-- 
+-
 
 ## Constraints
 

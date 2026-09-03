@@ -5,6 +5,38 @@ validation, cross-role contract conflicts, or user/domain meaning disputes.
 It is a Lead-owned decision wrapper around the existing Sprint → Batch → Task
 flow, not a second router or an all-role meeting.
 
+## Explicit new-idea brainstorm trigger
+
+When the user asks to **brainstorm a new idea**, generate ideas, or explore a
+new product direction, Lead opens a bounded discovery meeting before writing a
+PRD, choosing a solution, or dispatching implementation. This is a meeting
+packet, not a worker task:
+
+- Lead frames the opportunity, target segment, desired outcome, evidence, and
+  the decision that must be made; Lead remains the synthesizer and PIC chooser.
+- Product Manager supplies business value and customer-impact ideas.
+- `advisor` supplies the technical direction, feasibility, leverage, and scale
+  view; builders do not implement during the brainstorm.
+- `contradictor` supplies the explicit challenge when the user asks for
+  evaluation/stress testing or when risk, ambiguity, disagreement, or reversal
+  cost warrants it. The Contradictor is not a praise or rubber-stamp lane.
+- `frontend-ux-lead` joins only when a UX contract can change the decision; it
+  is not a generic Designer role.
+- Consult serially, keep WIP ≤2, and add a named Domain Advisor only when its
+  domain evidence changes the decision. Never create a standing brainstorm
+  panel or a new role family.
+- The packet contains the canonical-role perspectives, prioritized options
+  (maximum five), assumptions/experiments, scope in/out, PIC, stop condition, and one
+  recommended next user action. Use
+  [`core/templates/discovery-brainstorm-meeting.md`](templates/discovery-brainstorm-meeting.md)
+  when a durable packet is needed. It remains `PM_IN_PROGRESS` until the user
+  confirms the handoff; `auto_action: none`.
+
+If the brainstorm reveals a shared contract, migration/auth/privacy risk, or
+two or more FE/API/BE/DB layers, Lead conditionally routes to System Architect
+after PM confirmation. Brainstorm output never allocates builders, invokes a
+model, advances a stage, or approves a product decision on the user's behalf.
+
 ## Lean participation
 
 - **Lead:** frames the concern, runs the synthesis, chooses the PIC, and admits
@@ -61,6 +93,12 @@ Run a fresh TE pass after correction, then one sequential Gatekeeper review.
 `FAIL`, `BLOCKED`, insufficient evidence, or a non-approval stops for the
 human gate. “Test all” means all required scenarios and selected layers in the
 frozen Batch, not the whole repository or every possible layer on every loop.
+
+At Batch or Sprint close, send material observations through
+[learning-and-distillation.md](learning-and-distillation.md). Correlation is
+input to learning; it is not permission to promote a new rule. A single
+observation remains a candidate, and durable promotion follows the separate
+validation and human-gate requirements.
 
 The active Normal/Risky QA selection and evidence gates are in
 [qa-operating-model.md](qa-operating-model.md). Gatekeeper evidence is not

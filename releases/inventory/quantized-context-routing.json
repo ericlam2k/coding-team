@@ -1,0 +1,46 @@
+{
+  "schema_version": "rolling-feature-inventory/1",
+  "feature_id": "quantized-context-routing",
+  "feature_version": "1.0.0",
+  "title": "Quantized context routing",
+  "summary": "Deterministically classify a task into an abstract context budget and model tier without vendor mapping or dispatch.",
+  "change_type": "NEW_FEATURE",
+  "proposed_bump": "MAJOR",
+  "feature_owner_role": "backend-engineer",
+  "state": "GK_REVIEWED",
+  "classification": "PUBLIC",
+  "surface": "CORE",
+  "public_dependency_ranges": [],
+  "coupled_feature_refs": [],
+  "compatibility": {
+    "prior_version": null,
+    "backward_compatible": true,
+    "notes": "New closed-schema core callable and explicit JSON CLI; outputs only abstract tiers and never selects a vendor model."
+  },
+  "migration": {"required": false, "notes": "No persisted state or data migration."},
+  "rollback": {
+    "supported": true,
+    "notes": "Disable the explicit quantize route and continue using the existing Lead-owned routing workflow."
+  },
+  "evidence": {
+    "release_contract": "implementation/architecture-contracts/sprint-2-versioned-feature-release-v1.md",
+    "feature_contract": "implementation/architecture-contracts/sprint-2-quantized-context-routing-v1.md",
+    "artifact": "coding-team/core/routing/quantizer.py",
+    "context_budgeter": "coding-team/core/routing/context_budgeter.py",
+    "tests": "coding-team/scripts/tests/test_task_quantization.py",
+    "integration_tests": "coding-team/adapters/codex/tests/test_tool_cli.py",
+    "test_engineer": ".coding-team/handoffs/s2-token-opt-te-routing-sol-20260812.md",
+    "gatekeeper": ".coding-team/handoffs/s2-token-opt-gatekeeper-closeout-sol-20260812.md",
+    "documentation": "coding-team/docs/token-optimization-tools.md"
+  },
+  "release_eligible": false,
+  "eligibility_blockers": [
+    "HEURISTIC_THRESHOLDS_NOT_EFFICIENCY_VALIDATED",
+    "VENDOR_MODEL_MAPPING_NOT_IMPLEMENTED",
+    "COMMIT_EVIDENCE_MISSING",
+    "IMMUTABLE_MANIFEST_MISSING",
+    "HUMAN_RELEASE_APPROVAL_MISSING"
+  ],
+  "release_owner_id": null,
+  "approval_ref": null
+}

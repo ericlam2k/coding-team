@@ -29,6 +29,8 @@
 - **Keep:**
 - **Change:**
 - **New work to schedule:**
+- **Learning entries / disposition:** (link entries, or `NONE` plus reviewed source refs and reason)
+- **Promotion gate refs:** (required when a lesson changes durable policy, routing, security/privacy, or a public contract)
 
 ## Performance
 

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agentic Worker"
+  short_description: "Implement bounded tasks with evidence"
+  default_prompt: "Use $agentic-worker for this frozen Task Spec and return the complete A11 evidence bundle."
+policy:
+  allow_implicit_invocation: false

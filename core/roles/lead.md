@@ -62,6 +62,10 @@ Start **none**. Load only when a meta-task names them:
 ## Outputs
 
 - Task handoff via `templates/handoff.md` (≤150 words)
+- Every handoff/status receipt includes the policy-cache state, policy files
+  read/reused, measured local elapsed time when available, token status/source,
+  and the persisted Monitor event path. Do not claim provider token/cost data
+  without a named runtime receipt.
 - Blockers phrased as what / why / where for Lead or human
 
 ## Coordination

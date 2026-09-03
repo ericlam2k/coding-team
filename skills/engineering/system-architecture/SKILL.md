@@ -45,8 +45,11 @@ does not create another runtime, agents, or approval authority.
 - System Architect owns the technical contract; Lead owns cross-role
   synthesis/admission. PM and project-domain roles advise on meaning; they do
   not approve architecture.
-- FIO assembles against the frozen contract. The Architect is not FIO and does
-  not allocate, integrate, validate, or accept.
+- FIO is a temporary overlay on the existing owner of the primary seam. That
+  owner checks and hands off the admitted seam within exclusive paths; Lead
+  orchestrates and the Architect freezes the contract. FIO is not a separate
+  role, skill, or model route, and does not make the Architect's contract,
+  allocate work, integrate another owner's paths, validate, or accept.
 - Add Advisor for non-obvious or high-leverage direction. Add Contradictor
   after Advisor for material conflict, shared/public contracts,
   security/privacy, costly reversal, or explicit challenge. Keep debate serial.

@@ -11,6 +11,7 @@ Canonical IDs are stable labels. Adapters may also record a runtime subagent UUI
 | `contradictor` | Why might the plan be wrong? | Read-only pre-build; serial with Advisor |
 | `domain-advisor` | What does the **named domain** say? | Consult peer; template → `{domain}-advisor` |
 | `investigator` | What does the repo say? | Read-only map |
+| `monitor-agent` | What happened during the run? | Trace, cost, and graph records; no acceptance authority |
 | `backend-engineer` | Server / API / data change | Scoped writes |
 | `frontend-ux-lead` | UX contract / design review | Read + scoped writes when assigned |
 | `frontend-builder` | UI implementation | Scoped writes |
@@ -18,8 +19,27 @@ Canonical IDs are stable labels. Adapters may also record a runtime subagent UUI
 | `docs-steward` | What should humans read later? | Docs writes only |
 | `gatekeeper` | Can we accept this as done? | Read-only decision after TE |
 
-Role cards: [`core/roles/`](../core/roles/).  
+Role cards: [`core/roles/`](../core/roles/).
 Domain Expert pattern: [`core/domain-advisors.md`](../core/domain-advisors.md).
+
+### FIO is not a canonical role
+
+`fio` is intentionally absent from this registry and has no role card, skill,
+model route, or adapter spawn. **Functional Integration Owner** is a temporary
+responsibility overlay recorded on a Batch. The Lead names exactly one existing
+canonical role (or `NONE`) for one declared integration seam:
+
+- `frontend` → the Frontend Builder owning the primary UI/client seam;
+- `backend` → the Backend Engineer owning the primary API/data seam;
+- `cross-layer` → whichever of those two owns the primary seam; the other
+  keeps its own task and paths;
+- `ux-contract` or `none` → `NONE` unless the brief explicitly names a
+  UX-only seam for `frontend-ux-lead`.
+
+For a single-task Batch, the task owner may carry FIO with no duplicate task or
+ceremony. FIO checks and reports the admitted seam only; it is not a Tech Lead,
+orchestrator, System Architect, Test Engineer, or Gatekeeper. It writes only
+its exclusive paths. Material drift follows **FIO → Lead → System Architect**.
 
 ## Domain Expert → `[Domain]-Advisor`
 

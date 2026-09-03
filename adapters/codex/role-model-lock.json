@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "lock_id": "wysy-codex-required-seat-lock",
+  "adapter": "codex",
+  "revision": "role-model-lock-r1-draft",
+  "lifecycle": {
+    "state": "DRAFT",
+    "activation": null
+  },
+  "approval": {
+    "status": "APPROVED",
+    "approved_by": "human",
+    "approval_ref": "chat:model-set-resume:2026-08-10",
+    "approved_at": "2026-08-10T03:38:33+00:00"
+  },
+  "seats": {
+    "lead": {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "product-manager": {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "system-architect": {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "backend-engineer": {
+      "model": "gpt-5.6-luna",
+      "effort": "max"
+    },
+    "test-engineer": {
+      "model": "gpt-5.6-luna",
+      "effort": "max"
+    },
+    "advisor": {
+      "model": "claude-opus-5",
+      "effort": "high"
+    },
+    "contradictor": {
+      "model": "deepseek-v4-pro",
+      "effort": "xhigh"
+    }
+  },
+  "unlisted_role_behavior": "APPROVED_TIER_MAP",
+  "digest": "sha256:edcf68a13825d009545a2017f98a07b2075fbbe13ebb1f03461bb558bd8bee9c"
+}

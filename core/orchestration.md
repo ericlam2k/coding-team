@@ -123,6 +123,93 @@ frozen contract, the QA route supplies evidence, and Gatekeeper decides. Materia
 **FIO → Lead → System Architect**. The Architect does not allocate, assemble,
 implement, validate, or accept.
 
+## Assignment fit and bounded execution
+
+Apply this rule to every canonical role in this file. Before dispatch, Lead
+checks that the task verb, evidence boundary, and reasoning fit the role
+card's Purpose, Access, Duties, Stop conditions, and Never rules. A model,
+free WIP slot, or manager's ability does not expand role capacity. If one task
+mixes execution and synthesis, split it into two tasks. Give each task one
+owner and one acceptance artifact. If no canonical role fits, return
+`HUMAN_DECISION_REQUIRED`.
+
+Every new or corrected Task brief must record these fields before dispatch:
+
+| Field | Required value |
+|---|---|
+| `execution_scope` | One bounded verb, named paths/query/source set, output artifact, and explicit exclusions |
+| `reasoning_depth` | `MECHANICAL`, `RECONCILE`, or `JUDGMENT` |
+| `enumeration_required` | `true` or `false` |
+| `synthesis_input_ref` | A completed Investigator packet path, or `NONE` |
+
+`MECHANICAL` means locate, list, count, extract, or normalize without deciding
+meaning. `RECONCILE` means follow bounded evidence or label a conflict without
+choosing policy. `JUDGMENT` means decide, design, synthesize, validate, or
+accept within the role. Set the field for the work that runs. Do not promote
+mechanical work because its final decision is important.
+
+Legacy briefs remain readable when these fields are absent. Treat each absent
+field as `UNSPECIFIED`. Before a new policy-sensitive enumeration, Lead must
+materialize all four fields. An `UNSPECIFIED` field with apparent enumeration
+blocks dispatch and requires a corrected brief.
+
+### Manager execution boundary
+
+Manager roles are `lead`, `product-manager`, `system-architect`, `advisor`,
+`contradictor`, and any `{domain}-advisor`. They may frame a question, name a
+bounded source and query, state acceptance, compare supplied evidence, resolve
+meaning, and emit a decision or contract. They must stop before they locate,
+list, count, copy, or normalize source facts. Incidental reading of a named
+excerpt is allowed. Expanding the source set or producing an enumeration is
+not allowed.
+
+Lead alone reconciles role outputs into the decision, owner, acceptance
+artifact, and next gate. Lead may reject an insufficient packet or request a
+corrected brief. Lead must not repeat the search. Investigator supplies facts
+and conflicts. Investigator does not make policy, architecture, product,
+validation, or acceptance decisions.
+
+### Investigator routing and escalation
+
+When `enumeration_required=true`, Lead creates a separate `investigator` Task
+with a named path or query before manager synthesis. The packet states its
+source boundary, requested fields, provenance format, stop condition, and
+evidence artifact. A manager session is not an enumeration fallback. The
+manager may synthesize enumerated facts only from the completed packet named by
+`synthesis_input_ref`.
+
+Use the existing escalation route for the next admitted Task. Keep a bounded
+single-module mechanical lookup at Investigator / Tier 0. Return to Lead for a
+corrected Investigator / Tier 1 brief when evidence conflicts, cross-file
+tracing is needed, or a behavior or stateful trace is needed. Use a fitting judgment role
+at Tier 2 only for a completed packet that raises a contract, architecture,
+security, privacy, migration, release, or decision-changing conflict. Stop for
+the existing human gate when no canonical role fits or scope needs secrets,
+production, privacy, legal choice, irreversible action, or external provider
+access. Context growth and missing telemetry do not cause a model hop.
+
+### Checkpoint and telemetry boundary
+
+Record `lookup_session_count`, `inspected_source_count`, and receipt input,
+cached, and output fields when supplied. Set every missing receipt field to
+`TELEMETRY_UNAVAILABLE` and record its source. Missing telemetry is not zero,
+an estimate, or a cost claim.
+
+Before a second lookup session, evidence-boundary expansion, a second
+follow-up, the 75% artifact review trigger, `T_checkpoint` without a complete
+artifact, or unexplained receipt growth without accepted evidence, stop and
+write a bounded checkpoint. Include completed facts, evidence references,
+unavailable fields, one unresolved item, and exactly one next Task. At the 75%
+trigger, compress only the handoff packet or stop. At `T_hard` set the Task
+to `BLOCKED`. Do not silently continue, retry, expand scope, or change model.
+
+Monitor records an observational projection of the assignment fields, parent
+and worker task/role IDs, planned-to-actual tier/model/effort, bounded source
+set, inspected-source count, lookup-session count, checkpoint or escalation
+reason, evidence reference, result, and receipt input/cached/output or
+`TELEMETRY_UNAVAILABLE` with source. Monitor records compliance. It does not
+route, act, or become a competing fact source.
+
 ## Canonical role IDs
 
 Use only these IDs (see `roles/`):
@@ -183,6 +270,39 @@ continuation may safely reuse context only when identity, scope, permissions,
 policy, and evidence remain current and the corrected brief records a material
 delta; follow [adaptive-timing.md](adaptive-timing.md).
 
+### Context-compaction sweet point (provisional)
+
+Context compaction is a Lead-owned packet rewrite, not a role, router, retry,
+or permission to drop evidence. Keep the smallest packet that preserves the
+objective, identity, scope/owned paths, acceptance, evidence refs and status,
+unresolved unknowns, last decision, and exactly one next action. Do not paste
+raw transcripts or reproduce source dumps.
+
+Use these bounded targets while `EXP-S2-CONTEXT-COMPACT-001` is open:
+
+| Artifact | Hard cap | Sweet-point target (60%) | Review trigger (75%) |
+|---|---:|---:|---:|
+| Sprint brief | 600 | 360 | 450 |
+| Batch brief | 450 | 270 | 338 |
+| Batch checkpoint | 300 | 180 | 225 |
+| Task run prompt | 250 | 150 | 188 |
+| Handoff | 150 | 90 | 113 |
+
+The 60% value is an explicit operating hypothesis, not measured token
+efficiency. At the 75% review trigger, Lead either compresses the packet into
+the target band or stops with a bounded checkpoint; it never silently extends
+the context or discards unresolved evidence. A host compaction or new
+conversation requires a fresh policy-cache identity and policy read before a
+policy-sensitive action; rotate the context fingerprint as specified by
+`core/policy-cache.md`.
+
+The compact packet must carry `packet_revision`, `source_refs`,
+`verified_facts`, `reasoned_or_unknown`, `decision`, `next_action`, and
+`compaction_status=PROVISIONAL|VALIDATED|REJECTED`. `PROVISIONAL` remains local
+until five independent observations satisfy the experiment's retention,
+correction, and re-read measures. No compact packet changes role ownership,
+model routing, workflow stage, gate state, or `auto_action=none`.
+
 ## Task-size metric: when to split instead of waiting
 
 Task timing uses the active approved profile defined by
@@ -241,6 +361,14 @@ original Task frozen.
   `aesthetic` finish lens is review, not a second generator or a second
   accountable Task.
 - Do not auto-load every skill because Lead or multi-agent work is happening.
+- The stable policy bundle is a separate session/context concern. The Codex
+  adapter may reuse an unchanged policy manifest after a verified cache `HIT`,
+  but this does not cache task facts, role-card bytes, system instructions, or
+  host tools. A missing/changed policy file, new session, context loss or
+  compaction, high-risk/learning trigger, or human refresh request requires a
+  fresh policy read. `BYPASSED`/`UNAVAILABLE` fails closed for policy-sensitive
+  delegation. Record cache/timing/token provenance in the local Monitor
+  receipt; never infer provider savings from a cache hit.
 
 ### Skill overrides
 
@@ -260,9 +388,12 @@ Prefer the host’s **Tier 0** mapped slug (Codex often maps this to a Luna-clas
 
 **Do not** use cheap-utility as the accountable default for Lead, PM, Backend, Frontend/UX contract ownership, Code Reviewer, Test Engineer validation synthesis, Docs Steward governed docs, or Gatekeeper. Escalate Tier 0 → Tier 1 build/validate when evidence conflicts, scope crosses modules, behavior is statefully complex, validation fails, or accessibility/security/privacy/public-contract implications appear. Escalate to Tier 2/3 only under recorded high-risk triggers in [model-routing.md](model-routing.md).
 
-## Functional Integration Owner (FIO)
+## Functional Integration Owner (FIO) overlay
 
-Each batch names one **Functional Integration Owner**: the role accountable for the integrated behavior after individual tasks land (usually Backend or Frontend Builder for that surface). FIO:
+**FIO is a temporary responsibility overlay on one existing canonical
+implementation role, not a role ID.** The role registry, role cards, model map,
+and adapter delegation table must never contain `fio`. The Lead records the
+overlay in the Batch brief before build:
 
 - Owns cross-task seams inside the batch
 - Does not replace Code Reviewer risk verification, Test Engineer evidence, or Gatekeeper accept/block
@@ -310,6 +441,16 @@ required evidence or `BLOCK` stops; Gatekeeper remains final.
 For the full participant, artifact, and PDCA rules, use
 [meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
 Batch matrix, not an unbounded repository-wide rerun.
+
+### Learning and distillation
+
+At material Batch and Sprint close, Lead records an evidence-linked learning
+disposition using [learning-and-distillation.md](learning-and-distillation.md).
+Monitor Agent capture is observational only. A single observation remains a
+candidate; durable policy, routing, skill, template, security, privacy, or
+public-contract promotion requires the validation and human-gate rules in that
+policy. Never create a standing learning/consolidation role or silently mutate
+core policy from a run.
 
 ## WIP, rotation, and context economy
 

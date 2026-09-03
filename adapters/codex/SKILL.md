@@ -145,7 +145,55 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/coding-team/scripts/check-install.py
 
 ## Cheap-utility defaults (Codex)
 
-Prefer the Tier **0** mapped slug (usually `gpt-5.6-luna`) for Investigator, low-risk Frontend Builder, and eligible support cells. Do not use it as the accountable default for Lead, PM, Backend, Frontend/UX Lead, Test Engineer synthesis, Docs Steward, or Gatekeeper. Escalate per `core/model-routing.md`.
+Prefer the approved Tier **0** mapped slug from `model-pool.map.md` for
+Investigator, low-risk Frontend Builder, and eligible support cells. Never
+invent or assume a provider slug. Do not use Tier 0 as the accountable default
+for Lead, PM, Backend, Frontend/UX Lead, Test Engineer synthesis, Docs Steward,
+or Gatekeeper. Escalate per `core/model-routing.md`.
+
+## Role-card preflight and delegation
+
+Before delegating any task, the Lead must resolve and read the complete
+canonical role card selected for that task. Resolution uses a non-empty
+`CODING_TEAM_ROOT` first; when it is not configured, use the repo-local
+`coding-team/core/roles/<canonical-id>.md` fallback. Only canonical IDs from
+`core/orchestration.md` are valid. The Lead records the source, sanitized path
+reference, SHA-256, readability/preflight status, baseline status, and
+consumption status in the local handoff/flow receipt.
+
+When the flow adapter is in use, the user-invoked `role-card.check` preflight is
+required before a role recommendation is unlocked. It has read-only
+filesystem/card access and makes an explicit metadata-only flow-state write
+(action/evidence/status). It establishes that the bytes were readable and
+hashed at check time (`READABLE_AT`); it never means host-attested consumption
+and never mutates workflow/model-map/artifacts or invokes a role/model.
+
+For ordinary Codex delegation, a current `READABLE_AT` preflight plus a
+project-local Task handoff is sufficient. The handoff records task/run ID,
+canonical role ID, matching card hash, exclusive scope, planned → actual
+model/effort, result status, and artifact/evidence references. If the host does
+not emit a same-task role-consumption receipt, keep
+`role_instructions: NOT_CONSUMED` and `consumption_status: UNVERIFIED`; that
+absence is not a dispatch gate. Host model, token, and runtime telemetry remain
+`UNAVAILABLE` when no named source supplies them.
+
+`CONSUMED` is reserved for an approved same-task host-runtime receipt carrying
+the canonical role ID, matching hash, task/run ID, and local evidence. If a
+receipt is supplied and any field mismatches, fail closed. The adapter never
+mints, repairs, or infers a host receipt.
+
+Missing, unreadable, invalid, stale, or baseline-blocked cards fail closed to
+the human and one `role-card.check` repair action. Never auto-load, retry,
+spawn, or infer authorization. Keep card contents and absolute host paths out
+of receipts; local Expert output may show only a project-relative path or the
+stable `external:CODING_TEAM_ROOT/...` token plus hash. Public-safe output
+omits path/hash and retains status plus an opaque evidence reference.
+
+Docs Steward is eligible only when admission names one durable documentation
+path and the same bounded task has fresh Test Engineer `PASS`, followed
+sequentially by Gatekeeper `APPROVE` or `APPROVE_WITH_NOTES`. Ordinary role
+handoffs return to Lead or the next canonical owner; they never route through
+Docs Steward.
 
 ## Lead loop (short)
 
