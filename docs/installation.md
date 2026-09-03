@@ -1,8 +1,8 @@
-# Install
+# Installation
 
-## Quick start
+## Quick start: one friendly command
 
-Clone the public repository and run the friendly installer:
+For a normal local setup, use the top-level installer:
 
 ```bash
 git clone https://github.com/ericlam2k/coding-team.git
@@ -10,101 +10,140 @@ cd coding-team
 ./install.sh
 ```
 
-The installer detects Codex, Cursor, or Cline. If it cannot decide, it asks
-which host to use. It also asks for an optional project folder. Press Enter to
-skip that question.
+The installer detects Codex, Cursor, or Cline when possible. If it finds more
+than one host, it asks which one to use. If it cannot detect a host, it offers
+Codex as the default. In an interactive session, it can ask for an optional
+first project folder.
 
-For scripts or CI, choose the host and skip all questions:
+The project path is used only to add the normal
+`coding-team` pointer to that project's `AGENTS.md`. A missing or unwritable
+project is reported and skipped; it does not make the framework installation
+look successful by silently changing another folder.
+
+Use `--no-questionnaire` for CI or scripts. Combine it with an explicit host
+when needed:
 
 ```bash
 ./install.sh --platform codex --no-questionnaire
+./install.sh --platform cursor --no-questionnaire
 ```
 
-The installer links the host adapter and QA support. It does not write a model
-map or enable an addon.
+The no-questionnaire path never waits for host or communication input. It uses
+the safe defaults and does not write a model map. If more than one host is
+installed, pass `--platform` to resolve that choice explicitly.
 
-## Optional project setup
+## Advanced: one canonical install
 
-Add the coding-team pointer to a project during install:
-
-```bash
-./install.sh --project /path/to/your/project
-```
-
-You can do this later:
+Clone the repository and install the adapter for your host:
 
 ```bash
-./bin/ct project /path/to/your/project
-```
-
-## Model map
-
-A model map connects task tiers to models available on your host. It is
-optional.
-
-The proposal follows this simple rule:
-
-**Premium decide. Eco build. Cheap search/docs. Human gate for irreversible
-risk.**
-
-The proposer reads the host pool and lists every valid model ID. GPT names in
-the example map are references, not requirements. If one is unavailable, the
-proposer selects a detected model with the closest tier hints. If no useful
-hint exists, it uses a fallback and marks the choice as a heuristic. Review the
-suggestion before writing it.
-
-Show a proposal without writing a file:
-
-```bash
-./bin/ct map propose --platform codex
-```
-
-Approve and write the local map:
-
-```bash
-./bin/ct map approve --platform codex
-```
-
-For automation, --yes is the explicit approval:
-
-```bash
-./bin/ct map approve --platform codex --yes
-```
-
-Use the same commands with cursor or cline when that host is configured. Do not
-copy a map from one host to another.
-
-## Simple safety
-
-Lead checks task size and proof before assigning work. Builders use focused
-local checks for low-risk changes. Material or risky work uses Test Engineer →
-Gatekeeper, in that order. Run at most two non-conflicting tasks at once.
-Human approval is still required for irreversible actions.
-
-## Direct installer
-
-For a host-specific install without the friendly questionnaire:
-
-```bash
+git clone https://github.com/ericlam2k/coding-team.git
+cd coding-team
 ./scripts/install-coding-team.sh --platform codex
 ```
 
-Check an existing install without changing it:
+The same command supports `cursor` and `cline`:
+
+```bash
+./scripts/install-coding-team.sh --platform cursor
+./scripts/install-coding-team.sh --platform cline
+```
+
+The installer links the selected host adapter and conditional QA support. It
+does not write a model map, enable addons, or create a second installation
+mode. Core policy remains the same on every host.
+
+Use `--check` to inspect an existing activation without changing it:
 
 ```bash
 ./scripts/install-coding-team.sh --check --platform codex
 ```
 
-Set CODEX_HOME when Codex uses a different home directory.
+Set `CODEX_HOME` to a project-local directory when the host cannot read your
+global Codex home. The installer refuses to overwrite a non-symlink target.
 
-## Optional addon
+## One installation contract
 
-PM Lean is off by default:
+Every public installation command installs the selected host adapter and
+conditional QA support. The command does not select an installation variant,
+write a model map, or enable an addon. Use the explicit extension commands
+below when you need those actions.
+
+## Optional model map
+
+A model map is host-specific configuration, not portable core policy. It is
+optional and deliberately separated into a read step and a human-gated write
+step:
+
+```bash
+# Read-only: show a suggestion and write nothing.
+./bin/ct map propose --platform codex
+
+# Explicit approval: prompt, then write the local host map if approved.
+./bin/ct map approve --platform codex
+```
+
+For a non-interactive environment, `--yes` is an explicit approval signal:
+
+```bash
+./bin/ct map approve --platform codex --yes
+```
+
+Do not copy a concrete map between hosts. Record the planned tier and actual
+host/model choice in the task handoff when the runtime supplies that
+information. Missing model telemetry stays unavailable.
+
+## Activate the framework
+
+Set `CODING_TEAM_ROOT` to this checkout and load the adapter skill for your
+host. A first task should name one outcome, one boundary, the proof to collect,
+and the stop condition.
+
+The shared operating rules are WIP ≤ 2 ordinary tool-using lanes plus at most
+one read-only, non-authoritative supervisor relay (total child lanes ≤3 only
+when admitted), disjoint writes, and Code Reviewer → conditional Test Engineer
+→ Gatekeeper sequencing. A human decision remains required before irreversible
+actions.
+
+## Conditional QA
+
+| QA path | Public status | Runtime behavior |
+|---|---|---|
+| **Normal QA** | `AVAILABLE` | Default for ordinary, bounded changes |
+| **Risky QA** | `EXPERIMENTAL` | Uses the existing high-risk workflow and evidence rules |
+
+Normal work uses the ordinary focused checks for the task. Risky QA is
+implemented and available for careful trial use when a change affects state,
+security, privacy, shared contracts, migration/rollback, or has repeated
+failures.
+
+Risky or bounded work can load the `qa-evidence-enforcement` skill and its
+validator. A bounded pass targets 120 seconds, checkpoints at 180 seconds, and
+hard-stops at 240 seconds. A timeout is `BLOCKED` evidence, not an automatic
+retry. When a risky trigger applies, do not continue under Normal QA.
+
+`EXPERIMENTAL` is a maturity label, not an enable/disable switch. This update
+does not change the installer, trigger policy, validator, or human gates. See
+the [basic Risky QA example](examples/risky-qa-trial.md).
+
+## Addons
+
+Addons are separate and default OFF. Enable one only when you need it:
 
 ```bash
 ./bin/ct enable pm-lean
 ./bin/ct disable pm-lean
 ```
 
-See [Model-pool mapping](model-pool-mapping.md) for proposal details and
-[Project scope](project-scope.md) for the public boundary.
+Addons do not change core routing, role ownership, human gates, or acceptance
+authority. See [Addons](addons.md).
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| Adapter is not active | Re-run the canonical installer for the selected platform. |
+| An installer flag is rejected | Use the documented `--platform`, `--check`, or `--no-questionnaire` command. |
+| You want to inspect model choices | Use `./bin/ct map propose`; it is read-only. |
+| You want to write a model map | Use `./bin/ct map approve` and make the approval explicit. |
+| An addon is not available | Check `./bin/ct status`; addons are opt-in and host-specific. |

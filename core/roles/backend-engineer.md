@@ -34,7 +34,7 @@ Load when the brief names them (start none):
 
 ## Never
 
-- Invent roles; edit outside owned files; skip TE for “obvious” batch work
+- Invent roles; edit outside owned files; bypass the QA route for “obvious” batch work
 - Commit/push/deploy without explicit human approval when gated
 
 ## Outputs

@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "prepare-dispatch.py"
+RUNTIME = Path(__file__).resolve().parents[1] / "runtime.md"
 SPEC = importlib.util.spec_from_file_location("prepare_dispatch", SCRIPT)
 if SPEC is None or SPEC.loader is None:  # pragma: no cover - test bootstrap
     raise RuntimeError(f"cannot load {SCRIPT}")
@@ -34,18 +35,23 @@ class PrepareDispatchTests(unittest.TestCase):
             "stop": "Stop on scope conflict; do not commit or push.",
             "model": "gpt-5.6-luna",
             "effort": "max",
-            "fork_turns": "all",
+            "fork_context": False,
             "allocation": self.allocation(),
         }
 
     def allocation(self) -> dict[str, object]:
-        unit = {"status": "ESTIMATED", "seconds": 1, "source": "test-fixture"}
+        unit = {
+            "status": "MEASURED", "seconds": 1, "source": "test-fixture",
+            "evidence_ref": "evidence:test-duration",
+        }
         return {
             "owner": "backend-engineer",
             "concern": "dispatch admission",
             "input_refs": ["adapters/codex/scripts/prepare-dispatch.py"],
             "result": "one bounded dispatch decision",
             "prerequisites": [{"name": "packet normalized", "status": "passed"}],
+            "candidate_changed_paths": 2,
+            "prior_hard_stop": False,
             "timing_profile": {
                 "target_s": 10, "checkpoint_s": 20, "hard_stop_s": 30,
                 "reserve_s": 5, "max_hard_cap_s": 30,
@@ -59,20 +65,38 @@ class PrepareDispatchTests(unittest.TestCase):
         result = MODULE.prepare_dispatch(self.packet())
 
         self.assertEqual(result["status"], "READY")
-        self.assertEqual(result["spawn"]["fork_turns"], "all")
+        self.assertEqual(
+            set(result["spawn"]),
+            {"agent_type", "fork_context", "message", "model", "reasoning_effort"},
+        )
+        self.assertEqual(result["spawn"]["fork_context"], False)
         self.assertEqual(result["spawn"]["agent_type"], "worker")
-        self.assertEqual(result["spawn"]["task_name"], "ct_dispatch_rca_b01")
+        self.assertEqual(result["spawn"]["model"], "gpt-5.6-luna")
+        self.assertEqual(result["spawn"]["reasoning_effort"], "max")
         self.assertRegex(result["dispatch_id"], r"^ctd_[0-9a-f]{24}$")
-        self.assertNotIn("model", result["spawn"])
-        self.assertNotIn("reasoning_effort", result["spawn"])
         self.assertNotIn("role", result["spawn"])
         self.assertNotIn("task_id", result["spawn"])
+        self.assertNotIn("task_name", result["spawn"])
+        self.assertNotIn("fork_turns", result["spawn"])
         role_card = Path(result["role_card"])
         self.assertTrue(role_card.is_absolute())
         self.assertTrue(role_card.is_file())
         self.assertIn(str(role_card), result["message"])
         self.assertLessEqual(result["word_count"], MODULE.MAX_MESSAGE_WORDS)
         self.assertNotIn("encrypted", result["message"].lower())
+        self.assertIn("- **Recommended next to-do:**", result["message"])
+        self.assertIn("- **Pending tasks:**", result["message"])
+        self.assertIn("task ID — owner — prerequisite — state", result["message"])
+
+    def test_runtime_documents_the_live_explicit_role_spawn_contract(self) -> None:
+        runtime = RUNTIME.read_text(encoding="utf-8")
+        self.assertIn("set `fork_context=false`", runtime)
+        self.assertIn(
+            "`agent_type`, `fork_context`, `message`, `model`, and `reasoning_effort`",
+            runtime,
+        )
+        self.assertNotIn("`task_name`, `fork_turns`", runtime)
+        self.assertNotIn("positive depth `3`", runtime)
 
     def test_dispatch_id_is_stable_and_changes_with_material_delta(self) -> None:
         first = MODULE.prepare_dispatch(self.packet())
@@ -89,16 +113,35 @@ class PrepareDispatchTests(unittest.TestCase):
             self.assertNotEqual(first["admission"]["digest"], changed["admission"]["digest"])
             self.assertNotEqual(first["dispatch_id"], changed["dispatch_id"])
 
-    def test_omitted_fork_turns_uses_named_model_safe_positive_depth(self) -> None:
+    def test_omitted_fork_context_is_blocked_until_host_mode_is_explicit(self) -> None:
         packet = self.packet()
-        packet.pop("fork_turns")
+        packet.pop("fork_context")
 
-        result = MODULE.prepare_dispatch(packet)
+        with self.assertRaises(MODULE.PacketValidationError) as raised:
+            MODULE.prepare_dispatch(packet)
 
-        self.assertEqual(result["spawn"]["fork_turns"], "3")
-        self.assertEqual(result["spawn"]["model"], "gpt-5.6-luna")
-        self.assertEqual(result["spawn"]["reasoning_effort"], "max")
-        self.assertIn("fork_turns=3", result["spawn"]["message"])
+        self.assertTrue(any("fork_context" in item and "required" in item for item in raised.exception.errors))
+
+    def test_numeric_fork_depth_is_blocked_instead_of_coerced(self) -> None:
+        for value in (3, "3"):
+            packet = self.packet()
+            packet.pop("fork_context")
+            packet["fork_turns"] = value
+
+            with self.subTest(value=value), self.assertRaises(MODULE.PacketValidationError) as raised:
+                MODULE.prepare_dispatch(packet)
+
+            self.assertTrue(any("not representable" in item for item in raised.exception.errors))
+
+    def test_full_history_fork_is_blocked_with_explicit_role_override(self) -> None:
+        packet = self.packet()
+        packet.pop("fork_context")
+        packet["fork_turns"] = "all"
+
+        with self.assertRaises(MODULE.PacketValidationError) as raised:
+            MODULE.prepare_dispatch(packet)
+
+        self.assertTrue(any("incompatible" in item for item in raised.exception.errors))
 
     def test_opaque_payload_is_blocked(self) -> None:
         packet = self.packet()
@@ -146,6 +189,7 @@ class PrepareDispatchTests(unittest.TestCase):
 
     def test_none_fork_is_blocked(self) -> None:
         packet = self.packet()
+        packet.pop("fork_context")
         packet["fork_turns"] = "none"
 
         with self.assertRaises(MODULE.PacketValidationError) as raised:
@@ -254,7 +298,10 @@ class PrepareDispatchTests(unittest.TestCase):
         allocation = self.allocation()
         allocation["atomic"] = True
         allocation["priced_units"] = {
-            category: [{"status": "MEASURED", "seconds": 6, "source": "measured"}]
+            category: [{
+                "status": "MEASURED", "seconds": 6, "source": "measured",
+                "evidence_ref": "evidence:measured-duration",
+            }]
             for category in ("setup", "work", "validation", "handoff")
         }
         packet["allocation"] = allocation
@@ -272,6 +319,56 @@ class PrepareDispatchTests(unittest.TestCase):
         packet["allocation"]["timing_profile"]["reserve_s"] = 20
         with self.assertRaises(MODULE.PacketValidationError):
             MODULE.prepare_dispatch(packet)
+
+    def test_candidate_wide_validation_is_split_from_scoped_task(self) -> None:
+        packet = self.packet()
+        packet["paths"] = ["AGENTS.md"]
+        packet["validation"] = [
+            "Verify HEAD, tree, diff, and 852 paths."
+        ]
+        packet["allocation"]["candidate_changed_paths"] = 852
+
+        result = MODULE.prepare_dispatch(packet)
+
+        self.assertEqual(result["status"], "SPLIT")
+        self.assertTrue(result["admission"]["allocation"]["candidate_wide_validation"])
+        self.assertNotIn("spawn", result)
+
+        packet["allocation"]["prior_hard_stop"] = True
+        retry = MODULE.prepare_dispatch(packet)
+        self.assertEqual(retry["status"], "BLOCK")
+        self.assertNotIn("spawn", retry)
+
+    def test_prior_hard_stop_requires_measured_replan(self) -> None:
+        packet = self.packet()
+        packet["allocation"]["prior_hard_stop"] = True
+
+        result = MODULE.prepare_dispatch(packet)
+
+        self.assertEqual(result["status"], "BLOCK")
+        self.assertNotIn("spawn", result)
+
+    def test_estimated_time_never_admits_a_worker(self) -> None:
+        packet = self.packet()
+        packet["allocation"]["priced_units"]["work"][0] = {
+            "status": "ESTIMATED", "seconds": 1, "source": "author estimate"
+        }
+
+        result = MODULE.prepare_dispatch(packet)
+
+        self.assertEqual(result["status"], "MEASURE")
+        self.assertNotIn("spawn", result)
+
+    def test_measured_unit_requires_evidence_reference(self) -> None:
+        packet = self.packet()
+        packet["allocation"]["priced_units"]["setup"][0] = {
+            "status": "MEASURED", "seconds": 1, "source": "claimed measurement"
+        }
+
+        with self.assertRaises(MODULE.PacketValidationError) as raised:
+            MODULE.prepare_dispatch(packet)
+
+        self.assertTrue(any("evidence_ref" in item for item in raised.exception.errors))
 
 
 if __name__ == "__main__":

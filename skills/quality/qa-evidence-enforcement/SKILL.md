@@ -37,7 +37,12 @@ separate approval gate.
    `ENVIRONMENT_DEFECT`, `TOOL_TRANSPORT_DEFECT`, or `UNKNOWN`.
 8. Record the correlation result, demonstrated root cause or explicit
    no-shared-cause result, corrective Batch reference, and regression references.
-9. Record the exact `validated_commit` and require a clean working tree.
+9. Record the exact current candidate identity from
+   `$CODING_TEAM_ROOT/core/qa-operating-model.md`: either the validated commit
+   with a clean working tree, or closed manifest-bound `DIRTY` evidence. The
+   latter binds the validated HEAD commit, manifest, candidate tree, working
+   tree, and per-file hashes and requires repository revalidation; a commit
+   alone is insufficient.
 10. Run the repository validator:
 
    ```bash
@@ -60,13 +65,17 @@ Promotion is valid only when all of these are true:
 - correlation complete;
 - confirmed defects linked to a regression case or corrective Batch;
 - Gatekeeper decision is not started until this evidence is accepted;
-- Gatekeeper reviewed commit equals the TE validated commit;
+- Code Reviewer, TE, QA-validator, and Gatekeeper reviewed identity all match
+  the exact current candidate identity; commit mode retains the reviewed-commit
+  equality check, while manifest mode requires matching identity evidence and
+  repository revalidation;
 - human approval exists when a human gate is required.
 
 `FAIL`, `BLOCKED`, `TIMEOUT`, `REVISE`, stale evidence, missing evidence,
-dirty-tree evidence, or commit mismatch stops promotion. A timeout is a valid
-stop record, not a pass: Gatekeeper must not start, and the Lead must queue one
-smaller follow-up or ask the human. Do not auto-retry.
+identity mismatch, failed repository revalidation, or dirty evidence without a
+valid closed manifest stops promotion. A timeout is a valid stop record, not a
+pass: Gatekeeper must not start, and the Lead must queue one smaller follow-up
+or ask the human. Do not auto-retry.
 
 ## Scope boundary
 
@@ -75,6 +84,7 @@ smaller follow-up or ask the human. Do not auto-retry.
 - This skill validates evidence and promotion readiness.
 - `debugging` or `root-cause-tracing` may be named for failure analysis, but
   this skill never replaces those methods or changes code.
-- The validator checks commit identity and promotion evidence; it cannot claim
-  to observe arbitrary editor writes during an active test run unless the host
-  adapter provides that instrumentation.
+- The validator checks the declared candidate identity and current repository
+  evidence at validation time; it cannot claim to observe arbitrary editor
+  writes during an active test run unless the host adapter provides that
+  instrumentation.

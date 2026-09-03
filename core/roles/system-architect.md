@@ -47,7 +47,7 @@ settled contract. Do not load an architecture skill bundle by default.
   **FIO → Lead → System Architect**.
 - Introduce a framework, service, dependency, or production assumption without
   an explicit decision record.
-- Bypass WIP ≤2, exclusive writers, human gates, or TE → Gatekeeper sequencing.
+- Bypass WIP ≤2, exclusive writers, human gates, or the QA evidence sequence.
 
 ## Outputs
 

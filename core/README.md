@@ -2,6 +2,9 @@
 
 Host-independent coding-team policy. Adapters under `adapters/` bind this core to a runtime (**adapter binds runtime** — core does not favor any IDE or agent host).
 
+The quality route is **Code Reviewer → conditional Test Engineer → Gatekeeper**;
+the Reviewer routes executable evidence and Gatekeeper remains final.
+
 ## Index
 
 | Path | Purpose |
@@ -12,7 +15,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [qa-operating-model.md](qa-operating-model.md) | Normal/Risky QA flow, selected layers, evidence, and promotion gates |
 | [../docs/archive/qa-operating-model-archive-29311de.md](../docs/archive/qa-operating-model-archive-29311de.md) | Archived prior QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
-| [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
+| [concurrency.md](concurrency.md) | WIP ≤ 2 ordinary + ≤1 read-only supervisor relay; quality sequence and parallel rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |
 | [roles/](roles/) | Canonical role cards |
 | [templates/](templates/) | Sprint / batch / task / handoff / checkpoint / review / report / perf |
@@ -27,10 +30,12 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [roles/contradictor.md](roles/contradictor.md) | `contradictor` |
 | [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` |
 | [roles/investigator.md](roles/investigator.md) | `investigator` |
+| [roles/monitor-agent.md](roles/monitor-agent.md) | `monitor-agent` — bounded read-only supervisor relay |
 | [roles/system-architect.md](roles/system-architect.md) | `system-architect` |
 | [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
 | [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |
 | [roles/frontend-builder.md](roles/frontend-builder.md) | `frontend-builder` |
+| [roles/code-reviewer.md](roles/code-reviewer.md) | `code-reviewer` — independent diff-first review and evidence routing |
 | [roles/test-engineer.md](roles/test-engineer.md) | `test-engineer` |
 | [roles/docs-steward.md](roles/docs-steward.md) | `docs-steward` |
 | [roles/gatekeeper.md](roles/gatekeeper.md) | `gatekeeper` |
@@ -45,6 +50,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [templates/handoff.md](templates/handoff.md) | Role handoff (≤150w) |
 | [templates/batch-checkpoint.md](templates/batch-checkpoint.md) | Batch checkpoint (≤300w) |
 | [templates/qa-evidence.json](templates/qa-evidence.json) | Machine-readable QA evidence and promotion manifest |
+| [templates/code-review.md](templates/code-review.md) | Code Reviewer findings, verdict, and conditional validation route |
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |
@@ -57,7 +63,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | `skills/engineering/` | Backend, frontend, system architecture, frameworks, performance, styling, data, devops |
 | `skills/quality/` | Testing, review, debugging, bounded QA evidence, problem-solving, sequential thinking |
 | `skills/process/` | Context engineering, docs seeker, PM execution |
-| `skills/design/` | Hallmark + awesome-design-md (paired), ui-ux-pro-max, aesthetic, frontend-design |
+| `skills/design/` | Scenario router; anti-ui-slop, Hallmark + named design reference, frontend-design, aesthetic, ui-ux-pro-max |
 
 ## Install note
 

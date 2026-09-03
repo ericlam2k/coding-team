@@ -20,9 +20,11 @@ coding-team makes those decisions visible:
 
 - **Sprint → Batch → Task** keeps a big goal small enough to steer.
 - **Role cards** make ownership and boundaries explicit.
-- **WIP ≤ 2** limits concurrent tool-using work.
+- **WIP ≤ 2 ordinary + ≤1 supervisor relay** limits concurrent tool-using work:
+  the relay is read-only and non-authoritative, so total child lanes can reach
+  3 only when that optional lane is admitted; never start a third ordinary lane.
 - **Human gates** protect irreversible actions.
-- **Test Engineer → Gatekeeper** puts independent evidence before final acceptance.
+- **Code Reviewer → conditional Test Engineer → Gatekeeper** puts independent diff/risk review and required executable evidence before final acceptance.
 
 The result is a visible path from request to reviewed change—not a promise of
 more autonomy. You keep the final decision.
@@ -38,44 +40,6 @@ This illustrative visual shows the public loop: request → bounded work →
 evidence → your decision. The [communication guide](docs/communication-style.md)
 keeps the language clear without changing the underlying constraints or
 evidence.
-
-
-## How the multiagent orchestration works
-
-The framework has one **Lead**. The Lead first checks the goal, the size of the
-work, and what will prove it is done. Then the Lead assigns small tasks to the
-right roles.
-
-<picture>
-  <source media="(max-width: 640px)" srcset="docs/examples/assets/coding-team-multiagent-mobile.svg">
-  <img src="docs/examples/assets/coding-team-multiagent.svg" alt="Coding Team role flow: you give the goal, Lead checks size and assigns work, builders implement, Test Engineer checks material work, Gatekeeper decides, and you approve publishing.">
-</picture>
-
-- **You give the goal:** outcome, limits, and the decisions that must stay with
-  you.
-- **Lead checks before assigning:** Is the task clear? Can one role own it? Is
-  it small enough? What check will prove it works? If not, Lead asks the team
-  or splits the work into Sprint → Batch → Task.
-- **Team input is optional:** Product Manager, System Architect, Advisor,
-  Contradictor, or a Domain Advisor joins only when their answer can change the
-  task.
-- **Builders implement:** Backend Engineer and Frontend Builder can work at the
-  same time only when their files and dependencies do not conflict.
-- **Tests match the risk:** builders run focused checks. For material or risky
-  work, Test Engineer checks the result, then Gatekeeper accepts, revises, or
-  blocks it.
-- **Human gates:** commit, push/merge, release, and public export require an
-  explicit yes. Silence, an agent's "approved" message, and a passing test are
-  not approval.
-
-### How Lead estimates task size
-
-The public framework uses a rule-based check, not an automatic estimator.
-Before assigning work, Lead checks for one owner, one concern, one result, and
-a short run with a clear stop. If similar completed work has measured time,
-Lead may use it as an estimate. If not, Lead says the estimate is unknown and
-splits the task or runs a small fact-finding step. After the task, record the
-actual time, outcome, and blocker so the next estimate has evidence.
 
 ## QA maturity
 
@@ -144,7 +108,7 @@ extensions; see [Installation](docs/installation.md).
 
 | Layer | What it does |
 |---|---|
-| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
+| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2 ordinary + ≤1 supervisor relay, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
 | **Addons** | PM Lean decision support — default OFF, explicit-only |

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "coding-team": {
+      "description": "coding-team orchestration (lab-first OpenCode adapter)",
+      "mode": "primary",
+      "prompt": "You are the Lead of coding-team. Read adapters/opencode/AGENTS.md and core/orchestration.md. Enforce WIP <= 2, frozen candidate -> deterministic checks -> Code Reviewer -> conditional Test Engineer -> Gatekeeper per core/qa-operating-model.md, human gates, and evidence receipts at a recorded SHA. Lab-only: no core/ changes, no push/merge to main."
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "ask",
+    "webfetch": "ask"
+  }
+}

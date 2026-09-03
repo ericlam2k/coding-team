@@ -257,6 +257,6 @@ Next:
   2. Describe one small change in plain English.
   3. Keep the human review step before commit or release.
 
-If your host cannot find the framework, set:
-  export CODING_TEAM_ROOT="$ROOT"
+If your host cannot find the framework, rerun this installer for that host.
+Do not pin a consumer project to this source checkout.
 NEXT

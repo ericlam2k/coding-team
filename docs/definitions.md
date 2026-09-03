@@ -11,7 +11,7 @@ Shared vocabulary for coding-team. Use these terms in briefs, handoffs, and docs
 | **Task** | One atomic deliverable with one canonical owner, exclusive file ownership, dependencies, stop condition, one primary skill or `none`, and an owner self-check. |
 | **Lead** | The parent agent/session that classifies nature, assigns tiers, creates the task list, delegates, integrates, and enforces gates. Never spawn Lead as a subagent. |
 | **Functional Integration Owner** | An assignment (not a new role) naming which existing role owns the batch’s shared contract and integration order before independent validation. |
-| **WIP ≤ 2** | At most two concurrent tool-using specialist runs. Accelerate by smaller queued work and proven-disjoint parallels — never by raising the cap. |
+| **WIP ≤ 2 ordinary + ≤1 supervisor relay** | At most two concurrent ordinary tool-using specialist runs, plus one optional read-only, non-authoritative supervisor relay. Total child lanes may reach 3 only when that relay is admitted; never start a third ordinary run. |
 | **Handoff** | ≤150-word return packet from a specialist: status, evidence paths, unresolved questions, next owner. |
 | **Checkpoint** | ≤300-word batch state snapshot used after pause, context shrink, or Gatekeeper acceptance. |
 | **Run prompt** | ≤250-word delegation prompt projected from the task brief. The full template is never the run prompt. |
@@ -54,7 +54,9 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **Domain Advisor** | Specialty consult peer. Template `domain-advisor` → instance `{domain}-advisor` / display `[Domain]-Advisor` (e.g. Talent-Advisor, Strategic-Advisor). Lead asks for domain when unclear. Not under PM or technical Advisor. |
 | **Advisor** | Pre-build: what should we do *technically*? |
 | **Contradictor** | Pre-build: why might this be wrong? Serial debate with Advisor when required. |
-| **Gatekeeper** | Post-build: `APPROVE` / `APPROVE_WITH_NOTES` / `REVISE` / `BLOCK` after Test Engineer evidence. |
+| **Code Reviewer** | Independent post-build diff/risk review; routes conditional Test Engineer evidence before Gatekeeper and never accepts. |
+| **Monitor Agent** | Optional bounded read-only supervisor relay under the frozen contract; reports one create-once artifact result and never controls work or accepts. |
+| **Gatekeeper** | Final post-build authority: `APPROVE` / `APPROVE_WITH_NOTES` / `REVISE` / `BLOCK` after the routed evidence, including Test Engineer evidence when required. |
 | **Human gate** | Explicit human approval for irreversible or ambiguous risk. Silence is never approval. |
 | **Lead cost discipline** | Lead emits judgment/briefs only — no implementation typing lane; defects return as corrected briefs; spec-readiness before dispatch. |
 | **Spec-readiness** | A ≤250-word run prompt with objective, files, interfaces, constraints, and verification — if you cannot finish it, do not delegate yet. |
@@ -72,12 +74,15 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **S2** | Cross-module / high-risk — recorded trigger required |
 | **V0–V3** | Validation depth from smoke to release-grade (set at batch READY) |
 
-## Design pairing
+## Product design routing
 
 | Term | Definition |
 |---|---|
-| **Hallmark** | Anti-AI-slop design skill; primary design authority for greenfield / redesign when assigned. |
-| **awesome-design-md** | Named `DESIGN.md` reference library. Read via [skills/design/design-md-index.md](../skills/design/design-md-index.md): at most one primary + one comparison; principles only — never clone branding. |
+| **Design router** | [`skills/design/design-router.md`](../skills/design/design-router.md) selects one primary generator by surface scenario, zero or one reference, and the required non-authoritative aesthetic finish lens. |
+| **anti-ui-slop** | Primary for operational UI, refinement, or usability audit; load exactly one playbook. |
+| **Hallmark** | Primary generator for `brand_web` when assigned. |
+| **awesome-design-md** | Optional named `DESIGN.md` reference for `brand_web`; principles only — never clone branding. |
+| **Aesthetic review** | Required finish lens for material design work; it reviews craft but never replaces product authority or acceptance. |
 
 ## Lead cost discipline
 

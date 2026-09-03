@@ -61,11 +61,12 @@ REQUIRED_FIELDS = (
     "effort",
     "allocation",
 )
-ALLOWED_FIELDS = frozenset((*REQUIRED_FIELDS, "fork_turns", "critical", "native_collaboration",
+ALLOWED_FIELDS = frozenset((*REQUIRED_FIELDS, "fork_turns", "fork_context", "critical", "native_collaboration",
                             "cancellable_pre_start_handle"))
 EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 ADMISSION_STATUSES = frozenset({"MEASURED", "ESTIMATED", "UNKNOWN"})
 ALLOCATION_MAX_INPUT_REFS = 32
+_VALIDATION_PATH_COUNT_RE = re.compile(r"\b([0-9]+)\s+(?:changed\s+)?paths?\b", re.IGNORECASE)
 
 # Canonical Coding Team roles remain authoritative in the plaintext packet.
 # This map selects only the closest Codex host execution shape.
@@ -91,7 +92,8 @@ HOST_AGENT_TYPES = {
 }
 
 _TASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9._:-]{2,127}$")
-_MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]{1,127}$")
+# Host model identifiers may contain spaces, for example `ZM Glm5.3F`.
+_MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/ -]{1,127}$")
 _CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _OPAQUE_PREFIX_RE = re.compile(
     r"^(?:enc(?:rypted)?|cipher(?:text)?|opaque|sealed|redacted|base64|jwe|kms)"
@@ -272,9 +274,9 @@ def _resolve_role_card(role: str, root: str | os.PathLike[str] | None) -> str:
 
 
 def _normalise_fork_turns(value: Any, errors: list[str]) -> str:
-    # The host treats an omitted fork_turns as full-history.  Make that safe
-    # default explicit in the output so the dispatch cannot inherit a caller's
-    # ambient setting.
+    # ``fork_turns`` is the canonical packet field.  The live Codex host only
+    # accepts the boolean ``fork_context`` field, so numeric depth cannot be
+    # represented without silently changing the worker's context mode.
     if value is None:
         errors.append("fork_turns: null is invalid; use 'all' or a positive depth")
         return ""
@@ -293,22 +295,24 @@ def _normalise_fork_turns(value: Any, errors: list[str]) -> str:
     if value == "all":
         return value
     if re.fullmatch(r"[1-9][0-9]*", value):
+        errors.append(
+            "fork_turns: numeric depth is not representable by the live Codex host; "
+            "use 'all' for fork_context=true"
+        )
         return value
-    errors.append("fork_turns: must be 'all' or a positive integer")
+    errors.append("fork_turns: must be 'all'; numeric depth is not supported by the live Codex host")
     return ""
+
+
+def _normalise_fork_context(value: Any, errors: list[str]) -> bool:
+    if not isinstance(value, bool):
+        errors.append("fork_context: must be a boolean")
+        return False
+    return value
 
 
 def _word_count(text: str) -> int:
     return len(_WORD_RE.findall(text))
-
-
-def _host_task_name(task_id: str) -> str:
-    """Return a stable task name accepted by the Codex collaboration API."""
-
-    name = re.sub(r"[^a-z0-9]+", "_", task_id.casefold()).strip("_")
-    if not name or not name[0].isalpha():
-        name = f"task_{name}"
-    return name[:64]
 
 
 def _seconds(value: Any, field: str, errors: list[str]) -> float:
@@ -324,7 +328,10 @@ def _normalise_allocation(value: Any, errors: list[str]) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         errors.append("allocation: required object")
         return {}
-    required = ("owner", "concern", "input_refs", "result", "prerequisites", "timing_profile")
+    required = (
+        "owner", "concern", "input_refs", "result", "prerequisites",
+        "timing_profile", "candidate_changed_paths", "prior_hard_stop",
+    )
     for field in required:
         if field not in value:
             errors.append(f"allocation.{field}: required")
@@ -383,6 +390,15 @@ def _normalise_allocation(value: Any, errors: list[str]) -> dict[str, Any]:
             name = _normalise_text(prerequisite, f"allocation.prerequisites[{index}]", errors)
             normalized_prerequisites.append({"name": name, "passed": True, "status": "passed"})
 
+    candidate_changed_paths = value.get("candidate_changed_paths")
+    if (isinstance(candidate_changed_paths, bool) or
+            not isinstance(candidate_changed_paths, int) or candidate_changed_paths < 0):
+        errors.append("allocation.candidate_changed_paths: must be a non-negative integer")
+        candidate_changed_paths = 0
+    prior_hard_stop = value.get("prior_hard_stop")
+    if not isinstance(prior_hard_stop, bool):
+        errors.append("allocation.prior_hard_stop: must be true or false")
+        prior_hard_stop = False
     profile = value.get("timing_profile", {})
     if not isinstance(profile, Mapping):
         errors.append("allocation.timing_profile: must be an object")
@@ -408,6 +424,7 @@ def _normalise_allocation(value: Any, errors: list[str]) -> dict[str, Any]:
         raw_units = {}
     units: dict[str, list[dict[str, Any]]] = {}
     unknown_unit = False
+    estimated_unit = False
     all_measured = True
     plan = 0.0
     for category in ("setup", "work", "validation", "handoff"):
@@ -423,14 +440,33 @@ def _normalise_allocation(value: Any, errors: list[str]) -> dict[str, Any]:
             status = str(entry.get("status", "")).upper()
             source = _normalise_text(entry.get("source", ""),
                                      f"allocation.priced_units.{category}[{index}].source", errors)
+            evidence_ref = entry.get("evidence_ref", "")
+            if status == "MEASURED":
+                evidence_ref = _normalise_text(
+                    evidence_ref,
+                    f"allocation.priced_units.{category}[{index}].evidence_ref",
+                    errors,
+                )
+            elif evidence_ref not in ("", None):
+                evidence_ref = _normalise_text(
+                    evidence_ref,
+                    f"allocation.priced_units.{category}[{index}].evidence_ref",
+                    errors,
+                )
+            else:
+                evidence_ref = ""
             seconds = 0.0 if status == "UNKNOWN" and "seconds" not in entry else _seconds(
                 entry.get("seconds"), f"allocation.priced_units.{category}[{index}].seconds", errors)
             if status not in ADMISSION_STATUSES:
                 errors.append(f"allocation.priced_units.{category}[{index}].status: invalid")
             unknown_unit = unknown_unit or status == "UNKNOWN"
+            estimated_unit = estimated_unit or status == "ESTIMATED"
             all_measured = all_measured and status == "MEASURED"
             plan += seconds
-            normalized_entries.append({"status": status, "seconds": seconds, "source": source})
+            normalized_entries.append({
+                "status": status, "seconds": seconds, "source": source,
+                "evidence_ref": evidence_ref,
+            })
         units[category] = normalized_entries
     critical = bool(value.get("critical", False))
     native = bool(value.get("native_collaboration", False))
@@ -438,12 +474,16 @@ def _normalise_allocation(value: Any, errors: list[str]) -> dict[str, Any]:
     return {"owner": owner, "concern": concern, "input_refs": normalized_refs, "result": result,
             "prerequisites": normalized_prerequisites, "timing_profile": normalized_profile,
             "priced_units": units, "plan_s": plan, "unknown_unit": unknown_unit,
+            "estimated_unit": estimated_unit,
             "all_measured": all_measured, "failed_prerequisite": failed_prerequisite,
             "validation_over_reserve": sum(item["seconds"] for item in units["validation"]) >
             normalized_profile["hard_stop_s"] - normalized_profile["reserve_s"],
             "structural_split": any(structural.values()), "atomic": bool(value.get("atomic", False)),
             "critical": critical, "native_collaboration": native,
-            "cancellable_pre_start_handle": cancellable}
+            "cancellable_pre_start_handle": cancellable,
+            "candidate_changed_paths": candidate_changed_paths,
+            "prior_hard_stop": prior_hard_stop,
+            "candidate_wide_validation": False, "validation_path_counts": []}
 
 
 def _admit(normalized: Mapping[str, Any]) -> tuple[str, dict[str, Any]]:
@@ -452,6 +492,12 @@ def _admit(normalized: Mapping[str, Any]) -> tuple[str, dict[str, Any]]:
         return "MEASURE", allocation
     if allocation["failed_prerequisite"] or allocation["validation_over_reserve"]:
         return "BLOCK", allocation
+    if allocation["prior_hard_stop"]:
+        return "BLOCK", allocation
+    if allocation["candidate_wide_validation"]:
+        return "SPLIT", allocation
+    if allocation["estimated_unit"]:
+        return "MEASURE", allocation
     if allocation["structural_split"]:
         return "SPLIT", allocation
     if allocation["critical"] and allocation["native_collaboration"] and not allocation["cancellable_pre_start_handle"]:
@@ -472,7 +518,7 @@ def _canonical_dispatch_payload(normalized: Mapping[str, Any]) -> bytes:
         key: normalized[key]
         for key in (
             "role", "task_id", "objective", "acceptance", "paths",
-            "validation", "stop", "model", "effort", "fork_turns",
+            "validation", "stop", "model", "effort", "fork_turns", "fork_context",
             "allocation",
         )
     }
@@ -547,11 +593,42 @@ def validate_packet(
     for field in ("critical", "native_collaboration", "cancellable_pre_start_handle"):
         if field in packet:
             allocation[field] = bool(packet[field])
+    validation_path_counts = [
+        int(match.group(1))
+        for item in validation
+        for match in _VALIDATION_PATH_COUNT_RE.finditer(item)
+    ]
+    allocation["validation_path_counts"] = validation_path_counts
+    allocation["candidate_wide_validation"] = any(
+        count > len(paths) for count in validation_path_counts
+    )
+    if (validation_path_counts and allocation.get("candidate_changed_paths") not in
+            set(validation_path_counts)):
+        errors.append(
+            "allocation.candidate_changed_paths: conflicts with validation path count"
+        )
 
-    # A positive depth preserves recent framing and permits an explicit model
-    # override in the Codex collaboration API.  Full-history forks inherit the
-    # parent model, so they are accepted only when deliberately requested.
-    fork_turns = _normalise_fork_turns(packet.get("fork_turns", "3"), errors)
+    if "fork_context" in packet and "fork_turns" in packet:
+        errors.append("fork_context and fork_turns are mutually exclusive; use fork_context")
+    if "fork_context" in packet:
+        fork_context = _normalise_fork_context(packet["fork_context"], errors)
+        fork_turns = "all" if fork_context else "fresh"
+    elif "fork_turns" in packet:
+        fork_turns = _normalise_fork_turns(packet["fork_turns"], errors)
+        fork_context = fork_turns == "all"
+    else:
+        errors.append("fork_context: required; choose false for an explicit role override")
+        fork_turns = ""
+        fork_context = False
+
+    # The live host cannot combine an explicit role override with a full-history
+    # fork: fork_context=true makes it inherit the parent agent type. Refuse
+    # that semantic mismatch instead of silently dropping the canonical role.
+    if fork_context and role in HOST_AGENT_TYPES:
+        errors.append(
+            "fork_context: true is incompatible with the explicit role agent_type; "
+            "use false for a fresh role-specific dispatch"
+        )
 
     if errors:
         raise PacketValidationError(errors)
@@ -568,6 +645,7 @@ def validate_packet(
         "model": model,
         "effort": effort,
         "fork_turns": fork_turns,
+        "fork_context": fork_context,
         "role_card": role_card,
         "allocation": allocation,
     }
@@ -589,9 +667,10 @@ def build_plaintext_message(normalized: Mapping[str, Any]) -> str:
             f"Owned paths: {paths}",
             f"Validation: {validation}",
             f"Stop condition: {normalized['stop']}",
-            f"Dispatch route: model={normalized['model']}; effort={normalized['effort']}; fork_turns={normalized['fork_turns']}",
+            f"Dispatch route: model={normalized['model']}; effort={normalized['effort']}; fork_context={normalized['fork_context']}",
             "READY proves packet preflight only; it does not prove supervision.",
             "Use only the listed scope. Return facts, evidence, blockers, and residual risk. Do not commit or push.",
+            "Closeout format: `- **Recommended next to-do:** <one action or NONE — objective complete>`; `- **Pending tasks:** <NONE or task ID — owner — prerequisite — state>`.",
         )
     )
     count = _word_count(message)
@@ -629,19 +708,17 @@ def prepare_dispatch(
         }
     message = build_plaintext_message(normalized)
 
-    # Keep the normalized packet visible for audit/debugging while exposing an
-    # exact Codex spawn_agent shape. Canonical role/task IDs stay in the packet
-    # and plaintext message; the host accepts agent_type/task_name instead.
+    # Keep the normalized packet visible for audit/debugging while exposing the
+    # exact live Codex spawn_agent shape. Canonical role/task IDs stay in the
+    # packet and plaintext message; they are not host payload fields.
     packet_out = dict(normalized)
     spawn = {
         "agent_type": HOST_AGENT_TYPES[normalized["role"]],
-        "task_name": _host_task_name(normalized["task_id"]),
-        "fork_turns": normalized["fork_turns"],
+        "fork_context": normalized["fork_context"],
         "message": message,
+        "model": normalized["model"],
+        "reasoning_effort": normalized["effort"],
     }
-    if normalized["fork_turns"] != "all":
-        spawn["model"] = normalized["model"]
-        spawn["reasoning_effort"] = normalized["effort"]
     return {
         "status": "READY",
         "readiness": "READY proves packet preflight only; it does not prove supervision.",

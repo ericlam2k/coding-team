@@ -16,13 +16,28 @@ Require a clear human yes (chat message, checkbox, or signed brief field) before
 
 Low-risk N0/N1 work inside an already-admitted batch does not need a fresh gate per task unless the brief or host install adds one.
 
-## Incomplete / non-complete output (mid-batch)
+## Task progression inside an admitted Batch
 
-Required when any coding-team task or batch returns output that is **not** accepted completion: anything other than Gatekeeper `APPROVE` / `APPROVE_WITH_NOTES` with batch `COMPLETE` (or an explicitly human-accepted residual-risk exception).
+A valid Task handoff may advance to the next dependency-safe Task already named
+in the admitted Batch without another human approval. Valid means the canonical
+owner returned `DONE` or `COMPLETE`, stayed inside owned paths, supplied the
+declared artifact and checks, and reported blockers and residual risk. This is
+Task completion only. It is not Batch acceptance and does not authorize commit,
+push, deploy, release, or another Batch. Reviewer routes are defined only in
+[`qa-operating-model.md`](qa-operating-model.md); normal scope-expansion and
+irreversible-action gates still apply.
 
-Includes: `PARTIAL`, `FAILED_TRANSIENT`, `FAILED_TRANSIENT_CONTEXT`, `REVISE`, `BLOCK`, `needs_decision`, empty/malformed deliverables, missing cleanup evidence, Test Engineer pass without Gatekeeper, or informative dry-run output that is not accepted.
+Stop immediately for `PARTIAL`, `FAILED_TRANSIENT`,
+`FAILED_TRANSIENT_CONTEXT`, `BLOCK`, `BLOCKED`, `needs_decision`, a missing or
+malformed handoff, failed declared checks outside the canonical QA evidence
+route, unowned mutation, conflicting or stale evidence, or any required gate.
+Do not retry, substitute a model, invent a correction, or admit a new Batch
+automatically.
 
-**Lead must stop and ask the human for the next step** before launching another coding-team task (except the single already-admitted retry in the active brief). Do not auto-chain fixes or admit a new batch without that gate.
+A terminal-closeout validator failure stops progression. Lead may request one
+format-only closeout correction from the same named owner; it is not a retry or
+a new Task. If that correction needs a decision, new evidence, a different
+owner, or new scope, stop for the human instead.
 
 Also stop when:
 
@@ -50,9 +65,29 @@ Optional host/project overlay: once a **preview** surface is already admitted fo
 
 If unclear, **ask again**. Do not proceed on ambiguity.
 
+## Conversation while a gate is pending
+
+A human gate pauses the governed action and workflow mutation; it does not
+pause conversation. Do not require the human to know or type command keywords.
+Interpret the semantic intent of natural language in the current task context.
+The categories below are internal handling rules, not user commands:
+
+- A question or request for an example or explanation is answered immediately
+  with **zero workflow mutation**, and the gate remains pending. Quoted approval
+  wording, including a request for an approval example, is not approval.
+- Approval resumes only when an explicit human message is bound to the current
+  task, gated action, and scope. Resume only the approved action; unrelated
+  gates and later actions remain pending.
+- A clear request to revise or cancel changes only the named current decision.
+  Do not infer approval or alter unrelated tasks, scope, gates, or release state.
+- Ambiguous input receives a concise clarification question with zero workflow
+  mutation, and the gate remains pending.
+
 ## After approval
 
 - Record the gate decision in the batch checkpoint or handoff (`who`, `what`, `when`).
 - Implement only the approved scope; new risk → new gate.
-- Incomplete/non-APPROVE after the gate still stops for human — approval to start is not approval to ship broken work.
+- A valid completed Task may advance only through the pre-admitted Batch queue.
+  Any stop condition above returns to the human; approval to start is not
+  approval to ship broken work.
 - A proposed commit message (when requested) never authorizes staging, commit, push, merge, or changing the staged set.

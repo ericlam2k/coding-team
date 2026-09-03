@@ -2,19 +2,22 @@
 
 `awesome-design-md` is a **named-lookup reference library**, not project design authority and not a substitute for Hallmark.
 
+Start with [`design-router.md`](design-router.md) for the surface scenario.
+The router selects exactly one primary generator; this index only governs
+named `DESIGN.md` principle references.
+
 ## Authority order
 
 1. Human-approved project artwork, brand guidelines, and governing specs
 2. Existing project tokens / CSS / design system
-3. Explicitly named `awesome-design-md/design-md/<brand>/DESIGN.md` for **principle extraction only**
-4. Generated recommendations from `ui-ux-pro-max` / `frontend-design` (last)
-
-When Hallmark is assigned, it outranks `frontend-design` / `aesthetic` / `ui-ux-pro-max` unless the brief names a narrower trigger.
+3. The admitted UX contract and its router-selected primary generator
+4. Exactly one named `awesome-design-md/design-md/<brand>/DESIGN.md` for
+   **principle extraction only** on the `brand_web` route
 
 ## Usage rules
 
 - Read this index first; do **not** browse the full catalog or paste multiple `DESIGN.md` bodies into a prompt.
-- When assigned: Read at most **one primary** and **one comparison** `DESIGN.md`.
+- On `brand_web`: read exactly **one** contract-named `DESIGN.md`.
 - Extract principles only (hierarchy, density, spacing rhythm, accent discipline, reading measure). Do **not** clone branding, proprietary fonts, logos, copy, or product-specific patterns.
 - Do **not** copy a third-party `DESIGN.md` into the project root as authority.
 - Prefer `DESIGN.md` over `preview.html` unless the task explicitly needs a visual swatch check.
@@ -49,7 +52,8 @@ If the task names a brand not listed, resolve `design-md/<folder>/DESIGN.md` by 
 
 ## Role routing
 
-- **Frontend/UX Lead:** owns which named reference(s) apply; cites path(s) in the UX contract.
-- **Frontend Builder:** reads only paths named in the UX contract or task brief.
+- **Frontend/UX Lead:** selects the route and one named reference for
+  `brand_web`; cites its exact path in the UX contract.
+- **Frontend Builder:** reads only the primary generator and route resources named in the UX contract or task brief.
 - **Investigator:** may locate a named path when assigned; never chooses visual direction.
 - **Gatekeeper:** may check that implementation did not copy third-party identity; does not browse for taste.

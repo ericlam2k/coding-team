@@ -94,34 +94,6 @@ unlink_path() {
   fi
 }
 
-install_adapter() {
-  local platform="$1"
-  case "$platform" in
-    codex)
-      link_path "$ROOT/adapters/codex" "$CODEX_HOME/skills/coding-team"
-      link_path "$QA_SKILL_SRC" "$CODEX_HOME/skills/qa-evidence-enforcement"
-      ;;
-    cursor)
-      mkdir -p "$ROOT/.cursor-install"
-      link_path "$ROOT/adapters/cursor" "$ROOT/.cursor-install/coding-team"
-      link_path "$QA_SKILL_SRC" "$ROOT/.cursor-install/qa-evidence-enforcement"
-      echo "Cursor: symlink ready at $ROOT/.cursor-install/coding-team"
-      echo "Copy/link into your project: .cursor/skills/coding-team → that path"
-      echo "  or: ln -s \"$ROOT/adapters/cursor\" \"/path/to/project/.cursor/skills/coding-team\""
-      ;;
-    cline)
-      mkdir -p "$ROOT/.cline-install"
-      link_path "$ROOT/adapters/cline" "$ROOT/.cline-install/coding-team"
-      link_path "$QA_SKILL_SRC" "$ROOT/.cline-install/qa-evidence-enforcement"
-      echo "Cline: symlink ready at $ROOT/.cline-install/coding-team"
-      echo "Point Cline skills/rules at CODING_TEAM_ROOT=$ROOT"
-      ;;
-    *)
-      die "unknown platform: $platform"
-      ;;
-  esac
-}
-
 map_outs() {
   local platform="$1"
   case "$platform" in
@@ -191,10 +163,10 @@ cmd_init() {
   fi
 
   echo "==> coding-team init (platform=$platform)"
-  install_adapter "$platform"
+  "$ROOT/scripts/install-coding-team.sh" --platform "$platform"
 
   echo
-  echo "Done. No model map was written. Set CODING_TEAM_ROOT=$ROOT when prompting your agent."
+  echo "Done. No model map was written and no project source root was pinned."
   echo "Check: ./bin/ct status"
 }
 
@@ -338,24 +310,44 @@ cmd_project() {
   [[ -d "$project" ]] || die "not a directory: $project"
   local agents="$project/AGENTS.md"
   local marker="<!-- coding-team:begin -->"
-  if [[ -f "$agents" ]] && grep -q 'coding-team:begin' "$agents"; then
-    echo "AGENTS.md already has coding-team pointer"
-    return 0
-  fi
-  cat >>"$agents" <<BLOCK
+  python3 - "$agents" <<'PY'
+import os
+import sys
+import tempfile
+from pathlib import Path
 
-${marker}
+path = Path(sys.argv[1])
+start = "<!-- coding-team:begin -->"
+end = "<!-- coding-team:end -->"
+block = """<!-- coding-team:begin -->
 ## Coding Team
 
-\`CODING_TEAM_ROOT=${ROOT}\`
-
-1. Load coding-team skill for your platform (Codex / Cursor / Cline adapter).
-2. Read \`core/\` + the approved local \`model-pool.map.md\` when configured.
-3. WIP ≤ 2; TE → Gatekeeper sequential; incomplete → ask human.
-4. PM Lean is default OFF — \`./bin/ct enable pm-lean\` only when needed.
-<!-- coding-team:end -->
-BLOCK
-  echo "updated $agents"
+1. Load the active installed coding-team skill for the host.
+2. For ordinary project work, use the installed root returned by its receipt check. Ignore ambient `CODING_TEAM_ROOT` and project-local `coding-team/` checkouts.
+3. Use a source checkout only when the task explicitly changes Coding Team itself; validate that release candidate once before installation.
+4. Validate this project's candidate; do not rerun framework tests or attach framework-wide path counts.
+5. WIP <= 2; Test Engineer then Gatekeeper when the active policy requires them.
+<!-- coding-team:end -->"""
+text = path.read_text(encoding="utf-8") if path.exists() else ""
+if start in text and end in text:
+    before, rest = text.split(start, 1)
+    _, after = rest.split(end, 1)
+    updated = before.rstrip() + "\n\n" + block + after
+else:
+    updated = text.rstrip() + "\n\n" + block + "\n"
+path.parent.mkdir(parents=True, exist_ok=True)
+descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+try:
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        handle.write(updated)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+finally:
+    if os.path.exists(temporary):
+        os.unlink(temporary)
+PY
+  echo "updated installed-version Coding Team pointer in $agents"
 }
 
 cmd_tools() {

@@ -2,14 +2,6 @@
 
 Paste this into a consumer project’s `AGENTS.md` (or run `./bin/ct project <path>`).
 
-## Public repository boundary
-
-This checkout is the public Coding Team framework and the source for a fresh
-install. Keep updates generic and customer-neutral. Do not copy or sync a
-private in-house lab, product code, customer data, internal evidence, secrets,
-or local project overlay into this repository. Private projects may consume
-this framework, but they do not become part of it.
-
 ## Coding Team (Codex)
 
 This project may use the **coding-team** orchestration skill for Sprint → Batch → Task multi-role work.
@@ -36,9 +28,21 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
 
 - Resolve `CODING_TEAM_ROOT` (env, or parent of `adapters/` when the skill is a symlink to `adapters/codex`).
 - Read `core/model-routing.md`, concurrency/human-gates when present, role cards under `core/roles/`, and the approved local `model-pool.map.md` only when explicitly configured.
-- **WIP ≤ 2** concurrent tool-using subagents.
-- **Test Engineer → Gatekeeper** sequential only.
+- **WIP ≤ 2 ordinary** concurrent tool-using subagents, plus at most one
+  optional read-only, non-authoritative supervisor relay (maximum child lanes
+  = 3 only when that relay is admitted; never a third ordinary lane).
+- **Code Reviewer → conditional Test Engineer → Gatekeeper**; TE and
+  Gatekeeper remain sequential when TE is required.
 - Incomplete / non-APPROVE → **ask the human**; do not invent acceptance.
-- Design: pair **hallmark** with **awesome-design-md** under `$CODING_TEAM_ROOT/skills/design/`.
+- Design: start at `$CODING_TEAM_ROOT/skills/design/design-router.md`; it
+  selects one primary generator and requires rendered inspection before a
+  material UI completion claim.
 
 Codex, Cursor, and Cline are host adapters. The core remains host-neutral.
+
+### Host-neutral rule
+
+Any change to `core/` or shared surfaces must remain host-neutral. Host-specific
+commands, models, and runtime live only under `adapters/<host>/`. Codex-bound
+features (watchdog, checkpoint, flow) are being rolled to host-neutral on the
+roadmap.

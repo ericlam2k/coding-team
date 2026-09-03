@@ -6,10 +6,10 @@
 Human goal
   → Lead classifies natures + proposes Sprint
   → Admit Batch READY (freeze validation + ownership)
-  → PM/domain decisions → TE scenario matrix
-  → Delegate Tasks (WIP ≤ 2)
-  → Integrate → complete TE pass → correlate → one corrective Batch if needed
-  → fresh Test Engineer → Gatekeeper
+  → PM/domain decisions → conditional TE scenario design when triggered
+  → Delegate Tasks (WIP ≤ 2 ordinary + optional ≤1 read-only supervisor relay)
+  → Integrate → deterministic checks → Code Reviewer
+  → conditional Test Engineer → final Gatekeeper
   → Checkpoint / next Batch or Sprint close
 ```
 
@@ -36,14 +36,19 @@ Template: [`core/templates/task-brief.md`](../core/templates/task-brief.md).
 ## Review chain
 
 1. Owner self-check
-2. Fresh **Test Engineer** validation (evidence)
-3. Independent **Gatekeeper** decision
+2. Deterministic checks and independent **Code Reviewer** risk route ([role card](../core/roles/code-reviewer.md), [review template](../core/templates/code-review.md))
+3. **Test Engineer** only when the route requires executable evidence
+4. Independent final **Gatekeeper** decision
 
-TE and Gatekeeper stay **sequential** for the same batch ([concurrency.md](../core/concurrency.md)).
+Code Reviewer → conditional TE → Gatekeeper stays sequential for the same batch ([concurrency.md](../core/concurrency.md)). Gatekeeper remains the final acceptance authority.
 
 ## Debate (when required)
 
-`Investigator → Advisor → Contradictor → Lead resolve → eco build → TE → GK`
+`Investigator → Advisor → Contradictor → Lead resolve → build`
+
+The post-build quality route remains Code Reviewer → conditional Test Engineer
+→ Gatekeeper; the supervisor relay only reports bounded status and cannot alter
+that route.
 
 Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.md).
 

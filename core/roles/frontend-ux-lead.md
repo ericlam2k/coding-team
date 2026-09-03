@@ -11,17 +11,20 @@
 
 ## Skills
 
-Load when the brief names them:
+For product UI, read `skills/design/design-router.md` and load only the route
+named by the brief. The router permits one primary generator, zero or one
+reference, and the required non-authoritative `aesthetic` finish lens.
 
-- `skills/design/hallmark/` **and** `skills/design/awesome-design-md/` — paired for greenfield/audit/redesign
-- `skills/design/ui-ux-pro-max/` — structured UX/UI reference when named
-- `skills/design/frontend-design/` or `skills/design/aesthetic/` — when named for craft direction
+Other skills load only when the brief names them:
+
 - `skills/engineering/frontend-development/` — only if implementing is assigned
 - `skills/process/context-engineering/` — packet/synthesis trigger only
 
 ## Duties
 
 - One journey/interaction question per task; clear acceptance for Builder
+- Record `surface_kind`, `primary_design_skill`, optional `reference`, and
+  `aesthetic_review: required` in the UX contract
 - Prefer existing design system language over novel patterns
 - Distinguish contract work from build work in the handoff
 
@@ -29,12 +32,12 @@ Load when the brief names them:
 
 - Visual direction conflicts unresolved and human preference unknown
 - Would expand into backend/API ownership
-- Hallmark/awesome pair required by brief but unavailable in install
+- A router-named skill or reference is unavailable in the install
 
 ## Never
 
 - Invent roles; replace Gatekeeper or Test Engineer
-- Ship production UI without TE→GK when the batch requires it
+- Ship production UI without the QA evidence route and Gatekeeper
 
 ## Outputs
 
