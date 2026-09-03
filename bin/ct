@@ -125,18 +125,9 @@ run_approve() {
   local outs=()
   local o
   while IFS= read -r o; do
-    [[ -n "$o" ]] && outs+=("$o")
+    [[ -n "$o" ]] && outs+=(--out "$o")
   done < <(map_outs "$platform")
-  local args=(--platform "$platform" --codex-home "$CODEX_HOME")
-  if [[ "${#outs[@]}" -gt 0 ]]; then
-    for o in "${outs[@]}"; do
-      args+=(--out "$o")
-    done
-  fi
-  if [[ "$#" -gt 0 ]]; then
-    args+=("$@")
-  fi
-  python3 "$PROPOSE" "${args[@]}"
+  python3 "$PROPOSE" --platform "$platform" --codex-home "$CODEX_HOME" "${outs[@]}" "$@"
 }
 
 cmd_init() {
@@ -210,9 +201,6 @@ cmd_status() {
     echo "Addons:"
     python3 -c "import json;d=json.load(open('$ROOT/addons/toggles.json'));
 [print(f\"  {k}: {'ON' if v.get('enabled') else 'OFF'}\") for k,v in d.get('addons',{}).items()]"
-    if [[ -f "$ROOT/addons/agentic-worker/VERSION" ]]; then
-      echo "  agentic-worker version: $(tr -d '[:space:]' < "$ROOT/addons/agentic-worker/VERSION")"
-    fi
   fi
 }
 
@@ -365,15 +353,6 @@ PY
 cmd_tools() {
   [[ $# -gt 0 ]] || die "usage: ./bin/ct tools <action> ..."
   exec python3 "$ROOT/adapters/codex/tool_cli.py" "$@"
-}
-
-cmd_tools() {
-  local action="${1:-}"
-  [[ $# -gt 0 ]] && shift
-  case "$action" in
-    terminal|skeleton|quantize|guard) python3 "$ROOT/adapters/codex/tool_cli.py" "$action" "$@" ;;
-    *) die "unknown tools action (use terminal, skeleton, quantize, or guard)" ;;
-  esac
 }
 
 main() {

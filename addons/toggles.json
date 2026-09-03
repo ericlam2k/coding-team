@@ -6,11 +6,6 @@
       "enabled": false,
       "path": "addons/pm-lean",
       "kind": "skill-pack"
-    },
-    "agentic-worker": {
-      "enabled": true,
-      "path": "addons/agentic-worker",
-      "kind": "skill-pack"
     }
   }
 }

@@ -8,7 +8,6 @@ Log Tier **2** / **3** usage and any tier/model substitutions (no host-secret ma
 - **Sprint / Batch / Task ID:**
 - **Role ID:**
 - **When:**
-- **Experiment ID (if any):**
 
 ## Routing
 
@@ -16,14 +15,12 @@ Log Tier **2** / **3** usage and any tier/model substitutions (no host-secret ma
 - **Tier planned:**
 - **Tier actual:**
 - **Substitution reason:** (unavailable | escalate | single-family pool | other)
-- **Fallback mode:** full | reduced-scope | read-only | planning-only | N/A
 
 ## Cost / outcome signals
 
 - **Why this tier was justified:**
 - **Result:** success | revise | blocked | escalated
 - **Retries before escalate:**
-- **Evidence refs:** (run, TE, Gatekeeper, decision pack)
 
 ## Notes
 

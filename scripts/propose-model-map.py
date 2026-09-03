@@ -348,7 +348,6 @@ def main() -> int:
 
     if args.platform == "codex":
         available = detect_codex(Path(args.codex_home).expanduser())
-        available = [slug for slug in available if slug not in CODEX_POLICY_EXCLUDED]
     elif args.platform == "cursor":
         available = detect_cursor()
     else:

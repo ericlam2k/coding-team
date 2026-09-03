@@ -15,11 +15,6 @@ Shared vocabulary for coding-team. Use these terms in briefs, handoffs, and docs
 | **Handoff** | ≤150-word return packet from a specialist: status, evidence paths, unresolved questions, next owner. |
 | **Checkpoint** | ≤300-word batch state snapshot used after pause, context shrink, or Gatekeeper acceptance. |
 | **Run prompt** | ≤250-word delegation prompt projected from the task brief. The full template is never the run prompt. |
-| **Learning** | An evidence-linked observation from a run, batch, or sprint; local and provisional until supported. |
-| **Distillation** | A bounded, evidence-backed claim extracted from learning records, with scope, confidence, and validation. |
-| **Promotion** | The separately approved act of baking a distilled claim into policy, routing, a skill, a template, or an adapter/project overlay. |
-| **Experiment (`EXP-*`)** | One falsifiable hypothesis with owner, measure, stop/revert rule, review point, evidence, and human continue/success/revert decision. |
-| **Fallback mode** | `FULL`, `REDUCED_SCOPE`, `READ_ONLY`, or `PLANNING_ONLY` declaration when a lower-tier model substitutes for a planned role model. |
 
 ## Nature (N0–N5)
 

@@ -1,4 +1,4 @@
-# WYSY + coding-team
+# coding-team
 
 **Vibe-code, but don't build blind.** Turn a plain-English idea into one small,
 reviewable change with a clear scope, useful proof, and your decision at the

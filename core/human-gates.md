@@ -13,7 +13,6 @@ Require a clear human yes (chat message, checkbox, or signed brief field) before
 | **Dependency / infra** | New package or service; production deploy; permanent environment change |
 | **Scope expansion** | Work outside the admitted sprint/batch brief |
 | **First release of a surface** | Shipping a new public endpoint, UI journey, or migration to production |
-| **Durable learning promotion** | Changing core policy, model routing, security/privacy guidance, or a public contract from a distilled lesson |
 
 Low-risk N0/N1 work inside an already-admitted batch does not need a fresh gate per task unless the brief or host install adds one.
 

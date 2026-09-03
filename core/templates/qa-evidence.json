@@ -17,17 +17,8 @@
     "selected_layers": ["unit", "integration", "regression"]
   },
   "timebox": {
-    "timing_profile_ref": "../adaptive-timing.md",
-    "profile_version": "V1",
-    "profile_provenance": "UNRESOLVED",
-    "profile_status": "UNRESOLVED",
-    "resolved_target_seconds": null,
-    "resolved_checkpoint_seconds": null,
-    "resolved_hard_seconds": null,
-    "resolved_reserve_seconds": null,
-    "resolved_max_hard_cap_seconds": null,
-    "recommended_target_seconds": 90,
-    "recommendation_status": "EDITABLE",
+    "soft_seconds": 120,
+    "hard_seconds": 240,
     "outcome": "COMPLETE",
     "stop_reason": "",
     "next_actions": []

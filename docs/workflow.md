@@ -64,8 +64,6 @@ Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.
 
 On context pressure: checkpoint ≤300 words → shrink → fresh session → reload checkpoint + brief + named paths only.
 
-Learning capture and governed distillation: [`core/learning-and-distillation.md`](../core/learning-and-distillation.md).
-
 Full policy: [`core/orchestration.md`](../core/orchestration.md).
 Material defect and mutation concerns: [`core/meeting-policy.md`](../core/meeting-policy.md).
 QA and promotion evidence: [`core/qa-operating-model.md`](../core/qa-operating-model.md).

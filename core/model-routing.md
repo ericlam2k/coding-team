@@ -8,11 +8,6 @@ Host-specific model slugs live only in the install-time file `model-pool.map.md`
 
 Premium models decide. Eco models build. Cheap models search and document. Human gate controls irreversible risk. Contradictor challenges before build when required. Gatekeeper accepts only after evidence.
 
-When trade-offs are close, Lead ranks user usability and practical usefulness
-first, then seeks a balanced result across stability, reliability, and
-performance. Do not trade away a usable, dependable flow for an unmeasured
-performance claim.
-
 ## Capability tiers
 
 | Tier | Use | Capability intent |
@@ -36,30 +31,9 @@ Map via `model-pool.map.md` after install — these are intents, not host slugs:
 | System Architect; Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Domain Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
 | N5 judgment; Adv↔Con deadlock | **3** | Max-risk only |
 
-### FIO model and skill inheritance
-
-FIO is a Batch assignment, not a routed role. It has no independent skill,
-model tier, or adapter entry. The assigned canonical owner keeps its task
-brief, named skills, planned→actual model/effort, and exclusive paths; carrying
-the FIO overlay adds only the admitted integration-seam check and handoff.
-Frontend seams inherit `frontend-builder` skills/model, API/data seams inherit
-`backend-engineer`, and an explicitly named UX-only seam inherits
-`frontend-ux-lead`. Do not auto-load every skill or escalate the model because
-the word FIO appears. Architecture, product, privacy, or UX decisions outside
-the frozen brief route to the corresponding canonical role.
-
 Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity, validation failure, or a11y/security/privacy/public-contract impact appears. Escalate to Tier 2/3 only under the recorded triggers below.
 
 ## Nature → route
-
-For every scoped WYSY feature/function/project-work request, prepend the
-Lead-owned intake screen `Lead → Product Manager → System Architect → Lead`.
-The PM check is always required for product consistency. The System Architect
-check is always required as a consistency screen; it produces one contract only
-when a recorded shared-contract, migration/auth/privacy, or multi-layer trigger
-applies, otherwise it records an explicit no-contract reason. This screen does
-not turn every request into an architecture batch, and ordinary informational
-questions stay outside it.
 
 | Nature | Delegate | Tier | Advisor | Contradictor | Gatekeeper |
 |---|---|---|---|---|---|
@@ -76,52 +50,6 @@ On Consult / N5 when specialty judgment is needed and **domain is not named**: L
 
 For triggered **N1/N2/N5** user-facing workflows, input parsing or matching, AI extraction, or public-contract work, insert a conditional pre-build Test Engineer scenario-design task after product/domain decisions and before builders. This freezes design input only; after integration retain deterministic checks → Code Reviewer → the route in `qa-operating-model.md` → Gatekeeper.
 
-## Assignment fit and lookup boundary
-
-The nature routes and tier routes above stay unchanged. Before each new or
-corrected dispatch, Lead records four Task fields:
-
-- `execution_scope`: one bounded verb with named paths, query, source set,
-  output artifact, and exclusions.
-- `reasoning_depth`: `MECHANICAL`, `RECONCILE`, or `JUDGMENT`.
-- `enumeration_required`: `true` or `false`.
-- `synthesis_input_ref`: a completed Investigator packet, or `NONE`.
-
-Match the fields to the assigned canonical role's card. Do not use model
-capability, free WIP, or manager capacity to widen the role. Split a mixed
-execution and synthesis task. Return `HUMAN_DECISION_REQUIRED` when no
-canonical role fits.
-
-Managers (`lead`, `product-manager`, `system-architect`, `advisor`,
-`contradictor`, and `{domain}-advisor`) may frame, name bounded sources and
-queries, compare supplied evidence, resolve meaning, and make their role's
-decision. They must stop before locating, listing, counting, copying, or
-normalizing source facts. `enumeration_required=true` requires a separate
-`investigator` Task before manager synthesis. The manager may use only the
-completed packet named by `synthesis_input_ref`. Investigator reports facts
-and conflicts. It does not make policy or acceptance decisions.
-
-Legacy briefs without the fields remain readable as `UNSPECIFIED`. Block new
-policy-sensitive enumeration until Lead materializes the fields. Do not use a
-manager lookup as a fallback. Keep the original packet and conflict labels
-when escalation creates the next Task.
-
-Record `lookup_session_count`, `inspected_source_count`, and receipt input,
-cached, and output values when supplied. Mark missing values
-`TELEMETRY_UNAVAILABLE`; do not use zero or an estimate. Before a second lookup
-session, evidence-boundary expansion, a second follow-up, the 75% artifact
-review trigger, `T_checkpoint` resolved from the active approved timing profile
-or its labeled fallback (see [adaptive-timing.md](adaptive-timing.md)) without
-a complete artifact, or unexplained
-receipt growth without accepted evidence, stop with a bounded checkpoint. The
-checkpoint contains completed facts, evidence references, unavailable fields,
-one unresolved item, and exactly one next Task. Context growth and missing
-telemetry do not trigger a model hop. A new Task is required after the stop.
-
-Monitor receives these fields as passive evidence. It does not route, retry,
-change a model, or act on a receipt. Context overflow and missing telemetry are
-not escalation triggers.
-
 ## Role separation (non-negotiable)
 
 | Role | Answers | Timing |
@@ -134,7 +62,7 @@ not escalation triggers.
 | **Test Engineer** | Does independent execution satisfy the required observable scenarios? | After Reviewer whenever the route requires TE; always before Gatekeeper |
 | **Gatekeeper** | Can this be accepted as done? | After implement + evidence |
 | **Product Manager** | Product scope / acceptance | Consult |
-| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO checks the admitted seam |
+| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO assembles |
 
 Post-integration TE triggers, direct-route eligibility, and Reviewer verdict routes live
 once in `qa-operating-model.md`. Model tier does not alter those evidence rules.

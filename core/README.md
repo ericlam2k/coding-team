@@ -54,11 +54,7 @@ the Reviewer routes executable evidence and Gatekeeper remains final.
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |
-| [templates/learning-entry.md](templates/learning-entry.md) | Learning signal and distillation disposition |
-| [templates/experiment-entry.md](templates/experiment-entry.md) | Bounded `EXP-*` / PDCA hypothesis and human decision |
-| [templates/distillation-entry.md](templates/distillation-entry.md) | Fallback/project lesson and governed promotion |
 | [templates/architecture-contract.md](templates/architecture-contract.md) | Named architecture contract before allocation |
-| [templates/discovery-brainstorm-meeting.md](templates/discovery-brainstorm-meeting.md) | Lead-owned product-trio discovery packet before PRD/solution selection |
 
 ## Skills layout (this repo)
 

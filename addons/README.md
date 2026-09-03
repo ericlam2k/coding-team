@@ -5,7 +5,6 @@ These packs live **outside** coding-team core. They are **default OFF** and must
 | Addon | What | License |
 |---|---|---|
 | [pm-lean/](pm-lean/) | Explicit-only PM assumption triage and experiment-design support | MIT — see `pm-lean/LICENSE` |
-| [agentic-worker/](agentic-worker/) | Explicit bounded-task implementation and A11 evidence overlay | External supplied pack — see `agentic-worker/SOURCE.md` |
 
 ## Toggle state
 
@@ -22,8 +21,6 @@ See [toggles.json](toggles.json). The PM Lean addon is disabled by default:
 ./bin/ct disable pm-lean
 ./bin/ct status
 ./install.sh --platform codex --global --enable pm-lean
-./install.sh --platform codex --global --enable agentic-worker
-./install.sh --platform codex --global --disable agentic-worker
 ```
 
 When enabled, the installer symlinks the addon skills into

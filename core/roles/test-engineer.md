@@ -37,14 +37,9 @@ Load when the brief names them:
 - Classify: product defect / flake / env / bad brief — do not silently “fix forward” as Builder
 - During a validation pass, collect all in-scope findings before any correction;
   return a correlation-ready packet rather than dispatching fixes.
-- For bounded QA, resolve `T_target`, `T_checkpoint`, and `T_hard` from a
-  matching approved timing profile under [the adaptive timing policy](../adaptive-timing.md);
-  if no valid profile matches, use a labeled versioned fallback and state its
-  remediation (fixed values are recommendations, never universal constants).
-  Declare the resolved bounds before running tests; stop scheduling at
-  `T_target`, record `CHECKPOINT` evidence at `T_checkpoint`, and cancel a
-  hung command at `T_hard`, returning `BLOCKED` with timeout evidence and one
-  next action.
+- For bounded QA, declare a 120-second target and 240-second hard stop before
+  running tests. Stop scheduling at the target; cancel a hung command at the
+  hard stop and return `BLOCKED` with timeout evidence and one next action.
 - When qa_required=true or qa_mode=bounded, run the qa-evidence-enforcement
   validator before handing evidence to Gatekeeper.
 - Gatekeeper must not start until this required evidence is accepted by Lead

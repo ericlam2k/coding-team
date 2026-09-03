@@ -9,6 +9,7 @@ Tiers are non-binding; record planned → actual in briefs. Never block start on
 ## Available pool
 
 - `gpt-5.6-sol`
+- `gpt-5.6-terra`
 - `gpt-5.6-luna`
 - `gpt-5.5`
 - `gpt-5.4`

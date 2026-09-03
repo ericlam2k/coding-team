@@ -86,19 +86,6 @@ trigger applies.
 PM Lean is default OFF and explicit-only: use at most one PM Lean skill per
 Product Manager task; it adds no routing, agents, or approval authority.
 
-## External WYSY PM references
-
-The WYSY project keeps external PM source separate from the core skill index.
-`phuryn/pm-skills` is cloned at the WYSY project level under
-`repo-source/pm-skills/`; its `pm-ai-shipping` skills are reference material
-for the planned `wysy-shipping-kit`, not active coding-team skills. Do not load
-them unless a task brief explicitly names the adapter and output paths.
-
-The bounded app-development-assistant evaluation is tracked separately in
-[`docs/agentic-pm-integration-m1.md`](agentic-pm-integration-m1.md). It is an
-`EXP-*` milestone only; it does not activate the external skills, change core
-routing, or modify the WYSY platform.
-
 ## Not bundled (add per project)
 
 Market-research / product-discovery packs, payment providers, shop frameworks, 3D, etc. Keep the framework lean.
