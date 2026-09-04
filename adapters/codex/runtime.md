@@ -43,11 +43,21 @@ spawn call. The Lead supplies a structured JSON object with:
 `role`, `task_id`, `objective`, `acceptance`, `paths`,
 `validation`, `stop`, `model`, `effort`, and an allocation with
 `candidate_changed_paths` and `prior_hard_stop`. For an explicit canonical
-role, set `fork_context=false`; the live host cannot combine an explicit
-`agent_type` with a full-history fork. `fork_context=true` and numeric
-`fork_turns` are rejected rather than silently changing role or context. Never
-pass a raw packet or opaque brief to `spawn_agent`. Opaque, encrypted-only,
-missing, non-canonical, or out-of-scope values fail closed.
+role, set `fork_turns` to a positive bounded context depth such as `"3"`.
+`fork_context`, `none`, `all`, omitted, boolean, zero, negative, and malformed
+depths are rejected rather than silently changing context, model, or reasoning
+semantics. Never pass a raw packet or opaque brief to the direct
+`collaboration.spawn_agent` tool. Opaque,
+encrypted-only, missing, non-canonical, or out-of-scope values fail closed.
+
+The packet's `host_binding` must also carry this exact preflight attestation:
+`{"tool":"collaboration.spawn_agent","mode":"direct_tool_call","available_to_caller":true}`.
+It means only that the current parent context exposes the named direct binding.
+Missing, false, malformed, extra-key, or indirect bindings return `BLOCKED`;
+the diagnostic is: run preflight from a parent context that exposes direct
+`collaboration.spawn_agent`, then invoke it directly; no indirect fallback
+exists. Do not substitute `functions.collaboration.spawn_agent`, `functions.exec`,
+`exec_command`, `tools.*`, shell, Python, Node, JavaScript, or nested bindings.
 
 Keep candidate-wide identity checks outside a narrower worker validation
 list. `MEASURED` timing units require an evidence reference. `ESTIMATED`
@@ -61,27 +71,40 @@ python3 "$CODING_TEAM_ROOT/adapters/codex/scripts/prepare-dispatch.py" \
   --coding-team-root "$CODING_TEAM_ROOT"
 ```
 
-Only a `READY` result may be passed to the host. Its `spawn` object uses exactly
-`agent_type`, `fork_context`, `message`, `model`, and `reasoning_effort`. The
-message is capped at 250 words and names the absolute
+Only a `READY` result may be passed to the host. `READY` means packet-valid plus
+direct-binding-attested preflight only; it does not prove host acceptance,
+child start, supervision, or completion. Its `spawn` object uses exactly
+`task_name`, `agent_type`, `fork_turns`, `message`, `model`, and
+`reasoning_effort`. `task_name` is derived deterministically from canonical
+`task_id` plus `dispatch_id`; callers never supply it. The message is capped at
+250 words and names the absolute
 canonical role-card path with an instruction to read it first. `BLOCKED`
 results have no usable spawn packet; Lead stops and corrects the brief rather
 than dispatching an encrypted blob or retrying the same malformed packet.
 
-The result also carries a deterministic `dispatch_id`. Use
-`dispatch_id + agent_thread_id + call_id` as the evidence identity. Invoke the
-returned `spawn` object once. Do not mirror the initial objective through
-`send_message` or `followup_task`; reserve those operations for a new material
-plaintext delta or a requested correction. This follows the standard
-at-most-once delivery and idempotency-key pattern. Codex UI activity rows may
-render one call more than once and are not authoritative run or usage counts.
+The result also carries a deterministic `dispatch_id`. Prefer
+`dispatch_id + agent_thread_id + call_id` as the evidence identity. When the
+host omits `agent_thread_id` or `call_id`, require `dispatch_id + deterministic
+task_name + the authoritative single spawn response`; explicitly record each
+unavailable thread/call identifier and whether the host model receipt is
+unavailable. Invoke the returned `spawn` object once. Do not mirror the initial
+objective through `send_message` or `followup_task`; reserve those operations
+for a new material plaintext delta or a requested correction. This follows the
+standard at-most-once delivery and idempotency-key pattern. Never use Codex UI
+activity rows as run, retry, token, cost, model, or identity evidence.
 
-This is a Codex-adapter guard, not host enforcement. A `READY` result proves
-only that this adapter built a bounded plaintext request and resolved the card
-path. It does not prove that a host consumed the role card, accepted the model
-route, or prevent a caller from bypassing this script through another spawn
-entry point. It cannot patch or alter the host collaboration API. Host/runtime
-receipts remain the authority for actual model use and role-card consumption.
+The top-level `READY` result also carries `invocation` guidance outside the
+six-key `spawn` object:
+`Invoke the direct collaboration.spawn_agent tool exactly once with READY.spawn; do not use functions.exec, exec_command, shell, JavaScript, or a nested tool binding.`
+The guidance is not forwarded to the worker. Invoke `READY.spawn` exactly once;
+the direct host response and child artifact/handoff remain the execution
+authority.
+
+This is a Codex-adapter guard, not host enforcement. The assertion cannot prove
+that a host consumed the role card, accepted the model route, or prevent a
+caller from bypassing this script through another spawn entry point. It cannot
+patch or alter the host collaboration API. Host/runtime receipts remain the
+authority for actual model use and role-card consumption.
 
 ## Bounded STUCK supervision
 

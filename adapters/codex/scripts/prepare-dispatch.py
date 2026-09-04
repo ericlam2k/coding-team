@@ -59,9 +59,11 @@ REQUIRED_FIELDS = (
     "stop",
     "model",
     "effort",
+    "fork_turns",
+    "host_binding",
     "allocation",
 )
-ALLOWED_FIELDS = frozenset((*REQUIRED_FIELDS, "fork_turns", "fork_context", "critical", "native_collaboration",
+ALLOWED_FIELDS = frozenset((*REQUIRED_FIELDS, "critical", "native_collaboration",
                             "cancellable_pre_start_handle"))
 EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 ADMISSION_STATUSES = frozenset({"MEASURED", "ESTIMATED", "UNKNOWN"})
@@ -92,6 +94,7 @@ HOST_AGENT_TYPES = {
 }
 
 _TASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9._:-]{2,127}$")
+_TASK_NAME_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 # Host model identifiers may contain spaces, for example `ZM Glm5.3F`.
 _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/ -]{1,127}$")
 _CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -102,6 +105,21 @@ _OPAQUE_PREFIX_RE = re.compile(
 )
 _ENCODED_RE = re.compile(r"^(?:[A-Fa-f0-9]{32,}|[A-Za-z0-9+/]{32,}={0,2})$")
 _WORD_RE = re.compile(r"\S+")
+
+DIRECT_HOST_BINDING = "collaboration.spawn_agent"
+DIRECT_HOST_MODE = "direct_tool_call"
+DIRECT_HOST_BINDING_GUIDANCE = (
+    "run preflight from a parent context that exposes direct collaboration.spawn_agent, "
+    "then invoke it directly; no indirect fallback exists"
+)
+DIRECT_HOST_INVOCATION = (
+    "Invoke the direct collaboration.spawn_agent tool exactly once with READY.spawn; "
+    "do not use functions.exec, exec_command, shell, JavaScript, or a nested tool binding."
+)
+READY_BOUNDARY = (
+    "READY proves packet-valid plus direct-binding-attested preflight only; it does not "
+    "prove host acceptance, child start, supervision, or completion."
+)
 
 
 class PacketValidationError(ValueError):
@@ -274,41 +292,100 @@ def _resolve_role_card(role: str, root: str | os.PathLike[str] | None) -> str:
 
 
 def _normalise_fork_turns(value: Any, errors: list[str]) -> str:
-    # ``fork_turns`` is the canonical packet field.  The live Codex host only
-    # accepts the boolean ``fork_context`` field, so numeric depth cannot be
-    # represented without silently changing the worker's context mode.
-    if value is None:
-        errors.append("fork_turns: null is invalid; use 'all' or a positive depth")
-        return ""
+    """Normalize the active host's bounded context-depth field."""
+
     if isinstance(value, bool):
-        errors.append("fork_turns: must be 'all' or a positive integer")
+        errors.append("fork_turns: must be a positive base-10 integer, not a boolean")
         return ""
     if isinstance(value, int):
-        value = str(value)
+        if value > 0:
+            return str(value)
+        errors.append("fork_turns: must be a positive base-10 integer")
+        return ""
     if not isinstance(value, str):
-        errors.append("fork_turns: must be 'all' or a positive integer")
+        errors.append("fork_turns: must be a positive base-10 integer string")
         return ""
-    value = value.strip().lower()
-    if value == "none":
-        errors.append("fork_turns: 'none' is rejected because it drops task context")
-        return ""
-    if value == "all":
-        return value
     if re.fullmatch(r"[1-9][0-9]*", value):
-        errors.append(
-            "fork_turns: numeric depth is not representable by the live Codex host; "
-            "use 'all' for fork_context=true"
-        )
         return value
-    errors.append("fork_turns: must be 'all'; numeric depth is not supported by the live Codex host")
+    errors.append(
+        "fork_turns: require a positive base-10 integer string; "
+        "none, all, zero, negative, and malformed depths are unsupported"
+    )
     return ""
 
 
-def _normalise_fork_context(value: Any, errors: list[str]) -> bool:
-    if not isinstance(value, bool):
-        errors.append("fork_context: must be a boolean")
-        return False
-    return value
+def _normalise_host_binding(value: Any, errors: list[str]) -> dict[str, Any]:
+    """Require the caller to attest the one direct host binding explicitly."""
+
+    expected_keys = {"tool", "mode", "available_to_caller"}
+    if not isinstance(value, Mapping):
+        errors.append(
+            "host_binding: require an exact object with tool, mode, and "
+            f"available_to_caller; {DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+        return {}
+
+    invalid = False
+    actual_keys = set(value)
+    missing = sorted(expected_keys - actual_keys)
+    extra = sorted(actual_keys - expected_keys)
+    if missing or extra:
+        invalid = True
+        detail = []
+        if missing:
+            detail.append(f"missing keys: {', '.join(missing)}")
+        if extra:
+            detail.append(f"unexpected keys: {', '.join(extra)}")
+        errors.append(
+            "host_binding: must contain exactly tool, mode, and "
+            f"available_to_caller ({'; '.join(detail)}); "
+            f"{DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+
+    tool = value.get("tool")
+    if tool != DIRECT_HOST_BINDING:
+        invalid = True
+        errors.append(
+            f"host_binding.tool: unsupported binding {tool!r}; expected "
+            f"{DIRECT_HOST_BINDING}; {DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+
+    mode = value.get("mode")
+    if mode != DIRECT_HOST_MODE:
+        invalid = True
+        errors.append(
+            f"host_binding.mode: expected {DIRECT_HOST_MODE!r}; "
+            f"{DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+
+    available = value.get("available_to_caller")
+    if not isinstance(available, bool) or available is not True:
+        invalid = True
+        errors.append(
+            "host_binding.available_to_caller: must be the boolean true; "
+            f"{DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+
+    if invalid:
+        return {}
+    return {
+        "tool": DIRECT_HOST_BINDING,
+        "mode": DIRECT_HOST_MODE,
+        "available_to_caller": True,
+    }
+
+
+def _derive_task_name(task_id: str, dispatch_id: str) -> str:
+    """Derive the host task name frozen by CT-CODEX-HOST-SCHEMA-V1."""
+
+    task_slug = re.sub(r"[^a-z0-9]+", "_", task_id.lower()).strip("_")
+    dispatch_suffix = dispatch_id.removeprefix("ctd_")
+    task_name = f"ct_{task_slug}_{dispatch_suffix}"
+    if not task_slug or not _TASK_NAME_RE.fullmatch(task_name):
+        raise PacketValidationError(
+            ["task_id: cannot derive a valid lowercase underscore host task_name"]
+        )
+    return task_name
 
 
 def _word_count(text: str) -> int:
@@ -518,7 +595,7 @@ def _canonical_dispatch_payload(normalized: Mapping[str, Any]) -> bytes:
         key: normalized[key]
         for key in (
             "role", "task_id", "objective", "acceptance", "paths",
-            "validation", "stop", "model", "effort", "fork_turns", "fork_context",
+            "validation", "stop", "model", "effort", "fork_turns",
             "allocation",
         )
     }
@@ -535,7 +612,7 @@ def validate_packet(
         raise PacketValidationError(["packet: top-level JSON value must be an object"])
 
     errors: list[str] = []
-    unknown = sorted(set(packet) - ALLOWED_FIELDS)
+    unknown = sorted(set(packet) - ALLOWED_FIELDS - {"fork_context"})
     for field in unknown:
         if any(marker in field.lower() for marker in ("enc", "cipher", "opaque", "sealed", "blob")):
             errors.append(f"{field}: opaque/encrypted-only payload fields are rejected")
@@ -608,27 +685,17 @@ def validate_packet(
             "allocation.candidate_changed_paths: conflicts with validation path count"
         )
 
-    if "fork_context" in packet and "fork_turns" in packet:
-        errors.append("fork_context and fork_turns are mutually exclusive; use fork_context")
     if "fork_context" in packet:
-        fork_context = _normalise_fork_context(packet["fork_context"], errors)
-        fork_turns = "all" if fork_context else "fresh"
-    elif "fork_turns" in packet:
-        fork_turns = _normalise_fork_turns(packet["fork_turns"], errors)
-        fork_context = fork_turns == "all"
-    else:
-        errors.append("fork_context: required; choose false for an explicit role override")
-        fork_turns = ""
-        fork_context = False
-
-    # The live host cannot combine an explicit role override with a full-history
-    # fork: fork_context=true makes it inherit the parent agent type. Refuse
-    # that semantic mismatch instead of silently dropping the canonical role.
-    if fork_context and role in HOST_AGENT_TYPES:
         errors.append(
-            "fork_context: true is incompatible with the explicit role agent_type; "
-            "use false for a fresh role-specific dispatch"
+            "fork_context: legacy host field is unsupported; "
+            "use an explicit positive fork_turns value"
         )
+    if "fork_turns" in packet:
+        fork_turns = _normalise_fork_turns(packet["fork_turns"], errors)
+    else:
+        fork_turns = ""
+
+    host_binding = _normalise_host_binding(packet.get("host_binding"), errors)
 
     if errors:
         raise PacketValidationError(errors)
@@ -645,7 +712,7 @@ def validate_packet(
         "model": model,
         "effort": effort,
         "fork_turns": fork_turns,
-        "fork_context": fork_context,
+        "host_binding": host_binding,
         "role_card": role_card,
         "allocation": allocation,
     }
@@ -667,8 +734,8 @@ def build_plaintext_message(normalized: Mapping[str, Any]) -> str:
             f"Owned paths: {paths}",
             f"Validation: {validation}",
             f"Stop condition: {normalized['stop']}",
-            f"Dispatch route: model={normalized['model']}; effort={normalized['effort']}; fork_context={normalized['fork_context']}",
-            "READY proves packet preflight only; it does not prove supervision.",
+            f"Dispatch route: model={normalized['model']}; effort={normalized['effort']}; fork_turns={normalized['fork_turns']}",
+            READY_BOUNDARY,
             "Use only the listed scope. Return facts, evidence, blockers, and residual risk. Do not commit or push.",
             "Closeout format: `- **Recommended next to-do:** <one action or NONE — objective complete>`; `- **Pending tasks:** <NONE or task ID — owner — prerequisite — state>`.",
         )
@@ -697,6 +764,7 @@ def prepare_dispatch(
     canonical_identity = _canonical_dispatch_payload(normalized)
     admission_digest = hashlib.sha256(canonical_identity).hexdigest()
     dispatch_id = "ctd_" + admission_digest[:24]
+    task_name = _derive_task_name(normalized["task_id"], dispatch_id)
     normalized["admission_digest"] = admission_digest
     if decision != "ADMIT":
         return {
@@ -713,15 +781,16 @@ def prepare_dispatch(
     # packet and plaintext message; they are not host payload fields.
     packet_out = dict(normalized)
     spawn = {
+        "task_name": task_name,
         "agent_type": HOST_AGENT_TYPES[normalized["role"]],
-        "fork_context": normalized["fork_context"],
+        "fork_turns": normalized["fork_turns"],
         "message": message,
         "model": normalized["model"],
         "reasoning_effort": normalized["effort"],
     }
     return {
         "status": "READY",
-        "readiness": "READY proves packet preflight only; it does not prove supervision.",
+        "readiness": READY_BOUNDARY,
         "role": normalized["role"],
         "task_id": normalized["task_id"],
         "dispatch_id": dispatch_id,
@@ -731,6 +800,11 @@ def prepare_dispatch(
         "packet": packet_out,
         "admission": {"decision": decision, "digest": admission_digest, "allocation": allocation},
         "spawn": spawn,
+        "invocation": {
+            "tool": DIRECT_HOST_BINDING,
+            "mode": DIRECT_HOST_MODE,
+            "instruction": DIRECT_HOST_INVOCATION,
+        },
     }
 
 

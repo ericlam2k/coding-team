@@ -107,19 +107,34 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/coding-team/scripts/check-install.py
   its `READY.spawn` result. It rejects missing/non-canonical fields,
   opaque/encrypted-only payloads, and unsupported fork modes; it emits a
   plaintext message of at most 250 words and names the absolute role card to
-  read first. The live host payload is exactly `agent_type`, `fork_context`,
-  `message`, `model`, and `reasoning_effort`; an explicit role override uses
-  `fork_context=false`. Full-history `fork_context=true` is rejected with an
-  explicit role override because the host inherits the parent agent type, and
-  numeric depth is rejected instead of coerced.
-  Candidate path count and prior-hard-stop state are mandatory. Estimates
+  read first. The live host payload is exactly `task_name`, `agent_type`,
+  `fork_turns`, `message`, `model`, and `reasoning_effort`; `task_name` is
+  derived from canonical `task_id` plus `dispatch_id`, and callers provide a
+  positive bounded `fork_turns` depth. Legacy `fork_context`, `none`, `all`,
+  omitted, boolean, zero, negative, and malformed depths are rejected instead
+  of silently changing context, model, or reasoning semantics.
+  Candidate path count, prior-hard-stop state, and exact direct host-binding
+  attestation are mandatory. Estimates
   cannot produce `READY`; measured time requires a receipt. Candidate-wide
   verification cannot hide inside a narrower path task.
-  Omitted `fork_context` is blocked until the caller explicitly selects the
-  host-supported role-specific mode. A `BLOCKED` result stops the task and
+  Omitted `fork_turns` is blocked until the caller explicitly selects a
+  positive bounded context depth. A `BLOCKED` result stops the task and
   requires a corrected brief.
+  The packet's `host_binding` must also include this exact caller attestation:
+  `{"tool":"collaboration.spawn_agent","mode":"direct_tool_call","available_to_caller":true}`.
+  It means only that the current parent context exposes the named direct
+  binding. Missing, false, malformed, extra-key, or indirect bindings return
+  `BLOCKED`; the diagnostic is: run preflight from a parent context that
+  exposes direct `collaboration.spawn_agent`, then invoke it directly; no
+  indirect fallback exists. Do not substitute `functions.collaboration.spawn_agent`,
+  `functions.exec`, `exec_command`, `tools.*`, shell, Python, Node, JavaScript,
+  or nested bindings.
+  A `READY` result also carries `invocation` guidance outside `READY.spawn`:
+  `Invoke the direct collaboration.spawn_agent tool exactly once with READY.spawn; do not use functions.exec, exec_command, shell, JavaScript, or a nested tool binding.`
 - **At-most-once dispatch:** pass the returned plaintext `spawn` object to
-  `spawn_agent` exactly once. Record its `dispatch_id`. Do not immediately
+  the direct `collaboration.spawn_agent` tool exactly once, using the separate
+  `invocation` guidance; never use `functions.exec`, `exec_command`, shell,
+  JavaScript, or a nested tool binding. Record its `dispatch_id`. Do not immediately
   repeat it through `send_message` or `followup_task`. A later interaction is
   allowed only for a material plaintext delta or requested correction; UI
   activity rows are not execution or usage evidence.
