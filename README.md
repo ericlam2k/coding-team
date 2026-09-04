@@ -20,11 +20,11 @@ coding-team makes those decisions visible:
 
 - **Sprint → Batch → Task** keeps a big goal small enough to steer.
 - **Role cards** make ownership and boundaries explicit.
-- **WIP ≤ 2 ordinary + ≤1 supervisor relay** limits concurrent tool-using work:
-  the relay is read-only and non-authoritative, so total child lanes can reach
-  3 only when that optional lane is admitted; never start a third ordinary lane.
+- **WIP ≤ 2 ordinary specialists** keeps ownership clear and coordination small;
+  Lead owns status and routing, with no supervisor lane.
 - **Human gates** protect irreversible actions.
-- **Code Reviewer → conditional Test Engineer → Gatekeeper** puts independent diff/risk review and required executable evidence before final acceptance.
+- **Risk-triggered quality roles** add Code Reviewer, Test Engineer, or Gatekeeper
+  only when that role answers a real question.
 
 The result is a visible path from request to reviewed change—not a promise of
 more autonomy. You keep the final decision.
@@ -108,7 +108,7 @@ extensions; see [Installation](docs/installation.md).
 
 | Layer | What it does |
 |---|---|
-| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2 ordinary + ≤1 supervisor relay, nature → tier |
+| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2 ordinary, nature → tier |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
 | **Addons** | PM Lean decision support — default OFF, explicit-only |

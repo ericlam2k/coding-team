@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bounded Codex task supervisor: checkpoint, cancel, and one terminal receipt."""
+"""Bound a real background command and write one internal status record."""
 from __future__ import annotations
 import argparse, hashlib, json, os, signal, subprocess, sys, time
 from enum import Enum
@@ -44,7 +44,7 @@ def _observe_process_group(pgid: int) -> _GroupObservation:
             return _GroupObservation.UNAVAILABLE
         return _GroupObservation.UNAVAILABLE
 
-def _write_receipt(path: Path | None, receipt: dict[str, Any]) -> None:
+def _write_status(path: Path | None, receipt: dict[str, Any]) -> None:
     if path is None: return
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f".{path.name}.{os.getpid()}.{time.time_ns()}.tmp")
@@ -57,6 +57,10 @@ def _write_receipt(path: Path | None, receipt: dict[str, Any]) -> None:
         os.link(tmp, path)
     finally:
         tmp.unlink(missing_ok=True)
+
+# Private compatibility alias for existing watchdog callers. The file remains
+# an internal status record; this alias does not create workflow authority.
+_write_receipt = _write_status
 
 def supervise(command: list[str], *, task_id: str, run_id: str, target_seconds: float = 120.0,
               hard_stop_seconds: float = 240.0, receipt_path: Path | None = None,

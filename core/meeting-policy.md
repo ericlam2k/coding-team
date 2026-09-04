@@ -29,9 +29,8 @@ standing brainstorm panel.
    conditional, not an automatic pair.
 3. The Domain Advisor supplies named-domain cases and evidence when triggered;
    it does not approve the implementation.
-4. Test Engineer uses `pm-execution/test-scenarios` to turn the accepted inputs
-   into a user-observable Given/When/Then matrix, including negative and edge
-   cases, and freezes it before builders start.
+4. If executable behavior is the unresolved risk, Test Engineer may turn the
+   accepted inputs into a focused Given/When/Then matrix before builders start.
 5. Builders write the named red unit/contract/component cases first where
    practical, then implement the smallest green boundary.
 
@@ -57,10 +56,10 @@ artifact, stop condition, and clean-fixture strategy.
   PICs only for distinct technical and domain decisions. Lead admits one
   integrable corrective Batch or queues a separate provisional Batch.
 
-Run a fresh TE pass after correction, then one sequential Gatekeeper review.
-`FAIL`, `BLOCKED`, insufficient evidence, or a non-approval stops for the
-human gate. “Test all” means all required scenarios and selected layers in the
-frozen Batch, not the whole repository or every possible layer on every loop.
+Run only the focused evidence or decision role required by the unresolved risk.
+`FAIL`, `BLOCKED`, insufficient evidence, or a non-approval returns to Lead.
+“Test all” means the named scenarios and selected layers, not the whole
+repository or every possible layer on every loop.
 
 The active Normal/Risky QA selection and evidence gates are in
 [qa-operating-model.md](qa-operating-model.md). Gatekeeper evidence is not

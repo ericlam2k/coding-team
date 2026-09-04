@@ -6,7 +6,7 @@
 | Delegate | `Task` with role card path + ≤250-word run prompt + path ranges |
 | Model | Look up approved `model-pool.map.md` for assigned tier |
 | Resume | One immediate follow-up via `resume`; else fresh Task |
-| Concurrency | ≤2 ordinary tool-using Tasks plus at most one optional read-only, non-authoritative supervisor relay (maximum child lanes = 3 only when admitted; never a third ordinary lane); Code Reviewer → conditional Test Engineer → Gatekeeper sequential |
+| Concurrency | ≤2 ordinary Tasks, one accountable owner per task; quality roles are independent risk triggers |
 | Stop | Reconcile handle and artifacts; preserve partial work; unchanged route stays blocked |
 
 Canonical role IDs live in `core/roles/`. Prefer `.cursor/agents/<id>.md` in the consumer project when present; otherwise Read the role card from `CODING_TEAM_ROOT`.

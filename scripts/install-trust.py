@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 CONTRACT_VERSION = 1
-STATUS = "VERIFIED_INSTALL"
+STATUS = "ACTIVE"
 COMMON_AUTHORITY = (
     "bin/ct",
     "core/orchestration.md",
@@ -164,7 +164,7 @@ def check(
     if value.get("contract_version") != CONTRACT_VERSION:
         reasons.append("compatibility_changed")
     if value.get("status") != STATUS:
-        reasons.append("receipt_not_verified")
+        reasons.append("receipt_not_active")
     if value.get("installed_root") != str(root):
         reasons.append("installed_root_changed")
     if value.get("platform") != platform:
@@ -193,13 +193,13 @@ def check(
     reasons = sorted(set(reasons))
     if reasons:
         return {
-            "status": "REVALIDATE_REQUIRED",
+            "status": "INACTIVE",
             "reasons": reasons,
             "framework_validation": "INSTALL_OR_UPGRADE_ONLY",
             "product_validation": "REQUIRED",
         }
     return {
-        "status": "TRUSTED",
+        "status": "ACTIVE",
         "installed_root": str(root),
         "platform": platform,
         "compatibility_id": value["compatibility_id"],
@@ -227,7 +227,7 @@ def main() -> int:
         )
     except TrustError as exc:
         result = {
-            "status": "REVALIDATE_REQUIRED",
+            "status": "INACTIVE",
             "reasons": [str(exc)],
             "product_validation": "REQUIRED",
         }
@@ -244,7 +244,7 @@ def main() -> int:
             "product_validation": "REQUIRED",
         }
     print(json.dumps(display, sort_keys=True))
-    return 0 if result["status"] in {STATUS, "TRUSTED"} else 2
+    return 0 if result["status"] == STATUS else 2
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ Shared vocabulary for coding-team. Use these terms in briefs, handoffs, and docs
 | **Task** | One atomic deliverable with one canonical owner, exclusive file ownership, dependencies, stop condition, one primary skill or `none`, and an owner self-check. |
 | **Lead** | The parent agent/session that classifies nature, assigns tiers, creates the task list, delegates, integrates, and enforces gates. Never spawn Lead as a subagent. |
 | **Functional Integration Owner** | An assignment (not a new role) naming which existing role owns the batch’s shared contract and integration order before independent validation. |
-| **WIP ≤ 2 ordinary + ≤1 supervisor relay** | At most two concurrent ordinary tool-using specialist runs, plus one optional read-only, non-authoritative supervisor relay. Total child lanes may reach 3 only when that relay is admitted; never start a third ordinary run. |
+| **WIP ≤ 2 ordinary** | At most two concurrent ordinary specialists, with one accountable owner per task. Lead owns status and routing. |
 | **Handoff** | ≤150-word return packet from a specialist: status, evidence paths, unresolved questions, next owner. |
 | **Checkpoint** | ≤300-word batch state snapshot used after pause, context shrink, or Gatekeeper acceptance. |
 | **Run prompt** | ≤250-word delegation prompt projected from the task brief. The full template is never the run prompt. |
@@ -55,7 +55,6 @@ Concrete slugs appear only in install-time `model-pool.map.md`. See [model-pool-
 | **Advisor** | Pre-build: what should we do *technically*? |
 | **Contradictor** | Pre-build: why might this be wrong? Serial debate with Advisor when required. |
 | **Code Reviewer** | Independent post-build diff/risk review; routes conditional Test Engineer evidence before Gatekeeper and never accepts. |
-| **Monitor Agent** | Optional bounded read-only supervisor relay under the frozen contract; reports one create-once artifact result and never controls work or accepts. |
 | **Gatekeeper** | Final post-build authority: `APPROVE` / `APPROVE_WITH_NOTES` / `REVISE` / `BLOCK` after the routed evidence, including Test Engineer evidence when required. |
 | **Human gate** | Explicit human approval for irreversible or ambiguous risk. Silence is never approval. |
 | **Lead cost discipline** | Lead emits judgment/briefs only — no implementation typing lane; defects return as corrected briefs; spec-readiness before dispatch. |

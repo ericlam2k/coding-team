@@ -7,9 +7,10 @@ matched provider run produced identical token use because the local
 integration did not modify the provider request. No authoritative automatic
 runtime seam was available.
 
-The separate [`prepare-dispatch.py`](../adapters/codex/scripts/prepare-dispatch.py)
-packet validator remains active. It validates the task packet, role card,
-allocation, and plaintext spawn shape. It is not a provider token counter.
+The optional [`prepare-dispatch.py`](../adapters/codex/scripts/prepare-dispatch.py)
+formatter remains available. It converts a role (or native agent type) and
+plaintext message into the three-field host payload. It is not a gate,
+admission check, provider token counter, or execution receipt.
 
 The historical Customer-0 command now fails closed with
 `TOKEN-TOOLS-DISPOSED`:

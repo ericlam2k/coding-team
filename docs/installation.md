@@ -99,11 +99,9 @@ Set `CODING_TEAM_ROOT` to this checkout and load the adapter skill for your
 host. A first task should name one outcome, one boundary, the proof to collect,
 and the stop condition.
 
-The shared operating rules are WIP ≤ 2 ordinary tool-using lanes plus at most
-one read-only, non-authoritative supervisor relay (total child lanes ≤3 only
-when admitted), disjoint writes, and Code Reviewer → conditional Test Engineer
-→ Gatekeeper sequencing. A human decision remains required before irreversible
-actions.
+The shared operating rules are WIP ≤ 2 ordinary specialists, disjoint writes,
+and explicit human gates before irreversible actions. Lead routes quality roles
+only when their risk question exists.
 
 ## Conditional QA
 

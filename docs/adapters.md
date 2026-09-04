@@ -13,10 +13,9 @@ tiers, and evidence rules. An adapter binds that policy to a host runtime.
 ## Shared behavior
 
 Every adapter uses the same Lead → role-card → bounded-task shape, WIP ≤ 2
-ordinary tool-using lanes plus at most one read-only, non-authoritative
-supervisor relay (total child lanes ≤3 only when admitted), disjoint write
-ownership, Code Reviewer → conditional Test Engineer → Gatekeeper order, and
-human gates for irreversible actions. Only runtime mechanics differ.
+ordinary specialists, disjoint write ownership, and human gates for
+irreversible actions. Lead owns status and routes to related roles; only runtime
+mechanics differ.
 
 ## Installation behavior
 

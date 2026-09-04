@@ -5,17 +5,15 @@
 ```text
 Human goal
   → Lead classifies natures + proposes Sprint
-  → Admit Batch READY (freeze validation + ownership)
-  → PM/domain decisions → conditional TE scenario design when triggered
-  → Delegate Tasks (WIP ≤ 2 ordinary + optional ≤1 read-only supervisor relay)
-  → Integrate → deterministic checks → Code Reviewer
-  → conditional Test Engineer → final Gatekeeper
+  → PM/domain decisions when needed
+  → Delegate one accountable Task (WIP ≤ 2 ordinary specialists)
+  → Focused check → Handoff → related role when needed
   → Checkpoint / next Batch or Sprint close
 ```
 
 Incomplete or non-`APPROVE` output → **stop and ask the human**. Do not auto-chain.
 
-Lead applies **cost discipline** and the **spec-readiness test** before dispatch ([orchestration.md](../core/orchestration.md)).
+Lead applies the smallest useful scope before dispatch ([orchestration.md](../core/orchestration.md)).
 
 ## Sprint
 
@@ -37,18 +35,17 @@ Template: [`core/templates/task-brief.md`](../core/templates/task-brief.md).
 
 1. Owner self-check
 2. Deterministic checks and independent **Code Reviewer** risk route ([role card](../core/roles/code-reviewer.md), [review template](../core/templates/code-review.md))
-3. **Test Engineer** only when the route requires executable evidence
-4. Independent final **Gatekeeper** decision
+3. **Test Engineer** only when executable evidence remains unproven
+4. **Gatekeeper** only for a material final decision or release
 
-Code Reviewer → conditional TE → Gatekeeper stays sequential for the same batch ([concurrency.md](../core/concurrency.md)). Gatekeeper remains the final acceptance authority.
+These roles are independent risk triggers; when several are needed, run them
+sequentially against the affected evidence ([concurrency.md](../core/concurrency.md)).
 
 ## Debate (when required)
 
 `Investigator → Advisor → Contradictor → Lead resolve → build`
 
-The post-build quality route remains Code Reviewer → conditional Test Engineer
-→ Gatekeeper; the supervisor relay only reports bounded status and cannot alter
-that route.
+Quality roles remain optional and answer only unresolved questions.
 
 Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.md).
 

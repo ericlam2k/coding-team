@@ -33,7 +33,7 @@ def main() -> int:
         codex_home / "skills" / "qa-evidence-enforcement",
     )
     print(json.dumps(result, sort_keys=True))
-    return 0 if result.get("status") == "TRUSTED" else 2
+    return 0 if result.get("status") == "ACTIVE" else 2
 
 
 if __name__ == "__main__":

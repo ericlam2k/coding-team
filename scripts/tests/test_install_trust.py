@@ -59,8 +59,8 @@ class InstallTrustTests(unittest.TestCase):
     def test_matching_receipt_reuses_install_validation(self) -> None:
         issued = self.issue()
         result = self.check()
-        self.assertEqual(issued["status"], "VERIFIED_INSTALL")
-        self.assertEqual(result["status"], "TRUSTED")
+        self.assertEqual(issued["status"], "ACTIVE")
+        self.assertEqual(result["status"], "ACTIVE")
         self.assertEqual(result["framework_validation"], "REUSED_INSTALL_RECEIPT")
         self.assertEqual(result["product_validation"], "REQUIRED")
         self.assertFalse(result["framework_wide_scan"])
@@ -70,7 +70,7 @@ class InstallTrustTests(unittest.TestCase):
         self.issue()
         (self.root / "core/orchestration.md").write_text("drift\n", encoding="utf-8")
         result = self.check()
-        self.assertEqual(result["status"], "REVALIDATE_REQUIRED")
+        self.assertEqual(result["status"], "INACTIVE")
         self.assertIn("authority_drift", result["reasons"])
         self.assertEqual(result["product_validation"], "REQUIRED")
 
@@ -78,8 +78,8 @@ class InstallTrustTests(unittest.TestCase):
         self.issue()
         wrong_root = Path(self.temporary.name) / "other"
         wrong_root.mkdir()
-        self.assertEqual(MODULE.check(wrong_root, "codex", self.receipt, self.adapter_dst, self.qa_dst)["status"], "REVALIDATE_REQUIRED")
-        self.assertEqual(MODULE.check(self.root, "cursor", self.receipt, self.adapter_dst, self.qa_dst)["status"], "REVALIDATE_REQUIRED")
+        self.assertEqual(MODULE.check(wrong_root, "codex", self.receipt, self.adapter_dst, self.qa_dst)["status"], "INACTIVE")
+        self.assertEqual(MODULE.check(self.root, "cursor", self.receipt, self.adapter_dst, self.qa_dst)["status"], "INACTIVE")
         value = json.loads(self.receipt.read_text(encoding="utf-8"))
         value["contract_version"] = 999
         self.receipt.write_text(json.dumps(value), encoding="utf-8")
@@ -95,7 +95,7 @@ class InstallTrustTests(unittest.TestCase):
         before = {path.name for path in consumer.iterdir()}
         result = self.check()
         after = {path.name for path in consumer.iterdir()}
-        self.assertEqual(result["status"], "TRUSTED")
+        self.assertEqual(result["status"], "ACTIVE")
         self.assertEqual(before, after)
         self.assertNotIn(str(consumer), json.dumps(result))
 
@@ -130,7 +130,7 @@ class InstallTrustTests(unittest.TestCase):
             text=True,
         )
         result = json.loads(completed.stdout)
-        self.assertEqual(result["status"], "VERIFIED_INSTALL")
+        self.assertEqual(result["status"], "ACTIVE")
         self.assertLessEqual(result["authority_files_recorded"], 64)
         self.assertNotIn("authority_manifest", result)
 
@@ -138,14 +138,14 @@ class InstallTrustTests(unittest.TestCase):
         self.issue()
         for raw in ("[]", "null", "42", '"text"'):
             self.receipt.write_text(raw, encoding="utf-8")
-            self.assertEqual(self.check()["status"], "REVALIDATE_REQUIRED")
+            self.assertEqual(self.check()["status"], "INACTIVE")
         self.receipt.write_bytes(b"\xff\xfe")
-        self.assertEqual(self.check()["status"], "REVALIDATE_REQUIRED")
+        self.assertEqual(self.check()["status"], "INACTIVE")
         self.issue()
         self.adapter_dst.unlink()
         self.adapter_dst.symlink_to(self.root / "core")
         result = self.check()
-        self.assertEqual(result["status"], "REVALIDATE_REQUIRED")
+        self.assertEqual(result["status"], "INACTIVE")
         self.assertIn("activation_invalid", result["reasons"])
 
     def test_issue_refuses_wrong_activation_target(self) -> None:
@@ -180,7 +180,7 @@ class InstallTrustTests(unittest.TestCase):
             env=env,
         )
         result = json.loads(completed.stdout)
-        self.assertEqual(result["status"], "TRUSTED")
+        self.assertEqual(result["status"], "ACTIVE")
         self.assertEqual(result["installed_root"], str(ROOT.resolve()))
         self.assertNotIn(str(dirty_lab), completed.stdout)
 

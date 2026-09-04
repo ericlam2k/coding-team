@@ -1,4 +1,4 @@
 interface:
   display_name: "Coding Team"
   short_description: "Sprint → Batch → Task orchestration with role delegates"
-  default_prompt: "Use $coding-team as Lead: classify nature, assign tiers from model-pool.map.md, delegate up to WIP≤2 ordinary lanes plus an optional read-only supervisor relay (maximum child lanes 3; never a third ordinary lane), freeze the integrated candidate, follow Code Reviewer → conditional Test Engineer → Gatekeeper, and ask the human on incomplete or non-APPROVE results."
+  default_prompt: "Use $coding-team as Lead: classify the request, assign one accountable role, keep WIP≤2 ordinary specialists, and route each concise handoff to the next related role only when an unresolved question remains."

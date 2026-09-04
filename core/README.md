@@ -2,8 +2,8 @@
 
 Host-independent coding-team policy. Adapters under `adapters/` bind this core to a runtime (**adapter binds runtime** — core does not favor any IDE or agent host).
 
-The quality route is **Code Reviewer → conditional Test Engineer → Gatekeeper**;
-the Reviewer routes executable evidence and Gatekeeper remains final.
+Quality roles are independent risk-triggered capabilities; use only the role
+that answers the current unresolved question.
 
 ## Index
 
@@ -15,7 +15,7 @@ the Reviewer routes executable evidence and Gatekeeper remains final.
 | [qa-operating-model.md](qa-operating-model.md) | Normal/Risky QA flow, selected layers, evidence, and promotion gates |
 | [../docs/archive/qa-operating-model-archive-29311de.md](../docs/archive/qa-operating-model-archive-29311de.md) | Archived prior QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
-| [concurrency.md](concurrency.md) | WIP ≤ 2 ordinary + ≤1 read-only supervisor relay; quality sequence and parallel rules |
+| [concurrency.md](concurrency.md) | WIP ≤ 2 ordinary specialists and ownership rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |
 | [roles/](roles/) | Canonical role cards |
 | [templates/](templates/) | Sprint / batch / task / handoff / checkpoint / review / report / perf |
@@ -30,7 +30,6 @@ the Reviewer routes executable evidence and Gatekeeper remains final.
 | [roles/contradictor.md](roles/contradictor.md) | `contradictor` |
 | [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` |
 | [roles/investigator.md](roles/investigator.md) | `investigator` |
-| [roles/monitor-agent.md](roles/monitor-agent.md) | `monitor-agent` — bounded read-only supervisor relay |
 | [roles/system-architect.md](roles/system-architect.md) | `system-architect` |
 | [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
 | [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |

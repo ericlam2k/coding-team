@@ -1,6 +1,6 @@
 ---
 name: coding-team
-description: Platform-independent Sprint → Batch → Task coding team. Use for multi-role delivery under Cursor. Lead classifies nature, maps tiers from model-pool.map.md, delegates via Task agents.
+description: Lean Input → Process → Handoff coding team for Cursor.
 ---
 
 # Coding Team (Cursor)
@@ -16,21 +16,11 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 
 ## Hard constraints
 
-- WIP ≤ 2 ordinary tool-using Tasks, plus at most one optional read-only,
-  non-authoritative supervisor relay (maximum child lanes = 3 only when
-  admitted; never a third ordinary lane)
-- Code Reviewer → conditional Test Engineer → Gatekeeper sequential
-- Incomplete / non-APPROVE → stop for human
-- Oversized or timed-out work → split into a bounded Task and hand off the
-  checkpoint; do not leave it frozen or silently extend the run.
-- Lead cost discipline — briefs, not implementation code
+- WIP ≤ 2 ordinary tool-using Tasks; Lead owns status and there is no supervisor
+  lane
+- Code Reviewer, Test Engineer, and Gatekeeper are independent risk triggers
+- Incomplete work returns to Lead for correction or rerouting
+- Lead writes briefs and routes handoffs, never implementation code
 - PM Lean addon default OFF; enable it only for an explicit PM task
-- When `qa_required=true` or `qa_mode=bounded`, Test Engineer runs the
-  QA evidence validator before Gatekeeper. Bounded passes use a 120-second
-  target / 240-second hard stop; timeout returns `BLOCKED` without auto-retry.
-- After a hard stop, verify the live handle or terminal state and inspect the
-  declared artifact paths. Record `COMPLETE`, `PARTIAL`, or `NO_PROGRESS`,
-  preserve usable work, and price one materially changed smaller route under
-  `core/adaptive-timing.md`; never repeat the stopped route or hop models.
 
 See `$CODING_TEAM_ROOT/adapters/cursor/runtime.md`.
