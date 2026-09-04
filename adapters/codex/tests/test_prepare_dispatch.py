@@ -16,10 +16,13 @@ SPEC.loader.exec_module(MODULE)
 
 class NativePayloadTests(unittest.TestCase):
     def test_role_message_is_minimal_native_payload(self) -> None:
-        self.assertEqual(
-            MODULE.format_native_payload({"role": "backend-engineer", "message": "Run one focused check."}),
-            {"agent_type": "worker", "fork_context": False, "message": "Run one focused check."},
+        result = MODULE.format_native_payload(
+            {"role": "backend-engineer", "message": "Run one focused check."}
         )
+        self.assertEqual(result["agent_type"], "worker")
+        self.assertRegex(result["task_name"], r"^worker_[0-9a-f]{8}$")
+        self.assertEqual(result["fork_turns"], "1")
+        self.assertEqual(result["message"], "Run one focused check.")
 
     def test_explicit_model_and_effort_are_preserved(self) -> None:
         result = MODULE.prepare_dispatch({
@@ -28,23 +31,42 @@ class NativePayloadTests(unittest.TestCase):
         })
         self.assertEqual(result["model"], "gpt-5.6-sol")
         self.assertEqual(result["reasoning_effort"], "high")
-        self.assertEqual(set(result), {"agent_type", "fork_context", "message", "model", "reasoning_effort"})
+        self.assertEqual(
+            set(result),
+            {"agent_type", "task_name", "fork_turns", "message", "model", "reasoning_effort"},
+        )
 
     def test_direct_payload_can_skip_formatter_fields(self) -> None:
         self.assertEqual(MODULE.format_native_payload({
-            "agent_type": "explorer", "fork_context": False, "message": "Inspect one file."
-        }), {"agent_type": "explorer", "fork_context": False, "message": "Inspect one file."})
+            "agent_type": "explorer", "task_name": "inspect_one", "fork_turns": "all",
+            "message": "Inspect one file."
+        }), {
+            "agent_type": "explorer", "task_name": "inspect_one", "fork_turns": "all",
+            "message": "Inspect one file."
+        })
 
     def test_removed_controls_are_rejected(self) -> None:
-        for field in ("fork_turns", "task_name", "host_binding", "allocation", "dispatch_id"):
+        for field in ("host_binding", "allocation", "dispatch_id", "receipt"):
             with self.subTest(field=field), self.assertRaises(MODULE.PacketValidationError) as raised:
                 MODULE.format_native_payload({"agent_type": "worker", "message": "x", field: "legacy"})
             self.assertIn("removed workflow field", str(raised.exception))
 
-    def test_true_context_is_rejected_and_false_is_fixed(self) -> None:
-        with self.assertRaises(MODULE.PacketValidationError):
-            MODULE.format_native_payload({"agent_type": "worker", "message": "x", "fork_context": True})
-        self.assertFalse(MODULE.format_native_payload({"agent_type": "worker", "message": "x", "fork_context": False})["fork_context"])
+    def test_active_host_identity_and_context_fields_are_validated(self) -> None:
+        for packet in (
+            {"agent_type": "worker", "message": "x", "fork_context": False},
+            {"agent_type": "worker", "message": "x", "task_name": "Bad-Name"},
+            {"agent_type": "worker", "message": "x", "fork_turns": "none"},
+            {"agent_type": "worker", "message": "x", "fork_turns": 0},
+        ):
+            with self.subTest(packet=packet), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.format_native_payload(packet)
+
+        result = MODULE.format_native_payload({
+            "agent_type": "worker", "message": "x", "task_name": "bounded_task",
+            "fork_turns": 2,
+        })
+        self.assertEqual(result["task_name"], "bounded_task")
+        self.assertEqual(result["fork_turns"], "2")
 
     def test_invalid_role_and_message_fail_closed(self) -> None:
         for packet in ({"role": "monitor-agent", "message": "x"}, {"agent_type": "worker"}):

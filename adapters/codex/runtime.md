@@ -11,13 +11,14 @@ The optional `prepare-dispatch.py` formatter accepts a role (or a native
 `agent_type`) and a plaintext `message`/`objective`, then emits:
 
 ```json
-{"agent_type":"worker","fork_context":false,"message":"..."}
+{"agent_type":"worker","task_name":"worker_ab12cd34","fork_turns":"1","message":"..."}
 ```
 
 It may add `model` and `reasoning_effort` only when those options are explicitly
-provided. It never creates task names, IDs, receipts, timing or admission
-decisions, and callers may skip it for a direct `collaboration.spawn_agent`
-call. Rejected legacy fields fail closed so old ceremony cannot silently return.
+provided. `task_name` and `fork_turns` bind the active host call but do not create
+workflow authority; callers may skip the formatter for a direct
+`collaboration.spawn_agent` call. Receipts, timing, admission decisions, and
+other removed ceremony remain rejected.
 
 ## Roles and concurrency
 

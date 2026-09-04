@@ -27,16 +27,17 @@ residual risk, and the recommended next role or action.
 ## Optional native host formatting
 
 `adapters/codex/scripts/prepare-dispatch.py` is a convenience formatter, not a
-gate or admission step. It returns only:
+gate or admission step. It returns the active host's native fields:
 
 ```json
-{"agent_type":"worker","fork_context":false,"message":"..."}
+{"agent_type":"worker","task_name":"worker_ab12cd34","fork_turns":"1","message":"..."}
 ```
 
 `model` and `reasoning_effort` are included only when explicitly requested.
-There is no task name, context-depth field, host attestation, timing envelope,
-receipt, or required formatter call. Call `collaboration.spawn_agent` directly
-when the host payload is already available.
+`task_name` and `fork_turns` are host routing fields, not semantic task records;
+the handoff remains the only workflow record. There is no host attestation,
+timing envelope, receipt, or required formatter call. Call
+`collaboration.spawn_agent` directly when the host payload is already available.
 
 ## Watchdog
 
