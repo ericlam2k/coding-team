@@ -36,7 +36,7 @@ class PrepareDispatchTests(unittest.TestCase):
             "stop": "Stop on scope conflict; do not commit or push.",
             "model": "gpt-5.6-luna",
             "effort": "max",
-            "fork_turns": "3",
+            "fork_turns": "1",
             "host_binding": {
                 "tool": "collaboration.spawn_agent",
                 "mode": "direct_tool_call",
@@ -78,7 +78,7 @@ class PrepareDispatchTests(unittest.TestCase):
                 "reasoning_effort",
             },
         )
-        self.assertEqual(result["spawn"]["fork_turns"], "3")
+        self.assertEqual(result["spawn"]["fork_turns"], "1")
         self.assertEqual(result["spawn"]["agent_type"], "worker")
         self.assertEqual(result["spawn"]["model"], "gpt-5.6-luna")
         self.assertEqual(result["spawn"]["reasoning_effort"], "max")
@@ -113,6 +113,12 @@ class PrepareDispatchTests(unittest.TestCase):
         self.assertIn(str(role_card), result["message"])
         self.assertLessEqual(result["word_count"], MODULE.MAX_MESSAGE_WORDS)
         self.assertNotIn("encrypted", result["message"].lower())
+        self.assertIn("sole worker for this Task", result["message"])
+        self.assertIn("do not spawn, delegate, orchestrate", result["message"])
+        self.assertIn("Write only to the listed Owned paths", result["message"])
+        self.assertIn("all other paths are read-only", result["message"])
+        self.assertIn("stop and report BLOCKED", result["message"])
+        self.assertNotIn("fork_turns=", result["message"])
         self.assertIn("- **Recommended next to-do:**", result["message"])
         self.assertIn("- **Pending tasks:**", result["message"])
         self.assertIn("task ID — owner — prerequisite — state", result["message"])
@@ -124,10 +130,10 @@ class PrepareDispatchTests(unittest.TestCase):
             "`task_name`, `agent_type`, `fork_turns`, `message`, `model`, and "
             "`reasoning_effort`"
         )
-        self.assertIn("set `fork_turns` to a positive bounded context depth", runtime)
+        self.assertIn("set the host-required `fork_turns` to `\"1\"` only", runtime)
         self.assertIn(expected, " ".join(runtime.split()))
         self.assertIn(expected, " ".join(skill.split()))
-        self.assertIn("Legacy `fork_context`", skill)
+        self.assertIn("legacy `fork_context`", skill.lower())
         self.assertNotIn("set `fork_context=false`", runtime)
         runtime_prose = " ".join(runtime.split())
         self.assertIn(
@@ -151,6 +157,15 @@ class PrepareDispatchTests(unittest.TestCase):
             self.assertIn("direct collaboration.spawn_agent", prose)
             self.assertIn("no indirect fallback exists", prose)
             self.assertIn("Invoke the direct collaboration.spawn_agent tool exactly once", prose)
+
+    def test_worker_boundary_is_documented_for_single_specialist_execution(self) -> None:
+        runtime = " ".join(RUNTIME.read_text(encoding="utf-8").split())
+        skill = " ".join(SKILL.read_text(encoding="utf-8").split())
+        for prose in (runtime, skill):
+            self.assertIn("sole worker", prose)
+            self.assertIn("do not spawn, delegate, or orchestrate", prose)
+            self.assertIn("all other paths are read-only", prose)
+            self.assertIn("stop and report `BLOCKED`", prose)
 
     def test_dispatch_id_is_stable_and_changes_with_material_delta(self) -> None:
         first = MODULE.prepare_dispatch(self.packet())
@@ -178,15 +193,27 @@ class PrepareDispatchTests(unittest.TestCase):
         self.assertNotEqual(first["dispatch_id"], changed["dispatch_id"])
         self.assertNotEqual(first["spawn"]["task_name"], changed["spawn"]["task_name"])
 
-    def test_positive_fork_depth_integer_and_string_are_normalized(self) -> None:
-        for value, expected in ((1, "1"), (7, "7"), ("1", "1"), ("42", "42")):
+    def test_minimal_fork_depth_integer_and_string_are_normalized(self) -> None:
+        for value, expected in ((1, "1"), ("1", "1")):
             packet = self.packet()
             packet["fork_turns"] = value
 
             with self.subTest(value=value):
                 result = MODULE.prepare_dispatch(packet)
                 self.assertEqual(result["spawn"]["fork_turns"], expected)
-                self.assertIn(f"fork_turns={expected}", result["message"])
+                self.assertNotIn("fork_turns=", result["message"])
+
+    def test_larger_fork_depth_is_blocked_for_single_specialist_isolation(self) -> None:
+        for value in (2, 7, "2", "3", "42"):
+            packet = self.packet()
+            packet["fork_turns"] = value
+
+            with self.subTest(value=value), self.assertRaises(MODULE.PacketValidationError) as raised:
+                MODULE.prepare_dispatch(packet)
+
+            errors = " ".join(raised.exception.errors)
+            self.assertIn("fork_turns", errors)
+            self.assertIn("one-specialist isolation", errors)
 
     def test_omitted_fork_turns_is_blocked(self) -> None:
         packet = self.packet()

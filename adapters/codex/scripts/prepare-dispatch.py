@@ -120,6 +120,14 @@ READY_BOUNDARY = (
     "READY proves packet-valid plus direct-binding-attested preflight only; it does not "
     "prove host acceptance, child start, supervision, or completion."
 )
+MINIMAL_SPECIALIST_FORK_TURNS = "1"
+SPECIALIST_EXECUTION_BOUNDARY = (
+    "Specialist boundary: you are the sole worker for this Task. Perform the objective "
+    "yourself; do not spawn, delegate, orchestrate, or invoke another agent. Do not "
+    "call collaboration.spawn_agent, send_message, or followup_task. Write only to "
+    "the listed Owned paths; all other paths are read-only. If required work falls "
+    "outside them, stop and report BLOCKED. Do not commit, push, deploy, or expand scope."
+)
 
 
 class PacketValidationError(ValueError):
@@ -688,10 +696,15 @@ def validate_packet(
     if "fork_context" in packet:
         errors.append(
             "fork_context: legacy host field is unsupported; "
-            "use an explicit positive fork_turns value"
+            "use fork_turns='1' for single-specialist isolation"
         )
     if "fork_turns" in packet:
         fork_turns = _normalise_fork_turns(packet["fork_turns"], errors)
+        if fork_turns and fork_turns != MINIMAL_SPECIALIST_FORK_TURNS:
+            errors.append(
+                "fork_turns: only '1' is supported for one-specialist isolation; "
+                "larger inherited contexts can re-enter Lead routing"
+            )
     else:
         fork_turns = ""
 
@@ -734,10 +747,10 @@ def build_plaintext_message(normalized: Mapping[str, Any]) -> str:
             f"Owned paths: {paths}",
             f"Validation: {validation}",
             f"Stop condition: {normalized['stop']}",
-            f"Dispatch route: model={normalized['model']}; effort={normalized['effort']}; fork_turns={normalized['fork_turns']}",
             READY_BOUNDARY,
-            "Use only the listed scope. Return facts, evidence, blockers, and residual risk. Do not commit or push.",
-            "Closeout format: `- **Recommended next to-do:** <one action or NONE — objective complete>`; `- **Pending tasks:** <NONE or task ID — owner — prerequisite — state>`.",
+            SPECIALIST_EXECUTION_BOUNDARY,
+            "Return facts, evidence, blockers, and residual risk. Do not commit or push.",
+            "Closeout format: `- **Recommended next to-do:** <one action or NONE — objective complete>`; `- **Pending tasks:** <NONE or task ID — owner — prerequisite — state>`."
         )
     )
     count = _word_count(message)

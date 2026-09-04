@@ -1,6 +1,6 @@
 # Codex runtime — role delegation
 
-Lead (this skill) classifies nature, writes a ≤250-word run prompt, and spawns **one** Codex subagent per task. Prefer independent subagents with the mapped model/effort from `model-pool.map.md`.
+Lead (this skill) classifies nature, writes a ≤250-word run prompt, and spawns **one** Codex subagent per task. Each spawned specialist is the sole worker for that Task: it performs the brief itself, never delegates or spawns another agent, and writes only to the declared owned paths. Prefer independent subagents with the mapped model/effort from `model-pool.map.md`.
 
 ## Adaptive admission before preflight
 
@@ -43,7 +43,11 @@ spawn call. The Lead supplies a structured JSON object with:
 `role`, `task_id`, `objective`, `acceptance`, `paths`,
 `validation`, `stop`, `model`, `effort`, and an allocation with
 `candidate_changed_paths` and `prior_hard_stop`. For an explicit canonical
-role, set `fork_turns` to a positive bounded context depth such as `"3"`.
+role, set the host-required `fork_turns` to `"1"` only. `fork_turns` is a host
+context transport field, not a subagent count; larger inherited contexts are
+blocked because they can re-enter Lead routing. The current host contract does
+not represent a verified zero-context mode, so deleting the field would trade
+context leakage for host rejection.
 `fork_context`, `none`, `all`, omitted, boolean, zero, negative, and malformed
 depths are rejected rather than silently changing context, model, or reasoning
 semantics. Never pass a raw packet or opaque brief to the direct
@@ -105,6 +109,14 @@ that a host consumed the role card, accepted the model route, or prevent a
 caller from bypassing this script through another spawn entry point. It cannot
 patch or alter the host collaboration API. Host/runtime receipts remain the
 authority for actual model use and role-card consumption.
+
+The generated worker message adds a specialist boundary: the child is the sole
+worker; do not spawn, delegate, or orchestrate another agent. It may write only
+to the listed owned paths; all other paths are read-only. If required work falls
+outside those paths, it must stop and report `BLOCKED`. This is instruction-level
+containment; direct host spawning cannot sandbox file writes. Mutation-sensitive
+tasks should use the supervised critical-task runner, whose terminal receipt
+rejects unhanded paths.
 
 ## Bounded STUCK supervision
 
@@ -168,4 +180,4 @@ edit global or project configuration.
 
 ## Prompt packet (every spawn)
 
-Pass only: objective, acceptance, exclusive write/read paths, evidence pointers, validation command, stop condition, mapped `model` + `effort` if the runtime supports them. Do not paste full files, diffs, or prior transcripts.
+Pass only: objective, acceptance, exclusive write/read paths, evidence pointers, validation command, stop condition, mapped `model` + `effort` if the runtime supports them. The emitted prompt must identify one sole specialist, prohibit nested delegation, make unlisted paths read-only, and require `BLOCKED` when the scope is insufficient. Do not paste full files, diffs, or prior transcripts.
