@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Format a small native Codex payload.
+"""Prepare a validated native Codex dispatch payload.
 
-The formatter is optional convenience code. It does not admit work, create
-task identity, select a workflow, or prove that a host call was made. A
-caller may pass the returned object directly to the native host API instead.
+The formatter validates the caller's direct-host attestation and returns a
+READY wrapper around the exact native spawn shape. It does not invoke a host,
+admit work, or prove that a host call was made.
 """
 
 from __future__ import annotations
@@ -45,10 +45,33 @@ _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/ -]{1,127}$")
 _TASK_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 _EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 
+V1_HOST_BINDING = "collaboration.spawn_agent"
+V2_HOST_BINDING = "multi_agent_v1__spawn_agent"
+SUPPORTED_HOST_BINDINGS = frozenset({V1_HOST_BINDING, V2_HOST_BINDING})
+DIRECT_HOST_MODE = "direct_tool_call"
+DIRECT_HOST_BINDING_GUIDANCE = (
+    "run preflight from a parent context that exposes one supported direct spawn binding, "
+    "attest its exact tool name, then invoke that selected binding directly; "
+    "no indirect fallback or cross-binding translation exists"
+)
+V1_HOST_INVOCATION = (
+    "Invoke the direct collaboration.spawn_agent tool exactly once with READY.spawn; "
+    "do not use functions.exec, exec_command, shell, JavaScript, or a nested tool binding."
+)
+V2_HOST_INVOCATION = (
+    "Invoke the direct multi_agent_v1__spawn_agent tool exactly once with READY.spawn; "
+    "do not translate fields, retry, or use functions.exec, exec_command, shell, "
+    "JavaScript, or a nested tool binding."
+)
+READY_BOUNDARY = (
+    "READY proves packet-valid plus selected direct-binding-attested preflight only; "
+    "it does not prove host acceptance, child start, supervision, or completion."
+)
+
 # These fields belonged to the removed admission/receipt contract. Silently
 # carrying them forward would recreate a second workflow authority.
 REMOVED_FIELDS = frozenset({
-    "task_id", "host_binding", "allocation", "admission",
+    "task_id", "allocation", "admission",
     "dispatch_id", "receipt", "receipt_id", "prior_hard_stop", "candidate_changed_paths",
     "critical", "native_collaboration", "fork_context",
 })
@@ -85,6 +108,109 @@ def _role_agent_type(packet: Mapping[str, Any]) -> str:
     return HOST_AGENT_TYPES[role]
 
 
+def _normalise_host_binding(value: Any) -> dict[str, Any]:
+    """Require the caller to attest one supported direct host binding exactly."""
+
+    expected_keys = {"tool", "mode", "available_to_caller"}
+    if not isinstance(value, Mapping):
+        raise PacketValidationError([
+            "host_binding: require an exact object with tool, mode, and "
+            f"available_to_caller; {DIRECT_HOST_BINDING_GUIDANCE}"
+        ])
+
+    actual_keys = set(value)
+    if any(not isinstance(key, str) for key in actual_keys):
+        raise PacketValidationError([
+            "host_binding: keys must be strings and must be exactly tool, mode, "
+            f"and available_to_caller; {DIRECT_HOST_BINDING_GUIDANCE}"
+        ])
+    if actual_keys != expected_keys:
+        missing = sorted(expected_keys - actual_keys)
+        extra = sorted(actual_keys - expected_keys)
+        details = []
+        if missing:
+            details.append(f"missing keys: {', '.join(missing)}")
+        if extra:
+            details.append(f"unexpected keys: {', '.join(extra)}")
+        raise PacketValidationError([
+            "host_binding: must contain exactly tool, mode, and "
+            f"available_to_caller ({'; '.join(details)}); {DIRECT_HOST_BINDING_GUIDANCE}"
+        ])
+
+    errors = []
+    tool = value["tool"]
+    if not isinstance(tool, str) or tool not in SUPPORTED_HOST_BINDINGS:
+        errors.append(
+            f"host_binding.tool: unsupported binding {tool!r}; expected one of "
+            f"{sorted(SUPPORTED_HOST_BINDINGS)!r}; {DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+    if value["mode"] != DIRECT_HOST_MODE:
+        errors.append(
+            f"host_binding.mode: expected {DIRECT_HOST_MODE!r}; "
+            f"{DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+    if value["available_to_caller"] is not True or not isinstance(value["available_to_caller"], bool):
+        errors.append(
+            "host_binding.available_to_caller: must be the boolean true; "
+            f"{DIRECT_HOST_BINDING_GUIDANCE}"
+        )
+    if errors:
+        raise PacketValidationError(errors)
+    return {
+        "tool": value["tool"],
+        "mode": DIRECT_HOST_MODE,
+        "available_to_caller": True,
+    }
+
+
+def _required_model(packet: Mapping[str, Any]) -> str:
+    value = packet.get("model")
+    if value in (None, ""):
+        raise PacketValidationError(["model: required to populate READY.spawn"])
+    model = _text(value, "model")
+    if not _MODEL_RE.fullmatch(model):
+        raise PacketValidationError(["model: must be a concrete model slug"])
+    return model
+
+
+def _required_effort(packet: Mapping[str, Any]) -> str:
+    if "reasoning_effort" in packet and "effort" in packet:
+        raise PacketValidationError([
+            "reasoning_effort: do not combine with the legacy effort alias"
+        ])
+    key = "reasoning_effort" if "reasoning_effort" in packet else "effort"
+    value = packet.get(key)
+    if value in (None, ""):
+        raise PacketValidationError([
+            "reasoning_effort: required to populate READY.spawn"
+        ])
+    effort = _text(value, key).lower()
+    if effort not in _EFFORTS:
+        raise PacketValidationError([f"{key}: unsupported value '{effort}'"])
+    return effort
+
+
+def _optional_model(packet: Mapping[str, Any]) -> str | None:
+    value = _optional_text(packet, "model")
+    if value is not None and not _MODEL_RE.fullmatch(value):
+        raise PacketValidationError(["model: must be a concrete model slug"])
+    return value
+
+
+def _optional_effort(packet: Mapping[str, Any]) -> str | None:
+    if "effort" in packet:
+        raise PacketValidationError([
+            f"effort: unsupported for {V2_HOST_BINDING}; supply reasoning_effort explicitly"
+        ])
+    value = _optional_text(packet, "reasoning_effort")
+    if value is None:
+        return None
+    value = value.lower()
+    if value not in _EFFORTS:
+        raise PacketValidationError([f"reasoning_effort: unsupported value '{value}'"])
+    return value
+
+
 def _task_name(packet: Mapping[str, Any], agent_type: str, message: str) -> str:
     supplied = _optional_text(packet, "task_name")
     if supplied is not None:
@@ -99,16 +225,23 @@ def _task_name(packet: Mapping[str, Any], agent_type: str, message: str) -> str:
 
 
 def _fork_turns(packet: Mapping[str, Any]) -> str:
-    value = packet.get("fork_turns", "1")
+    if "fork_turns" not in packet:
+        raise PacketValidationError([
+            "fork_turns: required positive base-10 integer string"
+        ])
+    value = packet["fork_turns"]
     if isinstance(value, int) and value > 0:
         value = str(value)
-    if value == "all" or (isinstance(value, str) and value.isdigit() and int(value) > 0):
+    if isinstance(value, str) and re.fullmatch(r"[1-9][0-9]*", value):
         return value
-    raise PacketValidationError(["fork_turns: must be 'all' or a positive integer"])
+    raise PacketValidationError([
+        "fork_turns: require a positive base-10 integer string; "
+        "omitted, all, zero, negative, and malformed depths are unsupported"
+    ])
 
 
 def format_native_payload(packet: Mapping[str, Any]) -> dict[str, Any]:
-    """Return only fields understood by the native host spawn call."""
+    """Return the exact payload for the explicitly selected native host."""
 
     if not isinstance(packet, Mapping):
         raise PacketValidationError(["packet: top-level JSON value must be an object"])
@@ -117,39 +250,73 @@ def format_native_payload(packet: Mapping[str, Any]) -> dict[str, Any]:
     if errors:
         raise PacketValidationError(errors)
 
+    binding = _normalise_host_binding(packet.get("host_binding"))["tool"]
     agent_type = _role_agent_type(packet)
     message_value = packet.get("message", packet.get("objective"))
     if message_value is None:
         raise PacketValidationError(["message: required plaintext task message"])
     message = _text(message_value, "message")
+    if binding == V1_HOST_BINDING:
+        return {
+            "task_name": _task_name(packet, agent_type, message),
+            "agent_type": agent_type,
+            "fork_turns": _fork_turns(packet),
+            "message": message,
+            "model": _required_model(packet),
+            "reasoning_effort": _required_effort(packet),
+        }
+
+    cross_binding = [field for field in ("task_name", "fork_turns") if field in packet]
+    if cross_binding:
+        raise PacketValidationError([
+            f"{field}: unsupported for {V2_HOST_BINDING}; do not translate V1 fields"
+            for field in cross_binding
+        ])
     payload: dict[str, Any] = {
         "agent_type": agent_type,
-        "task_name": _task_name(packet, agent_type, message),
-        "fork_turns": _fork_turns(packet),
+        "fork_context": False,
         "message": message,
     }
-
-    model = _optional_text(packet, "model")
+    model = _optional_model(packet)
     if model is not None:
-        if not _MODEL_RE.fullmatch(model):
-            raise PacketValidationError(["model: must be a concrete model slug"])
         payload["model"] = model
-
-    effort_key = "reasoning_effort" if "reasoning_effort" in packet else "effort"
-    if effort_key in packet and packet[effort_key] not in (None, ""):
-        effort = _text(packet[effort_key], effort_key).lower()
-        if effort not in _EFFORTS:
-            raise PacketValidationError([f"{effort_key}: unsupported value '{effort}'"])
+    effort = _optional_effort(packet)
+    if effort is not None:
         payload["reasoning_effort"] = effort
     return payload
 
 
 def prepare_dispatch(packet: Mapping[str, Any], root: str | Path | None = None, *,
                      coding_team_root: str | Path | None = None) -> dict[str, Any]:
-    """Backward-compatible function name for the optional formatter."""
+    """Return READY preflight evidence and the unchanged native spawn payload."""
     if root is not None and coding_team_root is not None:
         raise PacketValidationError(["provide only one of root or coding_team_root"])
-    return format_native_payload(packet)
+    if not isinstance(packet, Mapping):
+        raise PacketValidationError(["packet: top-level JSON value must be an object"])
+    binding = _normalise_host_binding(packet.get("host_binding"))["tool"]
+    spawn = format_native_payload(packet)
+    dispatch_material = json.dumps(
+        {"binding": binding, "spawn": spawn},
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    dispatch_id = "ctd_" + hashlib.sha256(dispatch_material).hexdigest()[:24]
+    instruction = (
+        V1_HOST_INVOCATION if binding == V1_HOST_BINDING else V2_HOST_INVOCATION
+    )
+    return {
+        "status": "READY",
+        "readiness": READY_BOUNDARY,
+        "binding": binding,
+        "dispatch_id": dispatch_id,
+        "spawn": spawn,
+        "invocation": {
+            "tool": binding,
+            "mode": DIRECT_HOST_MODE,
+            "instruction": instruction,
+        },
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -159,7 +326,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         raw = Path(args.input).read_text(encoding="utf-8") if args.input else sys.stdin.read()
-        result = format_native_payload(json.loads(raw))
+        result = prepare_dispatch(json.loads(raw))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         print(json.dumps({"status": "BLOCKED", "errors": [f"invalid JSON input: {exc}"]}, indent=2))
         return 2

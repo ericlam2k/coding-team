@@ -1,77 +1,211 @@
 #!/usr/bin/env python3
-"""Focused tests for the optional native Codex payload formatter."""
+"""Focused tests for the bounded Codex host-binding selector."""
 
 from __future__ import annotations
 
 import importlib.util
+import io
+import json
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest.mock import patch
+
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "prepare-dispatch.py"
+RUNTIME = Path(__file__).resolve().parents[1] / "runtime.md"
+SKILL = Path(__file__).resolve().parents[1] / "SKILL.md"
 SPEC = importlib.util.spec_from_file_location("prepare_dispatch", SCRIPT)
-assert SPEC and SPEC.loader
+if SPEC is None or SPEC.loader is None:  # pragma: no cover
+    raise RuntimeError(f"cannot load {SCRIPT}")
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-class NativePayloadTests(unittest.TestCase):
-    def test_role_message_is_minimal_native_payload(self) -> None:
-        result = MODULE.format_native_payload(
-            {"role": "backend-engineer", "message": "Run one focused check."}
-        )
-        self.assertEqual(result["agent_type"], "worker")
-        self.assertRegex(result["task_name"], r"^worker_[0-9a-f]{8}$")
-        self.assertEqual(result["fork_turns"], "1")
-        self.assertEqual(result["message"], "Run one focused check.")
+class PrepareDispatchTests(unittest.TestCase):
+    @staticmethod
+    def binding(tool: str) -> dict[str, object]:
+        return {"tool": tool, "mode": "direct_tool_call", "available_to_caller": True}
 
-    def test_explicit_model_and_effort_are_preserved(self) -> None:
-        result = MODULE.prepare_dispatch({
-            "agent_type": "worker", "message": "Build the bounded change.",
-            "model": "gpt-5.6-sol", "reasoning_effort": "high",
-        })
-        self.assertEqual(result["model"], "gpt-5.6-sol")
-        self.assertEqual(result["reasoning_effort"], "high")
+    def v1_packet(self, **overrides: object) -> dict[str, object]:
+        packet: dict[str, object] = {
+            "role": "backend-engineer",
+            "message": "Run one focused check.",
+            "model": "gpt-5.6-sol",
+            "effort": "high",
+            "fork_turns": "1",
+            "host_binding": self.binding(MODULE.V1_HOST_BINDING),
+        }
+        packet.update(overrides)
+        return packet
+
+    def v2_packet(self, **overrides: object) -> dict[str, object]:
+        packet: dict[str, object] = {
+            "role": "code-reviewer",
+            "message": "Review the immutable four-file candidate.",
+            "host_binding": self.binding(MODULE.V2_HOST_BINDING),
+        }
+        packet.update(overrides)
+        return packet
+
+    def test_v1_ready_preserves_frozen_six_key_spawn(self) -> None:
+        result = MODULE.prepare_dispatch(self.v1_packet())
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual(result["binding"], MODULE.V1_HOST_BINDING)
         self.assertEqual(
-            set(result),
-            {"agent_type", "task_name", "fork_turns", "message", "model", "reasoning_effort"},
+            set(result["spawn"]),
+            {"task_name", "agent_type", "fork_turns", "message", "model", "reasoning_effort"},
         )
+        self.assertRegex(result["spawn"]["task_name"], r"^worker_[0-9a-f]{8}$")
+        self.assertEqual(result["spawn"]["fork_turns"], "1")
+        self.assertEqual(result["invocation"]["instruction"], MODULE.V1_HOST_INVOCATION)
 
-    def test_direct_payload_can_skip_formatter_fields(self) -> None:
-        self.assertEqual(MODULE.format_native_payload({
-            "agent_type": "explorer", "task_name": "inspect_one", "fork_turns": "all",
-            "message": "Inspect one file."
-        }), {
-            "agent_type": "explorer", "task_name": "inspect_one", "fork_turns": "all",
-            "message": "Inspect one file."
-        })
+    def test_v2_ready_matches_current_direct_host_shape(self) -> None:
+        result = MODULE.prepare_dispatch(self.v2_packet())
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual(result["binding"], MODULE.V2_HOST_BINDING)
+        self.assertEqual(
+            result["spawn"],
+            {
+                "agent_type": "advisor",
+                "fork_context": False,
+                "message": "Review the immutable four-file candidate.",
+            },
+        )
+        self.assertEqual(result["invocation"]["tool"], MODULE.V2_HOST_BINDING)
+        self.assertEqual(result["invocation"]["instruction"], MODULE.V2_HOST_INVOCATION)
+        self.assertRegex(result["dispatch_id"], r"^ctd_[0-9a-f]{24}$")
 
-    def test_removed_controls_are_rejected(self) -> None:
-        for field in ("host_binding", "allocation", "dispatch_id", "receipt"):
-            with self.subTest(field=field), self.assertRaises(MODULE.PacketValidationError) as raised:
-                MODULE.format_native_payload({"agent_type": "worker", "message": "x", field: "legacy"})
-            self.assertIn("removed workflow field", str(raised.exception))
+    def test_v2_optional_overrides_are_forwarded_only_when_supplied(self) -> None:
+        default = MODULE.prepare_dispatch(self.v2_packet())["spawn"]
+        overridden = MODULE.prepare_dispatch(self.v2_packet(
+            model="gpt-5.6-sol", reasoning_effort="high"
+        ))["spawn"]
+        self.assertNotIn("model", default)
+        self.assertNotIn("reasoning_effort", default)
+        self.assertEqual(overridden["model"], "gpt-5.6-sol")
+        self.assertEqual(overridden["reasoning_effort"], "high")
 
-    def test_active_host_identity_and_context_fields_are_validated(self) -> None:
+    def test_v2_rejects_legacy_or_conflicting_effort_alias(self) -> None:
         for packet in (
-            {"agent_type": "worker", "message": "x", "fork_context": False},
-            {"agent_type": "worker", "message": "x", "task_name": "Bad-Name"},
-            {"agent_type": "worker", "message": "x", "fork_turns": "none"},
-            {"agent_type": "worker", "message": "x", "fork_turns": 0},
+            self.v2_packet(effort="high"),
+            self.v2_packet(effort="high", reasoning_effort="high"),
         ):
-            with self.subTest(packet=packet), self.assertRaises(MODULE.PacketValidationError):
-                MODULE.format_native_payload(packet)
+            with self.subTest(packet=packet), self.assertRaises(MODULE.PacketValidationError) as raised:
+                MODULE.prepare_dispatch(packet)
+            self.assertIn("effort: unsupported", " ".join(raised.exception.errors))
 
-        result = MODULE.format_native_payload({
-            "agent_type": "worker", "message": "x", "task_name": "bounded_task",
-            "fork_turns": 2,
-        })
-        self.assertEqual(result["task_name"], "bounded_task")
-        self.assertEqual(result["fork_turns"], "2")
+    def test_v2_rejects_v1_and_caller_context_fields(self) -> None:
+        for field, value in (
+            ("task_name", "legacy_name"),
+            ("fork_turns", "1"),
+            ("fork_context", False),
+        ):
+            with self.subTest(field=field), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(self.v2_packet(**{field: value}))
 
-    def test_invalid_role_and_message_fail_closed(self) -> None:
-        for packet in ({"role": "monitor-agent", "message": "x"}, {"agent_type": "worker"}):
-            with self.assertRaises(MODULE.PacketValidationError):
-                MODULE.format_native_payload(packet)
+    def test_v1_requires_explicit_context_model_and_effort(self) -> None:
+        for field in ("fork_turns", "model", "effort"):
+            packet = self.v1_packet()
+            packet.pop(field)
+            with self.subTest(field=field), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(packet)
+        for value in ("none", "all", 0, -1, None):
+            with self.subTest(value=value), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(self.v1_packet(fork_turns=value))
+
+    def test_attestation_must_be_exact(self) -> None:
+        variants = (
+            None,
+            {"tool": MODULE.V2_HOST_BINDING, "mode": "direct_tool_call", "available_to_caller": False},
+            {"tool": MODULE.V2_HOST_BINDING, "mode": "exec", "available_to_caller": True},
+            {**self.binding(MODULE.V2_HOST_BINDING), "route": "shell"},
+        )
+        for value in variants:
+            with self.subTest(value=value), self.assertRaises(MODULE.PacketValidationError) as raised:
+                MODULE.prepare_dispatch(self.v2_packet(host_binding=value))
+            self.assertIn(MODULE.DIRECT_HOST_BINDING_GUIDANCE, " ".join(raised.exception.errors))
+
+    def test_unknown_and_indirect_bindings_fail_closed(self) -> None:
+        aliases = (
+            "functions.collaboration.spawn_agent",
+            "functions.exec",
+            "exec_command",
+            "tools.multi_agent_v1__spawn_agent",
+            "shell",
+            "python",
+            "node",
+            "javascript",
+        )
+        for alias in aliases:
+            with self.subTest(alias=alias), self.assertRaises(MODULE.PacketValidationError) as raised:
+                MODULE.prepare_dispatch(self.v2_packet(host_binding=self.binding(alias)))
+            errors = " ".join(raised.exception.errors)
+            self.assertIn(alias, errors)
+            self.assertIn(MODULE.DIRECT_HOST_BINDING_GUIDANCE, errors)
+
+    def test_ready_metadata_is_outside_spawn_and_limits_claims(self) -> None:
+        result = MODULE.prepare_dispatch(self.v2_packet())
+        for field in ("binding", "dispatch_id", "readiness", "invocation", "host_binding"):
+            self.assertNotIn(field, result["spawn"])
+        self.assertEqual(result["readiness"], MODULE.READY_BOUNDARY)
+        for claim in ("host acceptance", "child start", "supervision", "completion"):
+            self.assertIn(claim, result["readiness"])
+
+    def test_dispatch_id_is_deterministic_and_binding_scoped(self) -> None:
+        first = MODULE.prepare_dispatch(self.v2_packet())
+        second = MODULE.prepare_dispatch(self.v2_packet())
+        changed = MODULE.prepare_dispatch(self.v2_packet(message="Review a changed candidate."))
+        v1 = MODULE.prepare_dispatch(self.v1_packet(message="Review the immutable four-file candidate."))
+        self.assertEqual(first["dispatch_id"], second["dispatch_id"])
+        self.assertNotEqual(first["dispatch_id"], changed["dispatch_id"])
+        self.assertNotEqual(first["dispatch_id"], v1["dispatch_id"])
+
+    def test_cli_binding_failure_has_no_spawn(self) -> None:
+        packet = self.v2_packet()
+        packet["host_binding"] = self.binding("tools.multi_agent_v1__spawn_agent")
+        output = io.StringIO()
+        with patch("sys.stdin", io.StringIO(json.dumps(packet))), redirect_stdout(output):
+            status = MODULE.main([])
+        result = json.loads(output.getvalue())
+        self.assertEqual(status, 2)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertNotIn("spawn", result)
+
+    def test_cli_malformed_packets_fail_closed_without_traceback_or_spawn(self) -> None:
+        malformed = (
+            [],
+            self.v2_packet(host_binding={
+                "tool": [], "mode": "direct_tool_call", "available_to_caller": True,
+            }),
+        )
+        for packet_value in malformed:
+            output = io.StringIO()
+            with self.subTest(packet=packet_value), patch(
+                "sys.stdin", io.StringIO(json.dumps(packet_value))
+            ), redirect_stdout(output):
+                status = MODULE.main([])
+            result = json.loads(output.getvalue())
+            self.assertEqual(status, 2)
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertNotIn("spawn", result)
+
+    def test_removed_workflow_ceremony_stays_rejected(self) -> None:
+        for field in ("task_id", "allocation", "admission", "receipt", "prior_hard_stop"):
+            with self.subTest(field=field), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(self.v2_packet(**{field: "legacy"}))
+
+    def test_docs_bind_both_exact_host_variants(self) -> None:
+        runtime = " ".join(RUNTIME.read_text(encoding="utf-8").split())
+        skill = " ".join(SKILL.read_text(encoding="utf-8").split())
+        for prose in (runtime, skill):
+            self.assertIn(MODULE.V1_HOST_BINDING, prose)
+            self.assertIn(MODULE.V2_HOST_BINDING, prose)
+            self.assertIn(MODULE.V1_HOST_INVOCATION, prose)
+            self.assertIn(MODULE.V2_HOST_INVOCATION, prose)
+            self.assertIn(MODULE.READY_BOUNDARY, prose)
+            self.assertIn("fork_context=false", prose)
+            self.assertIn("agent_id", prose)
 
 
 if __name__ == "__main__":
