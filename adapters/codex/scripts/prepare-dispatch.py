@@ -48,12 +48,12 @@ _EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 ROUTE_PROFILES = {
     "frontend-builder": ("OR-Laguna", "medium"),
     "backend-engineer": ("gpt-5.6-luna", "medium"),
-    "system-architect": ("claude-fable-5.1", "high"),
+    "system-architect": ("claude-fable-5-1", "high"),
     "code-reviewer": ("gpt-5.6-luna", "high"),
     "test-engineer:design": ("claude-sonnet-5", "high"),
     "test-engineer:implement": ("gpt-5.6-luna", "medium"),
     "gatekeeper:frontend": ("gpt-6-astra", "high"),
-    "gatekeeper:backend": ("claude-fable-5.1", "high"),
+    "gatekeeper:backend": ("claude-fable-5-1", "high"),
 }
 
 V1_HOST_BINDING = "collaboration.spawn_agent"

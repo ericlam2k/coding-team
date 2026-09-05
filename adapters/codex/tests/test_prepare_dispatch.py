@@ -90,11 +90,19 @@ class PrepareDispatchTests(unittest.TestCase):
             MODULE.prepare_dispatch(self.v2_packet(model="gpt-5.6-sol"))
 
     def test_gatekeeper_and_te_routes_are_required_and_injected(self) -> None:
+        architect = MODULE.prepare_dispatch(self.v2_packet(role="system-architect"))["spawn"]
+        self.assertEqual(
+            (architect["model"], architect["reasoning_effort"]),
+            ("claude-fable-5-1", "high"),
+        )
         gatekeeper = self.v2_packet(role="gatekeeper", model_route="frontend")
         spawned = MODULE.prepare_dispatch(gatekeeper)["spawn"]
         self.assertEqual((spawned["model"], spawned["reasoning_effort"]), ("gpt-6-astra", "high"))
         backend_gatekeeper = MODULE.prepare_dispatch(self.v2_packet(role="gatekeeper", model_route="backend"))["spawn"]
-        self.assertEqual(backend_gatekeeper["model"], "claude-fable-5.1")
+        self.assertEqual(
+            (backend_gatekeeper["model"], backend_gatekeeper["reasoning_effort"]),
+            ("claude-fable-5-1", "high"),
+        )
         design = MODULE.prepare_dispatch(self.v2_packet(role="test-engineer", model_route="design"))["spawn"]
         self.assertEqual((design["model"], design["reasoning_effort"]), ("claude-sonnet-5", "high"))
         with self.assertRaises(MODULE.PacketValidationError):
