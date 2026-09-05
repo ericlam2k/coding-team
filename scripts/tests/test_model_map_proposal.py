@@ -161,6 +161,30 @@ class ExplicitSelectionTests(unittest.TestCase):
         self.assertIn("no model", proposal["te_execution"])
         self.assertEqual(proposal["benchmark_status"], "UNVERIFIED")
 
+    def test_risk_qualified_routes_render_as_separate_variants(self):
+        self.selection["roles"]["system-architect"] = {
+            "standard": {"primary": "alpha-premium", "fallback": "beta-premium"},
+            "high": {"primary": "alpha-balanced", "fallback": "beta-balanced"},
+        }
+        self.selection["roles"]["gatekeeper:backend"] = {
+            "standard": {"primary": "beta-premium", "fallback": "alpha-premium"},
+            "high": {"primary": "beta-balanced", "fallback": "alpha-balanced"},
+        }
+        proposal = self.build()
+        role_rows = {row["key"]: row for row in proposal["roles"]}
+        self.assertEqual(
+            {
+                "system-architect:standard",
+                "system-architect:high",
+                "gatekeeper:frontend",
+                "gatekeeper:backend:standard",
+                "gatekeeper:backend:high",
+            } - role_rows.keys(),
+            set(),
+        )
+        self.assertEqual(role_rows["system-architect:standard"]["suggested"], "alpha-premium")
+        self.assertEqual(role_rows["system-architect:high"]["suggested"], "alpha-balanced")
+
     def test_pair_fallback_overlap_is_rejected(self):
         self.selection["roles"]["product-manager"]["fallback"] = "alpha-balanced"
         self.assertTrue(any("families overlap" in problem for problem in self.build()["problems"]))

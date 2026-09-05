@@ -14,7 +14,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, NamedTuple
 
 
 class PacketValidationError(ValueError):
@@ -44,16 +44,36 @@ _CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/ -]{1,127}$")
 _TASK_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 _EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
+_RISKS = frozenset({"standard", "high"})
+
+
+class RouteProfile(NamedTuple):
+    model: str
+    effort: str
+    fallback_model: str | None = None
+    fallback_effort: str | None = None
+    risk: str | None = None
+
 
 ROUTE_PROFILES = {
-    "frontend-builder": ("OR-Laguna", "medium"),
-    "backend-engineer": ("gpt-5.6-luna", "medium"),
-    "system-architect": ("claude-fable-5-1", "high"),
-    "code-reviewer": ("gpt-5.6-luna", "high"),
-    "test-engineer:design": ("claude-sonnet-5", "high"),
-    "test-engineer:implement": ("gpt-5.6-luna", "medium"),
-    "gatekeeper:frontend": ("gpt-6-astra", "high"),
-    "gatekeeper:backend": ("claude-fable-5-1", "high"),
+    "frontend-builder": RouteProfile("OR-Laguna", "medium"),
+    "backend-engineer": RouteProfile("gpt-5.6-luna", "medium"),
+    "system-architect:standard": RouteProfile(
+        "claude-opus-5", "high", "gpt-6-astra", "high", "standard"
+    ),
+    "system-architect:high": RouteProfile(
+        "claude-fable-5-1", "high", "gpt-6-astra", "high", "high"
+    ),
+    "code-reviewer": RouteProfile("gpt-5.6-luna", "high"),
+    "test-engineer:design": RouteProfile("claude-sonnet-5", "high"),
+    "test-engineer:implement": RouteProfile("gpt-5.6-luna", "medium"),
+    "gatekeeper:frontend": RouteProfile("gpt-6-astra", "high"),
+    "gatekeeper:backend:standard": RouteProfile(
+        "claude-opus-5", "high", "gpt-6-astra", "high", "standard"
+    ),
+    "gatekeeper:backend:high": RouteProfile(
+        "claude-fable-5-1", "high", "gpt-6-astra", "high", "high"
+    ),
 }
 
 V1_HOST_BINDING = "collaboration.spawn_agent"
@@ -222,14 +242,41 @@ def _optional_effort(packet: Mapping[str, Any]) -> str | None:
     return value
 
 
-def _route_profile(packet: Mapping[str, Any]) -> tuple[str, str] | None:
+def _risk(packet: Mapping[str, Any], *, required: bool = False) -> str | None:
+    if "risk" not in packet:
+        if required:
+            raise PacketValidationError([
+                "risk: required for system-architect and backend gatekeeper; "
+                "use 'standard' or 'high'"
+            ])
+        return None
+    value = packet["risk"]
+    if value in (None, ""):
+        raise PacketValidationError(["risk: must be 'standard' or 'high'"])
+    risk = _text(value, "risk").lower()
+    if risk not in _RISKS:
+        raise PacketValidationError([
+            f"risk: unsupported value '{risk}'; expected 'standard' or 'high'"
+        ])
+    return risk
+
+
+def _route_profile(packet: Mapping[str, Any]) -> RouteProfile | None:
     role = _optional_text(packet, "role")
+    risk = _risk(packet)
     if role is None:
         return None
     role = role.lower()
-    if role not in ROUTE_PROFILES and role not in {"test-engineer", "gatekeeper"}:
+    if role not in ROUTE_PROFILES and role not in {
+        "system-architect", "test-engineer", "gatekeeper"
+    }:
         return None
     route = _optional_text(packet, "model_route")
+    if role == "system-architect":
+        if route is not None:
+            raise PacketValidationError(["model_route: unsupported for system-architect"])
+        risk = _risk(packet, required=True)
+        return ROUTE_PROFILES[f"system-architect:{risk}"]
     if role == "test-engineer":
         if route not in {"design", "implement"}:
             raise PacketValidationError(["model_route: test-engineer requires design or implement"])
@@ -237,7 +284,10 @@ def _route_profile(packet: Mapping[str, Any]) -> tuple[str, str] | None:
     if role == "gatekeeper":
         if route not in {"frontend", "backend"}:
             raise PacketValidationError(["model_route: gatekeeper requires frontend or backend"])
-        return ROUTE_PROFILES[f"{role}:{route}"]
+        if route == "backend":
+            risk = _risk(packet, required=True)
+            return ROUTE_PROFILES[f"gatekeeper:backend:{risk}"]
+        return ROUTE_PROFILES["gatekeeper:frontend"]
     if route is not None:
         raise PacketValidationError([f"model_route: unsupported for {role}"])
     return ROUTE_PROFILES[role]
@@ -249,12 +299,27 @@ def _routed_model_and_effort(packet: Mapping[str, Any]) -> tuple[str | None, str
     effort = _optional_effort(packet)
     if profile is None:
         return model, effort
-    expected_model, expected_effort = profile
-    if model is not None and model != expected_model:
-        raise PacketValidationError([f"model: {model!r} conflicts with selected route {expected_model!r}"])
-    if effort is not None and effort != expected_effort:
-        raise PacketValidationError([f"reasoning_effort: {effort!r} conflicts with selected route {expected_effort!r}"])
-    return expected_model, expected_effort
+    if model is not None and model != profile.model:
+        raise PacketValidationError([f"model: {model!r} conflicts with selected route {profile.model!r}"])
+    if effort is not None and effort != profile.effort:
+        raise PacketValidationError([f"reasoning_effort: {effort!r} conflicts with selected route {profile.effort!r}"])
+    return profile.model, profile.effort
+
+
+def _routing_metadata(packet: Mapping[str, Any]) -> dict[str, Any] | None:
+    profile = _route_profile(packet)
+    if profile is None or profile.fallback_model is None:
+        return None
+    return {
+        "risk": profile.risk,
+        "selected": {"model": profile.model, "reasoning_effort": profile.effort},
+        "fallback": {
+            "model": profile.fallback_model,
+            "reasoning_effort": profile.fallback_effort,
+        },
+        "automatic_fallback": False,
+        "fallback_requires": "a new authorized dispatch",
+    }
 
 
 def _task_name(packet: Mapping[str, Any], agent_type: str, message: str) -> str:
@@ -306,7 +371,7 @@ def format_native_payload(packet: Mapping[str, Any]) -> dict[str, Any]:
         model = _required_model(packet)
         effort = _required_effort(packet)
         profile = _route_profile(packet)
-        if profile is not None and (model, effort) != profile:
+        if profile is not None and (model, effort) != (profile.model, profile.effort):
             raise PacketValidationError(["model/reasoning_effort: conflicts with selected route"])
         return {
             "task_name": _task_name(packet, agent_type, message),
@@ -355,7 +420,7 @@ def prepare_dispatch(packet: Mapping[str, Any], root: str | Path | None = None, 
     instruction = (
         V1_HOST_INVOCATION if binding == V1_HOST_BINDING else V2_HOST_INVOCATION
     )
-    return {
+    result = {
         "status": "READY",
         "readiness": READY_BOUNDARY,
         "binding": binding,
@@ -367,6 +432,10 @@ def prepare_dispatch(packet: Mapping[str, Any], root: str | Path | None = None, 
             "instruction": instruction,
         },
     }
+    routing = _routing_metadata(packet)
+    if routing is not None:
+        result["routing"] = routing
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:

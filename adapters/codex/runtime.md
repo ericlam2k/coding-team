@@ -5,6 +5,11 @@ Lead supplies one bounded Input, a specialist performs the Process, and the
 specialist returns one Handoff. Direct native spawning is valid when the host
 payload is already known.
 
+System Architect and backend Gatekeeper packets require `risk: standard` or
+`risk: high`. Standard risk selects `claude-opus-5`; high risk selects
+`claude-fable-5-1`. `gpt-6-astra` / `high` is recorded as explicit fallback
+metadata only and requires a new authorized dispatch; it is never automatic.
+
 ## Native payload
 
 `prepare-dispatch.py` uses one bounded selector for two verified direct host

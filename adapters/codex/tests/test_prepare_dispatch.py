@@ -89,8 +89,71 @@ class PrepareDispatchTests(unittest.TestCase):
         with self.assertRaises(MODULE.PacketValidationError):
             MODULE.prepare_dispatch(self.v2_packet(model="gpt-5.6-sol"))
 
+    def test_v1_risk_routes_select_opus_or_fable(self) -> None:
+        standard = self.v1_packet(
+            role="system-architect", risk="standard",
+            model="claude-opus-5", effort="high",
+        )
+        high = self.v1_packet(
+            role="system-architect", risk="high",
+            model="claude-fable-5-1", effort="high",
+        )
+        self.assertEqual(
+            MODULE.prepare_dispatch(standard)["spawn"]["model"], "claude-opus-5"
+        )
+        self.assertEqual(
+            MODULE.prepare_dispatch(high)["spawn"]["model"], "claude-fable-5-1"
+        )
+
+    def test_v2_risk_routes_select_opus_or_fable(self) -> None:
+        standard = MODULE.prepare_dispatch(
+            self.v2_packet(role="system-architect", risk="standard")
+        )
+        high = MODULE.prepare_dispatch(
+            self.v2_packet(role="system-architect", risk="high")
+        )
+        self.assertEqual(standard["spawn"]["model"], "claude-opus-5")
+        self.assertEqual(high["spawn"]["model"], "claude-fable-5-1")
+
+    def test_backend_gatekeeper_requires_risk_and_exposes_nonautomatic_astra_fallback(self) -> None:
+        standard = MODULE.prepare_dispatch(self.v2_packet(
+            role="gatekeeper", model_route="backend", risk="standard"
+        ))
+        high = MODULE.prepare_dispatch(self.v2_packet(
+            role="gatekeeper", model_route="backend", risk="high"
+        ))
+        self.assertEqual(standard["spawn"]["model"], "claude-opus-5")
+        self.assertEqual(high["spawn"]["model"], "claude-fable-5-1")
+        self.assertNotIn("gpt-6-astra", standard["spawn"].values())
+        self.assertEqual(
+            standard["routing"]["fallback"],
+            {"model": "gpt-6-astra", "reasoning_effort": "high"},
+        )
+        self.assertFalse(standard["routing"]["automatic_fallback"])
+        self.assertEqual(standard["routing"]["fallback_requires"], "a new authorized dispatch")
+
+    def test_missing_or_invalid_risk_is_rejected_for_affected_roles(self) -> None:
+        packets = (
+            self.v2_packet(role="system-architect"),
+            self.v2_packet(role="system-architect", risk="critical"),
+            self.v2_packet(role="gatekeeper", model_route="backend"),
+            self.v2_packet(role="gatekeeper", model_route="backend", risk="low"),
+        )
+        for packet in packets:
+            with self.subTest(packet=packet), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(packet)
+
+    def test_risk_route_rejects_conflicting_models(self) -> None:
+        for risk, model in (("standard", "claude-fable-5-1"), ("high", "claude-opus-5")):
+            with self.subTest(risk=risk), self.assertRaises(MODULE.PacketValidationError):
+                MODULE.prepare_dispatch(self.v2_packet(
+                    role="system-architect", risk=risk, model=model
+                ))
+
     def test_gatekeeper_and_te_routes_are_required_and_injected(self) -> None:
-        architect = MODULE.prepare_dispatch(self.v2_packet(role="system-architect"))["spawn"]
+        architect = MODULE.prepare_dispatch(
+            self.v2_packet(role="system-architect", risk="high")
+        )["spawn"]
         self.assertEqual(
             (architect["model"], architect["reasoning_effort"]),
             ("claude-fable-5-1", "high"),
@@ -98,7 +161,9 @@ class PrepareDispatchTests(unittest.TestCase):
         gatekeeper = self.v2_packet(role="gatekeeper", model_route="frontend")
         spawned = MODULE.prepare_dispatch(gatekeeper)["spawn"]
         self.assertEqual((spawned["model"], spawned["reasoning_effort"]), ("gpt-6-astra", "high"))
-        backend_gatekeeper = MODULE.prepare_dispatch(self.v2_packet(role="gatekeeper", model_route="backend"))["spawn"]
+        backend_gatekeeper = MODULE.prepare_dispatch(
+            self.v2_packet(role="gatekeeper", model_route="backend", risk="high")
+        )["spawn"]
         self.assertEqual(
             (backend_gatekeeper["model"], backend_gatekeeper["reasoning_effort"]),
             ("claude-fable-5-1", "high"),

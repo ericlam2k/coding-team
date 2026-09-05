@@ -20,17 +20,24 @@ exact route is available; record planned and actual identity separately.
 | Frontend UX or visual work | `OR-GLM` / high | `claude-opus-5` / high |
 | Frontend Builder | `OR-Laguna` / medium | `claude-sonnet-5` / medium |
 | Backend Engineer build | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
-| Backend system work and System Architect | `claude-fable-5-1` / high | `gpt-6-astra` / high |
+| System Architect — standard risk | `claude-opus-5` / high | `gpt-6-astra` / high |
+| System Architect — high risk | `claude-fable-5-1` / high | `gpt-6-astra` / high |
 | Code Reviewer | `gpt-5.6-luna` / high | `gpt-6-astra` / high |
 | Test Engineer planning / scenario design | `claude-sonnet-5` / high | `gpt-6-astra` / high |
 | Test Engineer implementation | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
 | Gatekeeper after frontend work | `gpt-6-astra` / high | `claude-opus-5` / high |
-| Gatekeeper after backend work | `claude-fable-5-1` / high | `gpt-6-astra` / high |
+| Gatekeeper after backend work — standard risk | `claude-opus-5` / high | `gpt-6-astra` / high |
+| Gatekeeper after backend work — high risk | `claude-fable-5-1` / high | `gpt-6-astra` / high |
 
 `gpt-5.6-sol` and `gpt-5.5` are excluded from this profile. `OR-Laguna` and
 `claude-fable-5-1` require those exact configured routes. Do not substitute
 Laguna XS, an alias, or another Fable version; route unavailability returns to
 Lead for the named fallback on a new authorized route, never automatic retry.
+
+System Architect and backend Gatekeeper packets must declare `risk` as
+`standard` or `high`. Standard risk selects Opus; high risk selects Fable. The
+Astra fallback is metadata for a new authorized dispatch only, never an
+automatic retry, model switch, or standard-risk Fable fallback.
 
 ## Role routing
 

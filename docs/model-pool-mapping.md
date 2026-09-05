@@ -37,6 +37,12 @@ Supply an explicit selection JSON with `tiers`, optional per-`roles` overrides,
 optional `effort`/`fallback_effort`. Choices must be distinct and in the pool.
 Every tier and model-assigned role must be complete before approval.
 
+System Architect and backend Gatekeeper are risk-qualified routes. The proposal
+must carry separate `standard` and `high` rows: standard selects
+`claude-opus-5`, high selects `claude-fable-5-1`, and both declare
+`gpt-6-astra` / `high` as an explicit fallback. Fallback metadata never causes
+an automatic retry or model switch; use it only in a new authorized dispatch.
+
 PM/SA and Advisor/Contradictor must have disjoint declared family sets, including
 fallback choices. Families are explicit metadata, not string-splitting guesses.
 This enforces the operator's independence constraint, not independent reasoning

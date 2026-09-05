@@ -25,6 +25,10 @@ ROLE_TIERS = {
     "frontend-builder": "1 build", "code-reviewer": "1 validate",
     "test-engineer": "1 validate", "gatekeeper": "3", "docs-steward": "0",
 }
+RISK_VARIANTS = {
+    "system-architect": ("standard", "high"),
+    "gatekeeper:backend": ("standard", "high"),
+}
 CROSS_FAMILY_PAIRS = (("product-manager", "system-architect"), ("advisor", "contradictor"))
 EFFORTS = {"low", "medium", "high", "xhigh", "max", "ultra"}
 CREDENTIAL_VALUE_RE = re.compile(r"^(?:sk[-_]|key[-_]|token[-_]|secret[-_]|bearer\s+|password[-_])", re.I)
@@ -96,6 +100,21 @@ def route_row(key: str, tier: str, entry: dict, available: list[str]) -> dict:
     }
 
 
+def _route_entry(
+    roles: dict, keys: tuple[str, ...], fallback: dict, risk: str | None = None
+) -> dict:
+    """Resolve a flat or risk-nested route without inventing a model choice."""
+    for key in keys:
+        candidate = roles.get(key)
+        if not isinstance(candidate, dict):
+            continue
+        if risk is not None and isinstance(candidate.get(risk), dict):
+            return candidate[risk]
+        if "primary" in candidate or "fallback" in candidate:
+            return candidate
+    return fallback
+
+
 def build_rows(available: list[str], selection: dict | None = None) -> list[dict]:
     selection = selection or {}
     return [route_row(tier, tier, selection.get(tier, {}), available) for tier in TIER_ORDER]
@@ -110,7 +129,14 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
     if not all(isinstance(value, dict) for value in (tiers, roles, families)):
         raise ValueError("tiers, roles and families must be objects")
     phase_keys = {"test-engineer:design", "test-engineer:implement"}
-    if set(tiers) - set(TIER_ORDER) or set(roles) - ((set(ROLE_TIERS) - {"test-engineer"}) | phase_keys):
+    allowed_role_keys = (
+        (set(ROLE_TIERS) - {"test-engineer"})
+        | phase_keys
+        | {"system-architect:standard", "system-architect:high"}
+        | {"gatekeeper:frontend", "gatekeeper:backend"}
+        | {"gatekeeper:backend:standard", "gatekeeper:backend:high"}
+    )
+    if set(tiers) - set(TIER_ORDER) or set(roles) - allowed_role_keys:
         raise ValueError("Unknown tier, role or phase in selection")
     available = sorted({entry["slug"] for entry in inventory["models"]})
     if any(not looks_like_slug(slug) or not isinstance(family, str) or not re.fullmatch(r"[a-z][a-z0-9_-]*", family)
@@ -122,15 +148,45 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
     rows = build_rows(available, tiers)
     role_rows = []
     for role, tier in ROLE_TIERS.items():
-        phases = (("test-engineer:design", "2"), ("test-engineer:implement", "1 build")) if role == "test-engineer" else ((role, tier),)
-        for key, phase_tier in phases:
-            role_rows.append(route_row(key, phase_tier, roles.get(key, tiers.get(phase_tier, {})), available))
+        if role == "test-engineer":
+            phases = (("test-engineer:design", "2"), ("test-engineer:implement", "1 build"))
+            for key, phase_tier in phases:
+                role_rows.append(route_row(key, phase_tier, roles.get(key, tiers.get(phase_tier, {})), available))
+        elif role == "system-architect":
+            for risk in RISK_VARIANTS[role]:
+                key = f"{role}:{risk}"
+                entry = _route_entry(
+                    roles, (key, role), tiers.get(tier, {}), risk=risk
+                )
+                role_rows.append(route_row(key, tier, entry, available))
+        elif role == "gatekeeper":
+            frontend = _route_entry(
+                roles, ("gatekeeper:frontend", "gatekeeper"), tiers.get(tier, {})
+            )
+            role_rows.append(route_row("gatekeeper:frontend", tier, frontend, available))
+            for risk in RISK_VARIANTS["gatekeeper:backend"]:
+                key = f"gatekeeper:backend:{risk}"
+                entry = _route_entry(
+                    roles,
+                    (key, "gatekeeper:backend", "gatekeeper"),
+                    tiers.get(tier, {}),
+                    risk=risk,
+                )
+                role_rows.append(route_row(key, tier, entry, available))
+        else:
+            role_rows.append(route_row(role, tier, roles.get(role, tiers.get(tier, {})), available))
     problems = []
     by_role = {row["key"]: row for row in role_rows}
     for left, right in CROSS_FAMILY_PAIRS:
         family_sets = []
         for role in (left, right):
-            chosen = [by_role[role][field] for field in ("suggested", "fallback")]
+            role_matches = [
+                row for key, row in by_role.items()
+                if key == role or key.startswith(f"{role}:")
+            ]
+            chosen = [
+                row[field] for row in role_matches for field in ("suggested", "fallback")
+            ]
             if any(slug not in families for slug in chosen):
                 problems.append(f"{role}: primary/fallback family metadata missing")
             family_sets.append({families[slug] for slug in chosen if slug in families})
