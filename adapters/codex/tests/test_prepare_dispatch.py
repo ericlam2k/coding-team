@@ -31,8 +31,8 @@ class PrepareDispatchTests(unittest.TestCase):
         packet: dict[str, object] = {
             "role": "backend-engineer",
             "message": "Run one focused check.",
-            "model": "gpt-5.6-sol",
-            "effort": "high",
+            "model": "gpt-5.6-luna",
+            "effort": "medium",
             "fork_turns": "1",
             "host_binding": self.binding(MODULE.V1_HOST_BINDING),
         }
@@ -70,6 +70,8 @@ class PrepareDispatchTests(unittest.TestCase):
                 "agent_type": "advisor",
                 "fork_context": False,
                 "message": "Review the immutable four-file candidate.",
+                "model": "gpt-5.6-luna",
+                "reasoning_effort": "high",
             },
         )
         self.assertEqual(result["invocation"]["tool"], MODULE.V2_HOST_BINDING)
@@ -78,13 +80,25 @@ class PrepareDispatchTests(unittest.TestCase):
 
     def test_v2_optional_overrides_are_forwarded_only_when_supplied(self) -> None:
         default = MODULE.prepare_dispatch(self.v2_packet())["spawn"]
-        overridden = MODULE.prepare_dispatch(self.v2_packet(
-            model="gpt-5.6-sol", reasoning_effort="high"
+        matching = MODULE.prepare_dispatch(self.v2_packet(
+            model="gpt-5.6-luna", reasoning_effort="high"
         ))["spawn"]
-        self.assertNotIn("model", default)
-        self.assertNotIn("reasoning_effort", default)
-        self.assertEqual(overridden["model"], "gpt-5.6-sol")
-        self.assertEqual(overridden["reasoning_effort"], "high")
+        self.assertEqual(default["model"], "gpt-5.6-luna")
+        self.assertEqual(default["reasoning_effort"], "high")
+        self.assertEqual(matching["model"], "gpt-5.6-luna")
+        with self.assertRaises(MODULE.PacketValidationError):
+            MODULE.prepare_dispatch(self.v2_packet(model="gpt-5.6-sol"))
+
+    def test_gatekeeper_and_te_routes_are_required_and_injected(self) -> None:
+        gatekeeper = self.v2_packet(role="gatekeeper", model_route="frontend")
+        spawned = MODULE.prepare_dispatch(gatekeeper)["spawn"]
+        self.assertEqual((spawned["model"], spawned["reasoning_effort"]), ("gpt-6-astra", "high"))
+        backend_gatekeeper = MODULE.prepare_dispatch(self.v2_packet(role="gatekeeper", model_route="backend"))["spawn"]
+        self.assertEqual(backend_gatekeeper["model"], "claude-fable-5.1")
+        design = MODULE.prepare_dispatch(self.v2_packet(role="test-engineer", model_route="design"))["spawn"]
+        self.assertEqual((design["model"], design["reasoning_effort"]), ("claude-sonnet-5", "high"))
+        with self.assertRaises(MODULE.PacketValidationError):
+            MODULE.prepare_dispatch(self.v2_packet(role="gatekeeper"))
 
     def test_v2_rejects_legacy_or_conflicting_effort_alias(self) -> None:
         for packet in (

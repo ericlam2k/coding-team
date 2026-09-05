@@ -85,6 +85,15 @@ A failed or partial task returns to Lead for the smallest correction or
 rerouting. It does not automatically require a new gate, model change, or
 workflow restart.
 
+## Completion truth
+
+Mark work `complete` only when the requested outcome is actually true and its
+named acceptance evidence exists. A proposal, policy document, packet `READY`,
+installed symlink, or passing narrow check is not completion unless it proves
+the requested behavior. State any unavailable route, inherited host default,
+missing execution identity, unrun check, or remaining approval as `PARTIAL` or
+`BLOCKED`; never hide it behind a completion claim.
+
 ## Optional execution support
 
 - Use the watchdog only for a real background or long-running command that needs

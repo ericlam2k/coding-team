@@ -45,6 +45,17 @@ _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/ -]{1,127}$")
 _TASK_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 _EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 
+ROUTE_PROFILES = {
+    "frontend-builder": ("OR-Laguna", "medium"),
+    "backend-engineer": ("gpt-5.6-luna", "medium"),
+    "system-architect": ("claude-fable-5.1", "high"),
+    "code-reviewer": ("gpt-5.6-luna", "high"),
+    "test-engineer:design": ("claude-sonnet-5", "high"),
+    "test-engineer:implement": ("gpt-5.6-luna", "medium"),
+    "gatekeeper:frontend": ("gpt-6-astra", "high"),
+    "gatekeeper:backend": ("claude-fable-5.1", "high"),
+}
+
 V1_HOST_BINDING = "collaboration.spawn_agent"
 V2_HOST_BINDING = "multi_agent_v1__spawn_agent"
 SUPPORTED_HOST_BINDINGS = frozenset({V1_HOST_BINDING, V2_HOST_BINDING})
@@ -211,6 +222,41 @@ def _optional_effort(packet: Mapping[str, Any]) -> str | None:
     return value
 
 
+def _route_profile(packet: Mapping[str, Any]) -> tuple[str, str] | None:
+    role = _optional_text(packet, "role")
+    if role is None:
+        return None
+    role = role.lower()
+    if role not in ROUTE_PROFILES and role not in {"test-engineer", "gatekeeper"}:
+        return None
+    route = _optional_text(packet, "model_route")
+    if role == "test-engineer":
+        if route not in {"design", "implement"}:
+            raise PacketValidationError(["model_route: test-engineer requires design or implement"])
+        return ROUTE_PROFILES[f"{role}:{route}"]
+    if role == "gatekeeper":
+        if route not in {"frontend", "backend"}:
+            raise PacketValidationError(["model_route: gatekeeper requires frontend or backend"])
+        return ROUTE_PROFILES[f"{role}:{route}"]
+    if route is not None:
+        raise PacketValidationError([f"model_route: unsupported for {role}"])
+    return ROUTE_PROFILES[role]
+
+
+def _routed_model_and_effort(packet: Mapping[str, Any]) -> tuple[str | None, str | None]:
+    profile = _route_profile(packet)
+    model = _optional_model(packet)
+    effort = _optional_effort(packet)
+    if profile is None:
+        return model, effort
+    expected_model, expected_effort = profile
+    if model is not None and model != expected_model:
+        raise PacketValidationError([f"model: {model!r} conflicts with selected route {expected_model!r}"])
+    if effort is not None and effort != expected_effort:
+        raise PacketValidationError([f"reasoning_effort: {effort!r} conflicts with selected route {expected_effort!r}"])
+    return expected_model, expected_effort
+
+
 def _task_name(packet: Mapping[str, Any], agent_type: str, message: str) -> str:
     supplied = _optional_text(packet, "task_name")
     if supplied is not None:
@@ -257,13 +303,18 @@ def format_native_payload(packet: Mapping[str, Any]) -> dict[str, Any]:
         raise PacketValidationError(["message: required plaintext task message"])
     message = _text(message_value, "message")
     if binding == V1_HOST_BINDING:
+        model = _required_model(packet)
+        effort = _required_effort(packet)
+        profile = _route_profile(packet)
+        if profile is not None and (model, effort) != profile:
+            raise PacketValidationError(["model/reasoning_effort: conflicts with selected route"])
         return {
             "task_name": _task_name(packet, agent_type, message),
             "agent_type": agent_type,
             "fork_turns": _fork_turns(packet),
             "message": message,
-            "model": _required_model(packet),
-            "reasoning_effort": _required_effort(packet),
+            "model": model,
+            "reasoning_effort": effort,
         }
 
     cross_binding = [field for field in ("task_name", "fork_turns") if field in packet]
@@ -277,10 +328,9 @@ def format_native_payload(packet: Mapping[str, Any]) -> dict[str, Any]:
         "fork_context": False,
         "message": message,
     }
-    model = _optional_model(packet)
+    model, effort = _routed_model_and_effort(packet)
     if model is not None:
         payload["model"] = model
-    effort = _optional_effort(packet)
     if effort is not None:
         payload["reasoning_effort"] = effort
     return payload
