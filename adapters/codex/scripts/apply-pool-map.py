@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Write a Codex model map using the shared host-neutral proposer.
-
-This is a compatibility entry point. The installer uses
-``scripts/propose-model-map.py`` for detect → propose → approve; this command
-keeps the older direct-write interface without maintaining a second
-map algorithm.
-"""
+"""Preview supplied model IDs; approved writes use the canonical proposer."""
 
 from __future__ import annotations
 
@@ -53,18 +47,16 @@ def main() -> int:
     parser.add_argument("--stdin", action="store_true", help="Read a JSON list of model IDs from stdin")
     parser.add_argument("--slugs-json", help="Path to a JSON list of model IDs")
     parser.add_argument("--codex-home", default=str(Path.home() / ".codex"))
+    parser.add_argument("--propose-only", action="store_true")
     args = parser.parse_args()
+
+    if not args.propose_only:
+        parser.error("Direct writes are disabled. Use ct map propose/approve with explicit selection and matching digest.")
 
     proposer = load_proposer()
     available = load_slugs(args, proposer)
     rows = proposer.build_rows(available)
-    text = proposer.render("codex", available, rows, approved=True)
-    outs = args.outs or [str(Path.cwd() / "model-pool.map.md")]
-    for out in outs:
-        path = Path(out)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-        print(f"wrote {path}", file=sys.stderr)
+    text = proposer.render("codex", available, rows, approved=False)
     sys.stdout.write(text)
     return 0
 

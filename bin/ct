@@ -19,7 +19,6 @@ CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 die() { echo "error: $*" >&2; exit 1; }
 [[ -f "$PROPOSE" ]] || die "missing $PROPOSE"
 [[ -f "$QA_SKILL_SRC/SKILL.md" && -f "$QA_VALIDATOR" ]] || die "missing QA evidence enforcement assets"
-chmod +x "$ROOT/bin/ct" "$PROPOSE" 2>/dev/null || true
 
 usage() {
   cat <<'EOF'
@@ -28,11 +27,11 @@ coding-team v2 CLI (platform-independent)
   ./bin/ct init [--platform codex|cursor|cline]
       Detect/install the selected adapter only.
 
-  ./bin/ct map propose [--platform codex|cursor|cline]
-      Show a read-only host model-map suggestion. Never writes a file.
+  ./bin/ct map propose [--platform codex|cursor|cline] [--selection FILE] [--json]
+      Show all model options and explicit role/phase choices. Never writes a map.
 
-  ./bin/ct map approve [--platform codex|cursor|cline] [--yes]
-      Show the suggestion and explicitly approve a local model-map write.
+  ./bin/ct map approve --platform codex --selection FILE --approve-digest HASH --accept-unverified --yes
+      Approve the exact provisional choices; refuses to overwrite an existing map.
 
   ./bin/ct status
   ./bin/ct refresh [--platform ...]       (legacy alias for map propose)
@@ -99,8 +98,6 @@ map_outs() {
   case "$platform" in
     codex)
       echo "$CODEX_HOME/skills/coding-team/model-pool.map.md"
-      echo "$ROOT/adapters/codex/model-pool.map.md"
-      echo "$ROOT/examples/model-pool.map.md"
       ;;
     cursor)
       echo "$ROOT/adapters/cursor/model-pool.map.md"
@@ -225,28 +222,33 @@ cmd_map() {
   case "$action" in
     propose)
       local platform=""
+      local extra=()
       while [[ $# -gt 0 ]]; do
         case "$1" in
           --platform) platform="$2"; shift 2 ;;
+          --selection) extra+=(--selection "$2"); shift 2 ;;
+          --json) extra+=(--json); shift ;;
           *) die "unknown map propose flag: $1" ;;
         esac
       done
       [[ -n "$platform" ]] || platform="$(detect_platform)"
       [[ -n "$platform" ]] || die "pass --platform"
-      run_propose "$platform"
+      run_propose "$platform" "${extra[@]}"
       ;;
     approve)
       local platform="" yes=0
+      local extra=()
       while [[ $# -gt 0 ]]; do
         case "$1" in
           --platform) platform="$2"; shift 2 ;;
+          --selection|--approve-digest) extra+=("$1" "$2"); shift 2 ;;
+          --accept-unverified) extra+=(--accept-unverified); shift ;;
           --yes|-y) yes=1; shift ;;
           *) die "unknown map approve flag: $1" ;;
         esac
       done
       [[ -n "$platform" ]] || platform="$(detect_platform)"
       [[ -n "$platform" ]] || die "pass --platform"
-      local extra=()
       [[ "$yes" -eq 1 ]] && extra+=(--yes)
       run_approve "$platform" "${extra[@]}"
       ;;
