@@ -16,13 +16,16 @@ exact route is available; record planned and actual identity separately.
 
 | Work | Primary / effort | Fallback / effort |
 |---|---|---|
-| Premium decision and Gatekeeper | `gpt-6-astra` / high | `claude-opus-5` / high |
+| Premium decision | `gpt-6-astra` / high | `claude-opus-5` / high |
 | Frontend UX or visual work | `gpt-6-astra` / high | `claude-opus-5` / high |
 | Frontend Builder | `OR-Laguna` / medium | `claude-sonnet-5` / medium |
+| Backend Engineer build | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
 | Backend system work and System Architect | `claude-fable-5.1` / high | `gpt-6-astra` / high |
 | Code Reviewer | `gpt-5.6-luna` / high | `gpt-6-astra` / high |
-| Test Engineer scenario design | `claude-sonnet-5` / high | `gpt-6-astra` / high |
-| Test implementation | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
+| Test Engineer planning / scenario design | `claude-sonnet-5` / high | `gpt-6-astra` / high |
+| Test Engineer implementation | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
+| Gatekeeper after frontend work | `gpt-6-astra` / high | `claude-opus-5` / high |
+| Gatekeeper after backend work | `claude-fable-5.1` / high | `gpt-6-astra` / high |
 
 `gpt-5.6-sol` and `gpt-5.5` are excluded from this profile. `OR-Laguna` and
 `claude-fable-5.1` require those exact configured routes. Do not substitute
