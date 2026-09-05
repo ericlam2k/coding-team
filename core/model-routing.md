@@ -17,7 +17,7 @@ exact route is available; record planned and actual identity separately.
 | Work | Primary / effort | Fallback / effort |
 |---|---|---|
 | Premium decision | `gpt-6-astra` / high | `claude-opus-5` / high |
-| Frontend UX or visual work | `gpt-6-astra` / high | `claude-opus-5` / high |
+| Frontend UX or visual work | `OR-GLM` / high | `claude-opus-5` / high |
 | Frontend Builder | `OR-Laguna` / medium | `claude-sonnet-5` / medium |
 | Backend Engineer build | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
 | Backend system work and System Architect | `claude-fable-5.1` / high | `gpt-6-astra` / high |
