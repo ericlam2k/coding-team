@@ -28,6 +28,7 @@ ROLE_TIERS = {
 RISK_VARIANTS = {
     "system-architect": ("standard", "high"),
     "gatekeeper:backend": ("standard", "high"),
+    "code-reviewer": ("low", "high"),
 }
 CROSS_FAMILY_PAIRS = (("product-manager", "system-architect"), ("advisor", "contradictor"))
 EFFORTS = {"low", "medium", "high", "xhigh", "max", "ultra"}
@@ -65,8 +66,34 @@ def detect_codex(codex_home: Path) -> list[str]:
     return [entry["slug"] for entry in detect_codex_details(codex_home)["models"]]
 
 
+def detect_cursor_details() -> dict:
+    """Read an explicit Cursor pool. Do not invent slugs when none are configured."""
+    configured = os.environ.get("CURSOR_MODEL_POOL", "").strip()
+    slugs: list[str] = []
+    source = ""
+    if configured:
+        try:
+            parsed = json.loads(configured)
+            raw = parsed if isinstance(parsed, list) else [configured]
+        except json.JSONDecodeError:
+            raw = [part.strip() for part in configured.replace("\n", ",").split(",")]
+        slugs = sorted({item.strip() for item in raw if looks_like_slug(item)})
+        source = "env:CURSOR_MODEL_POOL"
+    if not slugs:
+        return {
+            "models": [],
+            "warnings": [
+                "No live Cursor pool; set CURSOR_MODEL_POOL or authenticate cursor agent --list-models"
+            ],
+        }
+    return {
+        "models": [{"slug": slug, "sources": [source]} for slug in slugs],
+        "warnings": [],
+    }
+
+
 def detect_cursor() -> list[str]:
-    return []
+    return [entry["slug"] for entry in detect_cursor_details()["models"]]
 
 
 def detect_cline() -> list[str]:
@@ -133,7 +160,8 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
         (set(ROLE_TIERS) - {"test-engineer"})
         | phase_keys
         | {"system-architect:standard", "system-architect:high"}
-        | {"gatekeeper:frontend", "gatekeeper:backend"}
+        | {"code-reviewer:low", "code-reviewer:high"}
+        | {"gatekeeper:frontend", "gatekeeper:backend", "gatekeeper:small"}
         | {"gatekeeper:backend:standard", "gatekeeper:backend:high"}
     )
     if set(tiers) - set(TIER_ORDER) or set(roles) - allowed_role_keys:
@@ -159,7 +187,18 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
                     roles, (key, role), tiers.get(tier, {}), risk=risk
                 )
                 role_rows.append(route_row(key, tier, entry, available))
+        elif role == "code-reviewer":
+            for risk in RISK_VARIANTS[role]:
+                key = f"{role}:{risk}"
+                entry = _route_entry(
+                    roles, (key, role), tiers.get(tier, {}), risk=risk
+                )
+                role_rows.append(route_row(key, tier, entry, available))
         elif role == "gatekeeper":
+            small = _route_entry(
+                roles, ("gatekeeper:small",), tiers.get("0", {})
+            )
+            role_rows.append(route_row("gatekeeper:small", "0", small, available))
             frontend = _route_entry(
                 roles, ("gatekeeper:frontend", "gatekeeper"), tiers.get(tier, {})
             )
@@ -260,6 +299,8 @@ def main() -> int:
     try:
         if args.platform == "codex":
             inventory = detect_codex_details(Path(args.codex_home).expanduser())
+        elif args.platform == "cursor":
+            inventory = detect_cursor_details()
         else:
             inventory = {"models": [], "warnings": ["No live discovery adapter configured for this platform; no fabricated pool is used"]}
         try:
