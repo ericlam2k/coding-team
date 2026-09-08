@@ -35,6 +35,8 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
 - If a named UX or architecture contract was used, that owner reviews the built
   result before Gatekeeper. Small single-owner patches skip that bounce. High
   risk adds proof and ship; it does not skip the contract owner.
+- Built-vs-contract inspect uses the cheapest capable slug; do not inherit the
+  contract-role premium model for browser or HTTP tool loops.
 - Incomplete work returns to Lead for correction or rerouting; do not invent
   acceptance.
 - Design: start at `$CODING_TEAM_ROOT/skills/design/design-router.md`; it

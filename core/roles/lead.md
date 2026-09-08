@@ -27,7 +27,11 @@ Start **none**. Load only when a meta-task names them:
 - Serial debate: Adv → Con → Lead resolution; never invent roles
 - Defects → corrected brief to the classified owner
 - After a named UX or architecture contract is implemented, route that owner
-  to the built UI/API before Gatekeeper unless the work is `small`
+  to the built UI/API before Gatekeeper unless the work is `small`. Dispatch
+  inspect evidence on `frontend-ux-lead:inspect` or `system-architect:inspect`
+  (cheap slug). Do not inherit the contract-role premium slug for browser or
+  HTTP tool loops. Escalate to the contract slug only if taste or architecture
+  judgment remains unresolved.
 - After work, keep the same task: a cheaper in-role model writes the handoff,
   or Lead writes it from the worker facts. Do not spawn Docs Steward for the
   ordinary task record. Do not open a new Task only to change model.

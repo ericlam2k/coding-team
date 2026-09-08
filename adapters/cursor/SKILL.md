@@ -22,6 +22,9 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 - If a named UX or architecture contract was used, that owner reviews the built
   result before Gatekeeper; small patches skip that bounce; high risk does not
   skip the contract owner
+- Built-vs-contract inspect uses `frontend-ux-lead:inspect` or
+  `system-architect:inspect` (cheap slug). Do not inherit GLM/Sol/Fable for
+  browser or HTTP tool loops
 - Incomplete work returns to Lead for correction or rerouting
 - Lead writes briefs and routes handoffs, never implementation code
 - PM Lean addon default OFF; enable it only for an explicit PM task

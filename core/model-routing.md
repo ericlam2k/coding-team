@@ -48,7 +48,8 @@ automatic retry, model switch, or standard-risk Fable fallback.
 | Shared contract | System Architect | premium |
 | Technical direction or challenge | Advisor / Contradictor | premium |
 | Implementation | Backend Engineer / Frontend Builder | economical capable builder |
-| UX contract | Frontend UX Lead | premium when ambiguous, otherwise economical |
+| UX contract / visual judgment | Frontend UX Lead | premium when ambiguous, otherwise economical |
+| Built UI/API inspect evidence | Frontend UX Lead / System Architect inspect phase | economical |
 | Code inspection | Code Reviewer | careful validator |
 | Runtime evidence | Test Engineer | careful validator |
 | Final material acceptance | Gatekeeper | independent premium judgment |
@@ -58,7 +59,8 @@ Choose the lowest-cost capable model. Escalate only when evidence conflicts,
 the task crosses a material contract, or risk justifies stronger judgment.
 Never retry by hopping models without changing the task or evidence. Writing
 the task handoff stays in the same role and thread on the cheapest capable
-slug; do not open a new Task only to change model.
+slug; do not open a new Task only to change model. Built-vs-contract inspect
+is a different phase: use the inspect slug, not the contract-role premium slug.
 
 `risk: standard` or `risk: high` on Architect or backend Gatekeeper packets
 selects the mapped model. It does not skip Frontend UX Lead or System Architect

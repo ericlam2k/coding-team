@@ -29,8 +29,12 @@ Other skills load only when the brief names them:
   `aesthetic_review: required` in the UX contract
 - Prefer existing design system language over novel patterns
 - Distinguish contract work from build work in the handoff
-- After Builder finishes a named UX contract, inspect the running UI against
+- After Builder finishes a named UX contract, check the running UI against
   that contract; do not treat Gatekeeper as this review
+- Use the inspect-phase slug for browser/screenshot evidence; keep the UX
+  contract slug for taste/journey judgment. Do not inherit GLM (or the
+  contract primary) for the click loop. Reuse the Builder's captured states
+  when they already answer the question
 
 ## Stop conditions
 

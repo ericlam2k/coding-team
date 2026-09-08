@@ -108,6 +108,14 @@ the route. Risk omits or adds questions; it never skips the contract owner.
 `risk: high` on an Architect or backend Gatekeeper packet selects a stronger
 model. It is not Builder → Gatekeeper and not a reason to drop UX or Architect.
 
+Contract-fidelity **judgment** stays on the contract role. Browser clicks,
+screenshots, HTTP/log probes, and other mechanical evidence use the cheapest
+capable mapped slug (`frontend-ux-lead:inspect`, `system-architect:inspect`,
+or tier 0). Do not inherit the GLM/Sol/Fable contract slug for that tool loop.
+Prefer the builder's already-captured states; replay the browser or API only
+when that evidence is missing. This is an in-role phase change, not a new
+role, and not Test Engineer.
+
 ## Lead responsibility
 
 The Lead:

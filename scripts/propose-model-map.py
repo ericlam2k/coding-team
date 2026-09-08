@@ -155,7 +155,12 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
     tiers, roles, families = (selection.get(name, {}) for name in ("tiers", "roles", "families"))
     if not all(isinstance(value, dict) for value in (tiers, roles, families)):
         raise ValueError("tiers, roles and families must be objects")
-    phase_keys = {"test-engineer:design", "test-engineer:implement"}
+    phase_keys = {
+        "test-engineer:design",
+        "test-engineer:implement",
+        "frontend-ux-lead:inspect",
+        "system-architect:inspect",
+    }
     allowed_role_keys = (
         (set(ROLE_TIERS) - {"test-engineer"})
         | phase_keys
@@ -180,6 +185,16 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
             phases = (("test-engineer:design", "2"), ("test-engineer:implement", "1 build"))
             for key, phase_tier in phases:
                 role_rows.append(route_row(key, phase_tier, roles.get(key, tiers.get(phase_tier, {})), available))
+        elif role == "frontend-ux-lead":
+            role_rows.append(route_row(
+                "frontend-ux-lead", tier, roles.get("frontend-ux-lead", tiers.get(tier, {})), available
+            ))
+            role_rows.append(route_row(
+                "frontend-ux-lead:inspect",
+                "0",
+                roles.get("frontend-ux-lead:inspect", tiers.get("0", {})),
+                available,
+            ))
         elif role == "system-architect":
             for risk in RISK_VARIANTS[role]:
                 key = f"{role}:{risk}"
@@ -187,6 +202,12 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
                     roles, (key, role), tiers.get(tier, {}), risk=risk
                 )
                 role_rows.append(route_row(key, tier, entry, available))
+            role_rows.append(route_row(
+                "system-architect:inspect",
+                "0",
+                roles.get("system-architect:inspect", tiers.get("0", {})),
+                available,
+            ))
         elif role == "code-reviewer":
             for risk in RISK_VARIANTS[role]:
                 key = f"{role}:{risk}"
@@ -221,7 +242,8 @@ def build_proposal(platform: str, inventory: dict, selection: dict | None = None
         for role in (left, right):
             role_matches = [
                 row for key, row in by_role.items()
-                if key == role or key.startswith(f"{role}:")
+                if (key == role or key.startswith(f"{role}:"))
+                and not key.endswith(":inspect")
             ]
             chosen = [
                 row[field] for row in role_matches for field in ("suggested", "fallback")

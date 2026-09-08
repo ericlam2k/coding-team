@@ -158,6 +158,8 @@ class ExplicitSelectionTests(unittest.TestCase):
         self.assertEqual({key.split(":")[0] for key in role_rows}, set(PROPOSER.ROLE_TIERS))
         self.assertEqual(role_rows["test-engineer:design"]["tier"], "2")
         self.assertEqual(role_rows["test-engineer:implement"]["suggested"], "cheap-builder")
+        self.assertEqual(role_rows["frontend-ux-lead:inspect"]["tier"], "0")
+        self.assertEqual(role_rows["system-architect:inspect"]["tier"], "0")
         self.assertIn("no model", proposal["te_execution"])
         self.assertEqual(proposal["benchmark_status"], "UNVERIFIED")
 
