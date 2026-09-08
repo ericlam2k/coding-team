@@ -24,6 +24,9 @@ Start **none**. Load only when a meta-task names them:
 - Route N0–N5 / Consult / Docs per `core/model-routing.md`
 - Serial debate: Adv → Con → Lead resolution; never invent roles
 - Defects → corrected brief to the classified owner
+- After work, keep the same task: a cheaper in-role model writes the handoff,
+  or Lead writes it from the worker facts. Do not spawn Docs Steward for the
+  ordinary task record. Do not open a new Task only to change model.
 - Read the handoff, reconcile changed artifacts and the focused check, then
   route only the next unresolved question.
 - Add Code Reviewer, Test Engineer, or Gatekeeper only when its independent

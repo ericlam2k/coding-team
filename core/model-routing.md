@@ -56,7 +56,9 @@ automatic retry, model switch, or standard-risk Fable fallback.
 
 Choose the lowest-cost capable model. Escalate only when evidence conflicts,
 the task crosses a material contract, or risk justifies stronger judgment.
-Never retry by hopping models without changing the task or evidence.
+Never retry by hopping models without changing the task or evidence. Writing
+the task handoff stays in the same role and thread on the cheapest capable
+slug; do not open a new Task only to change model.
 
 ## Related-role rule
 

@@ -49,6 +49,17 @@ The handoff is the task record. It states:
 
 No machine log or host formatter replaces the handoff.
 
+After the accountable role finishes, the same task and thread writes the short
+`templates/handoff.md` record. Use the cheapest capable mapped slug for that
+wrap-up. Do not spawn another role, and do not open a new Task only to change
+model.
+
+Docs Steward writes only a named durable documentation artifact others will
+reuse. It does not write ordinary task records.
+
+Lead may write the handoff from the worker's facts without a spawn, then route
+from that record. A hard stop does not reset by hopping models.
+
 ## Related-role routing
 
 The Lead chooses only the next role that answers an unresolved question.

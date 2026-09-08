@@ -33,6 +33,7 @@ Load when the brief names them:
 
 - Invent roles; implement product code “while documenting”
 - Load engineering skills unless the brief explicitly requires API excerpt accuracy aid
+- Write ordinary task records for other roles; this role owns named durable docs only
 
 ## Outputs
 
