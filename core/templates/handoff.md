@@ -9,6 +9,7 @@
 - **Recommended next role or action:**
 
 The finishing role writes this in the same task, using the cheapest capable
-mapped slug. Do not spawn Docs Steward for this record. Keep it concise enough
-for Lead to route without replaying the task. No separate machine validator is
-required.
+mapped slug. Do not spawn Docs Steward for this record. If a named UX or
+architecture contract existed, next owner is that contract role (or FIO seam),
+not Gatekeeper, unless the work is `small`. Keep it concise enough for Lead to
+route without replaying the task. No separate machine validator is required.

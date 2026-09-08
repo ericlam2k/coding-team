@@ -12,15 +12,22 @@ not a parallel workflow.
 
 ## When to use each role
 
+- **Frontend UX Lead / System Architect after build:** the named contract owner
+  checks that the built UI or API still matches. This is not a quality role and
+  is not Gatekeeper.
 - **Code Reviewer:** independent inspection is valuable for non-trivial code,
   contract, security, or maintainability risk.
 - **Test Engineer:** acceptance depends on executable behavior that the
   implementer evidence does not independently prove.
 - **Gatekeeper:** material final acceptance, release, migration, security, or
-  another explicitly governed decision.
+  another explicitly governed decision. Gatekeeper does not answer contract
+  fidelity.
 
 These roles are not mandatory for small deterministic work. When several are
-needed, evidence dependencies make them sequential.
+needed, evidence dependencies make them sequential. Do not treat Test Engineer
+then Gatekeeper as a required chain, and do not send a builder to Gatekeeper
+while a named UX or architecture contract is still unreviewed on the built
+result.
 
 ## Evidence
 

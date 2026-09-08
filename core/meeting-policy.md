@@ -57,7 +57,9 @@ artifact, stop condition, and clean-fixture strategy.
   integrable corrective Batch or queues a separate provisional Batch.
 
 Run only the focused evidence or decision role required by the unresolved risk.
-`FAIL`, `BLOCKED`, insufficient evidence, or a non-approval returns to Lead.
+After a named UX or architecture contract is implemented, that owner reviews the
+built result before Gatekeeper unless the work is `small`. `FAIL`, `BLOCKED`,
+insufficient evidence, or a non-approval returns to Lead.
 “Test all” means the named scenarios and selected layers, not the whole
 repository or every possible layer on every loop.
 

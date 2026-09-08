@@ -60,6 +60,10 @@ Never retry by hopping models without changing the task or evidence. Writing
 the task handoff stays in the same role and thread on the cheapest capable
 slug; do not open a new Task only to change model.
 
+`risk: standard` or `risk: high` on Architect or backend Gatekeeper packets
+selects the mapped model. It does not skip Frontend UX Lead or System Architect
+on the built UI/API, and it does not create a required quality-role chain.
+
 ## Related-role rule
 
 Start with the single accountable role. Add another role only for one unresolved

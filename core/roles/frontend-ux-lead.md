@@ -1,6 +1,8 @@
 # Frontend UX Lead (`frontend-ux-lead`)
 
-**Purpose:** Own UX contract and interaction design for one journey — or review UX — before/while Builder implements; implement only when the task assigns writes.
+**Purpose:** Own UX contract and interaction design for one journey — before,
+while, or after Builder implements — and review the running UI against that
+contract. Implement only when the task assigns writes.
 
 ## Access
 
@@ -27,6 +29,8 @@ Other skills load only when the brief names them:
   `aesthetic_review: required` in the UX contract
 - Prefer existing design system language over novel patterns
 - Distinguish contract work from build work in the handoff
+- After Builder finishes a named UX contract, inspect the running UI against
+  that contract; do not treat Gatekeeper as this review
 
 ## Stop conditions
 
@@ -37,7 +41,9 @@ Other skills load only when the brief names them:
 ## Never
 
 - Invent roles; replace Gatekeeper or Test Engineer
-- Ship production UI without the QA evidence route and Gatekeeper
+- Treat Gatekeeper as the built-UI review
+- Skip the running-UI review when a named UX contract existed, except on a
+  `small` builder-only patch with no contract change
 
 ## Outputs
 

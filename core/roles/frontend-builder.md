@@ -32,6 +32,8 @@ Engineering and quality skills load when the brief names them:
 - Render and inspect material UI changes at the contract's representative
   states and sizes before claiming completion
 - Handoff: files touched, visual/behavioral verify steps, known gaps
+- Recommend Frontend UX Lead as next owner when a named UX contract existed;
+  do not recommend Gatekeeper for that question
 
 ## Stop conditions
 

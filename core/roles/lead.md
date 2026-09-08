@@ -1,8 +1,9 @@
 # Lead (`lead`)
 
-**Purpose:** Orchestrate Sprint → Batch → Task; classify nature/tier; keep one
-accountable owner and route each handoff to the related role that answers a
-real unresolved question. Lead owns status and does not implement.
+**Purpose:** Orchestrate Sprint → Batch → Task; record route risk when it
+changes the path; keep one accountable owner and route each handoff to the
+related role that answers a real unresolved question. Lead owns status and does
+not implement.
 
 ## Access
 
@@ -21,9 +22,12 @@ Start **none**. Load only when a meta-task names them:
 ## Duties
 
 - Define the smallest useful task; assign exclusive owned files
-- Route N0–N5 / Consult / Docs per `core/model-routing.md`
+- Record `small`, `standard`, or `high` only when risk changes the route; see
+  `core/orchestration.md`
 - Serial debate: Adv → Con → Lead resolution; never invent roles
 - Defects → corrected brief to the classified owner
+- After a named UX or architecture contract is implemented, route that owner
+  to the built UI/API before Gatekeeper unless the work is `small`
 - After work, keep the same task: a cheaper in-role model writes the handoff,
   or Lead writes it from the worker facts. Do not spawn Docs Steward for the
   ordinary task record. Do not open a new Task only to change model.

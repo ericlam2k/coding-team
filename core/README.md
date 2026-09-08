@@ -9,10 +9,10 @@ that answers the current unresolved question.
 
 | Path | Purpose |
 |---|---|
-| [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
-| [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
+| [orchestration.md](orchestration.md) | Input → Process → Handoff; related-role routing; risk; FIO hat |
+| [model-routing.md](model-routing.md) | Capability guidance and host profiles; model choice is not workflow authority |
 | [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
-| [qa-operating-model.md](qa-operating-model.md) | Normal/Risky QA flow, selected layers, evidence, and promotion gates |
+| [qa-operating-model.md](qa-operating-model.md) | Risk-triggered quality roles, contract fidelity, evidence, and failure route |
 | [../docs/archive/qa-operating-model-archive-29311de.md](../docs/archive/qa-operating-model-archive-29311de.md) | Archived prior QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
 | [concurrency.md](concurrency.md) | WIP ≤ 2 ordinary specialists and ownership rules |
@@ -67,5 +67,6 @@ that answers the current unresolved question.
 ## Install note
 
 Optionally map abstract tiers to your host’s model pool with the explicit local
-`model-pool.map.md` flow. Lead classifies **nature**, assigns a **tier**, then
-looks up the mapped slug when one is approved and available.
+`model-pool.map.md` flow. Lead records **risk** (`small` / `standard` / `high`)
+when it changes the route, then looks up the mapped slug when one is approved
+and available. Risk does not skip the contract owner.

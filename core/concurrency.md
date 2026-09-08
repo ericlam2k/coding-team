@@ -17,6 +17,10 @@ The Lead owns status and routing through handoffs. There is no supervisor lane.
 ## Common sequencing
 
 - Builder finishes before an independent review of the same bytes.
+- If a named UX or architecture contract was used, that owner reviews the built
+  result before Gatekeeper. FIO may check the frozen seam first.
 - Test Engineer runs only when executable behavior needs independent evidence.
 - Gatekeeper runs only for material final acceptance or release.
 - Advisor and Contradictor run serially when both are genuinely needed.
+- Small single-owner work with no named contract may stop after the builder's
+  focused check.

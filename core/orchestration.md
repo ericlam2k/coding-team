@@ -74,6 +74,9 @@ The Lead chooses only the next role that answers an unresolved question.
 | Server, API, or persistence work | `backend-engineer` |
 | Journey or UX contract | `frontend-ux-lead` |
 | UI implementation | `frontend-builder` |
+| Built UI vs named UX contract | `frontend-ux-lead` |
+| Built API/data vs frozen architecture contract | `system-architect` |
+| Integration of a frozen contract | named builder as FIO (hat, not a role) |
 | Independent code inspection | `code-reviewer` |
 | Executable behavior evidence | `test-engineer` |
 | Durable documentation | `docs-steward` |
@@ -81,6 +84,29 @@ The Lead chooses only the next role that answers an unresolved question.
 
 Code Reviewer, Test Engineer, and Gatekeeper are independent capabilities, not a
 mandatory chain for every task. Use each only when its question exists.
+
+Do not merge these three questions: contract (before build), built vs contract
+(after build, when a named UX or architecture contract existed), and material
+accept/release (Gatekeeper). Gatekeeper does not replace Frontend UX Lead or
+System Architect on the running UI or API.
+
+FIO is a temporary hat on one builder after Architect froze a contract, not a
+role ID. Frontend Builder owns a frontend seam; Backend Engineer owns an
+API/data seam. Drift routes **FIO → Lead → System Architect**.
+
+## Risk
+
+Lead records `small`, `standard`, or `high` on the Input only when it changes
+the route. Risk omits or adds questions; it never skips the contract owner.
+
+| Risk | Built vs contract | Reviewer / Test Engineer | Gatekeeper |
+|---|---|---|---|
+| `small` — single-owner, no named UX/API contract | Skip | Skip when the focused check proves the outcome | Skip |
+| `standard` — named UX or architecture contract | Same owner reviews the built UI/API | Only if bytes or behavior remain unproven | Only if this is still a material accept/release |
+| `high` — security, privacy, migration, public contract, 2+ layers, mutation/state, or costly reversal | Same owner reviews the built UI/API | Usually yes | Yes |
+
+`risk: high` on an Architect or backend Gatekeeper packet selects a stronger
+model. It is not Builder → Gatekeeper and not a reason to drop UX or Architect.
 
 ## Lead responsibility
 

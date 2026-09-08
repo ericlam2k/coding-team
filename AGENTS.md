@@ -32,6 +32,9 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
   task. There is no supervisor lane.
 - Code Reviewer, Test Engineer, and Gatekeeper are independent risk-triggered
   roles; use only the role that answers a real unresolved question.
+- If a named UX or architecture contract was used, that owner reviews the built
+  result before Gatekeeper. Small single-owner patches skip that bounce. High
+  risk adds proof and ship; it does not skip the contract owner.
 - Incomplete work returns to Lead for correction or rerouting; do not invent
   acceptance.
 - Design: start at `$CODING_TEAM_ROOT/skills/design/design-router.md`; it

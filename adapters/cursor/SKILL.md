@@ -19,6 +19,9 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 - WIP ≤ 2 ordinary tool-using Tasks; Lead owns status and there is no supervisor
   lane
 - Code Reviewer, Test Engineer, and Gatekeeper are independent risk triggers
+- If a named UX or architecture contract was used, that owner reviews the built
+  result before Gatekeeper; small patches skip that bounce; high risk does not
+  skip the contract owner
 - Incomplete work returns to Lead for correction or rerouting
 - Lead writes briefs and routes handoffs, never implementation code
 - PM Lean addon default OFF; enable it only for an explicit PM task
