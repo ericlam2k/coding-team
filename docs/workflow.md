@@ -56,7 +56,7 @@ Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.
 | Sprint brief | 600 words |
 | Batch packet | 450 |
 | Run prompt | 250 |
-| Handoff | 150 |
+| Handoff | sufficient context; no word cap |
 | Checkpoint | 300 |
 
 On context pressure: checkpoint ≤300 words → shrink → fresh session → reload checkpoint + brief + named paths only.

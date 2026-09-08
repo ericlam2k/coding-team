@@ -12,7 +12,7 @@ Shared vocabulary for coding-team. Use these terms in briefs, handoffs, and docs
 | **Lead** | The parent agent/session that classifies nature, assigns tiers, creates the task list, delegates, integrates, and enforces gates. Never spawn Lead as a subagent. |
 | **Functional Integration Owner** | An assignment (not a new role) naming which existing role owns the batch’s shared contract and integration order before independent validation. |
 | **WIP ≤ 2 ordinary** | At most two concurrent ordinary specialists, with one accountable owner per task. Lead owns status and routing. |
-| **Handoff** | ≤150-word return packet from a specialist: status, evidence paths, unresolved questions, next owner. |
+| **Handoff** | Task record from a specialist: status, evidence, residual risk, and next owner. Follow `core/templates/handoff.md` and sufficient context; length is not a routing rule. |
 | **Checkpoint** | ≤300-word batch state snapshot used after pause, context shrink, or Gatekeeper acceptance. |
 | **Run prompt** | ≤250-word delegation prompt projected from the task brief. The full template is never the run prompt. |
 

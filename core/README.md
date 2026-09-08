@@ -46,7 +46,7 @@ that answers the current unresolved question.
 | [templates/sprint-brief.md](templates/sprint-brief.md) | Sprint (≤600w) |
 | [templates/batch-brief.md](templates/batch-brief.md) | Batch (≤450w) |
 | [templates/task-brief.md](templates/task-brief.md) | Task + run prompt (≤250w) |
-| [templates/handoff.md](templates/handoff.md) | Role handoff (≤150w) |
+| [templates/handoff.md](templates/handoff.md) | Role handoff |
 | [templates/batch-checkpoint.md](templates/batch-checkpoint.md) | Batch checkpoint (≤300w) |
 | [templates/qa-evidence.json](templates/qa-evidence.json) | Machine-readable QA evidence and promotion manifest |
 | [templates/code-review.md](templates/code-review.md) | Code Reviewer findings, verdict, and conditional validation route |

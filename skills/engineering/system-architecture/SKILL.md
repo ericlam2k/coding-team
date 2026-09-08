@@ -36,7 +36,7 @@ does not create another runtime, agents, or approval authority.
 - Label material claims `verified`, `reasoned-not-tested`, or `not-verified`.
 - Record planned → actual model capability and any `full`, `reduced`,
   `read-only`, or `planning-only` downshift.
-- Return one named contract plus a ≤150-word handoff with evidence labels,
+- Return one named contract plus a handoff with evidence labels,
   unresolved gates, residual risk, and next owner.
 ```
 

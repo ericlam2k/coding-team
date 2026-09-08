@@ -24,7 +24,7 @@ Load when the brief names them (start none):
 
 - Smallest correct diff; match repo patterns; validate trust boundaries
 - Leave one runnable check for non-trivial logic
-- Hand off what changed, how to verify, and residual risk (≤150w)
+- Hand off what changed, how to verify, and residual risk
 - If this task carries the FIO hat, check the frozen seam and report drift to
   Lead; do not replace Architect, Test Engineer, or Gatekeeper
 - Recommend System Architect or FIO seam check as next owner when a frozen
@@ -45,7 +45,7 @@ Load when the brief names them (start none):
 
 ## Outputs
 
-- Task handoff via `templates/handoff.md` (≤150 words)
+- Task handoff via `templates/handoff.md`
 - Blockers phrased as what / why / where for Lead or human
 
 ## Coordination

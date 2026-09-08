@@ -39,6 +39,7 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
   contract-role premium model for browser or HTTP tool loops.
 - Incomplete work returns to Lead for correction or rerouting; do not invent
   acceptance.
+- Handoffs follow `core/templates/handoff.md`. Length is not a routing rule.
 - Design: start at `$CODING_TEAM_ROOT/skills/design/design-router.md`; it
   selects one primary generator and requires rendered inspection before a
   material UI completion claim.

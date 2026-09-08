@@ -60,7 +60,7 @@ settled contract. Do not load an architecture skill bundle by default.
 ## Outputs
 
 - One named artifact using `core/templates/architecture-contract.md`.
-- A ≤150-word handoff using `core/templates/handoff.md` with evidence labels,
+- A handoff using `core/templates/handoff.md` with evidence labels,
   unresolved gates, residual risk, and the next owner.
 
 ## Coordination

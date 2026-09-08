@@ -14,8 +14,8 @@ Lead policy, orchestration, approvals, or human gates.
   or unrelated framework and policy material inside the child.
 - Perform only the declared objective and edit only the listed owned paths.
 - Run exactly one focused validation named by the task.
-- Return a handoff of no more than 150 words containing facts, evidence,
-  blockers, and residual risk.
+- Return a `templates/handoff.md` record containing facts, evidence,
+  blockers, and residual risk. Do not apply a word-count cap.
 - If blocked, stop and report `BLOCKED` without retrying.
 - Never retry, substitute a role or model, commit, push, deploy, expand scope,
   or perform unrequested follow-up work.

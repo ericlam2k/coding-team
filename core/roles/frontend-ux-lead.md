@@ -51,7 +51,7 @@ Other skills load only when the brief names them:
 
 ## Outputs
 
-- Task handoff via `templates/handoff.md` (≤150 words)
+- Task handoff via `templates/handoff.md`
 - Blockers phrased as what / why / where for Lead or human
 
 ## Coordination

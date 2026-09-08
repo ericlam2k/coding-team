@@ -57,7 +57,7 @@ Then map to `{domain}-advisor` and load this card with the domain filled in the 
 
 ## Outputs
 
-- Task handoff via `templates/handoff.md` (≤150 words), header must include instance id (`talent-advisor`, etc.)
+- Task handoff via `templates/handoff.md`; header must include instance id (`talent-advisor`, etc.)
 
 ## Capacity
 
