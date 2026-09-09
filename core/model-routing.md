@@ -52,15 +52,18 @@ automatic retry, model switch, or standard-risk Fable fallback.
 | Built UI/API inspect evidence | Frontend UX Lead / System Architect inspect phase | economical |
 | Code inspection | Code Reviewer | careful validator |
 | Runtime evidence | Test Engineer | careful validator |
-| Final material acceptance | Gatekeeper | independent premium judgment |
+| Final material acceptance | Gatekeeper | mapped judgment; cheap slug writes artifacts from that verdict |
 | Documentation | Docs Steward | economical |
 
 Choose the lowest-cost capable model. Escalate only when evidence conflicts,
 the task crosses a material contract, or risk justifies stronger judgment.
 Never retry by hopping models without changing the task or evidence. Writing
 the task handoff stays in the same role and thread on the cheapest capable
-slug; do not open a new Task only to change model. Built-vs-contract inspect
-is a different phase: use the inspect slug, not the contract-role premium slug.
+slug; do not open a new Task only to change model. Gatekeeper's
+`review-decision.md` is that same wrap-up from the origin verdict; the cheap
+slug does not remake the call. `gatekeeper:small` is unchanged.
+Built-vs-contract inspect is a different phase: use the inspect slug, not the
+contract-role premium slug.
 
 `risk: standard` or `risk: high` on Architect or backend Gatekeeper packets
 selects the mapped model. It does not skip Frontend UX Lead or System Architect

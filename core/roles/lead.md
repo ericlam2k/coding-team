@@ -32,9 +32,11 @@ Start **none**. Load only when a meta-task names them:
   (cheap slug). Do not inherit the contract-role premium slug for browser or
   HTTP tool loops. Escalate to the contract slug only if taste or architecture
   judgment remains unresolved.
-- After work, keep the same task: a cheaper in-role model writes the handoff,
-  or Lead writes it from the worker facts. Do not spawn Docs Steward for the
-  ordinary task record. Do not open a new Task only to change model.
+- After work, keep the same task: a cheaper in-role model writes the handoff
+  and, for Gatekeeper, the review-decision form from the origin verdict, or
+  Lead writes them from the worker facts. The cheap slug does not remake the
+  Gatekeeper call. `gatekeeper:small` is unchanged. Do not spawn Docs Steward
+  for the ordinary task record. Do not open a new Task only to change model.
 - Read the handoff, reconcile changed artifacts and the focused check, then
   route only the next unresolved question.
 - Add Code Reviewer, Test Engineer, or Gatekeeper only when its independent

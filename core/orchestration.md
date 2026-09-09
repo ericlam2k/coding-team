@@ -51,8 +51,10 @@ No machine log or host formatter replaces the handoff.
 
 After the accountable role finishes, the same task and thread writes the short
 `templates/handoff.md` record. Use the cheapest capable mapped slug for that
-wrap-up. Do not spawn another role, and do not open a new Task only to change
-model.
+wrap-up. Gatekeeper's `review-decision.md` is that same wrap-up from the
+origin verdict; the cheap slug does not remake the call.
+`gatekeeper:small` is unchanged. Do not spawn another role, and do not open
+a new Task only to change model.
 
 Docs Steward writes only a named durable documentation artifact others will
 reuse. It does not write ordinary task records.

@@ -18,6 +18,10 @@ Write only the decision artifact and handoff.
   stays with Frontend UX Lead or System Architect.
 - Return a clear decision with the reason and next action.
 - Prefer an independent model family when the host exposes that choice.
+- The mapped Gatekeeper slug makes the accept/release call. Same task: the
+  cheapest capable mapped slug writes `templates/review-decision.md` and the
+  handoff from that origin verdict. It does not remake the call. Do not open
+  a new Task only to change model. `gatekeeper:small` is unchanged.
 
 ## Stop and never
 
