@@ -1,33 +1,71 @@
-# Codex runtime — role delegation
+# Codex adapter runtime
 
-Lead (this skill) classifies nature, writes a ≤250-word run prompt, and spawns **one** Codex subagent per task. Prefer independent subagents with the mapped model/effort from `model-pool.map.md`.
+The host adapter carries the host call; it does not add workflow authority.
+Lead supplies one bounded Input, a specialist performs the Process, and the
+specialist returns one Handoff. Direct native spawning is valid when the host
+payload is already known.
 
-## Delegation table
+System Architect and backend Gatekeeper packets require `risk: standard` or
+`risk: high`. Standard risk selects `claude-opus-5`; high risk selects
+`claude-fable-5-1`. `gpt-6-astra` / `high` is recorded as explicit fallback
+metadata only and requires a new authorized dispatch; it is never automatic.
 
-| Canonical role | When to spawn | Codex pattern | Tier (look up map) | Notes |
-|---|---|---|---|---|
-| `investigator` | N0 map/fact; N2/N5 pre-scan | Subagent, read-mostly | 0 (1 if cross-file) | Path/line evidence only; no edits |
-| `advisor` | N2/N4/N5 direction | Subagent, read-only | 2 | Pre-build verdict; never implements or Gatekeeps |
-| `contradictor` | Required N2/N4/N5 debate | Subagent, read-only | 2 | **Serial after Advisor**; never parallel with Advisor under WIP |
-| `product-manager` | Ambiguous product scope | Subagent | 2 | Consult peer; not under Advisor |
-| `system-architect` | Shared multi-owner contract or ≥2 FE/API/BE/DB layers | Subagent, writes one named contract | 2 | Contract before Lead allocates; not FIO, builder, TE, or Gatekeeper |
-| `backend-engineer` | Server/API/persistence | Subagent, write to owned paths | 1 build | Exclusive file ownership |
-| `frontend-builder` | UI implement after UX contract | Subagent, write to owned paths | 1 build | No product/UX direction ownership |
-| `frontend-ux-lead` | Journey/UX contract | Subagent | 1–2 | Contract first; implement only if brief assigns writes |
-| `docs-steward` | Named durable docs | Subagent | 0 | After accepted validation when gate requires docs |
-| `test-engineer` | Batch V0–V3 evidence | Subagent | 1 validate | Before Gatekeeper only |
-| `gatekeeper` | Post-TE accept/block | Subagent, read-only | 2 | **After** fresh TE evidence; never with TE |
-| Lead (parent) | Orchestrate only | This skill / main thread | 2 for plan; else ambient | No implementation code from Lead |
+## Native payload
 
-## Sequencing rules
+`prepare-dispatch.py` uses one bounded selector for two verified direct host
+schemas. The caller attests exactly one visible binding with `mode` set to
+`direct_tool_call`, `available_to_caller` set to `true`, and no extra keys:
 
-```text
-WIP ≤ 2 tool-using subagents at once
-Debate (when required): Investigator → Advisor → Contradictor → Lead resolve → build → TE → GK
-Validation gate: Test Engineer completes → then Gatekeeper
-Incomplete / non-APPROVE → stop → ask human
+```json
+{"tool":"collaboration.spawn_agent","mode":"direct_tool_call","available_to_caller":true}
+{"tool":"multi_agent_v1__spawn_agent","mode":"direct_tool_call","available_to_caller":true}
 ```
 
-## Prompt packet (every spawn)
+Historical V1 `collaboration.spawn_agent` emits exactly `task_name`,
+`agent_type`, `fork_turns`, `message`, `model`, and `reasoning_effort`. Current
+V2 `multi_agent_v1__spawn_agent` emits `agent_type`, `fork_context`, and
+`message`; `model` and `reasoning_effort` appear only when explicitly supplied
+by the caller. V2 always emits `fork_context=false` for a fresh specialist and
+rejects caller-supplied `fork_context`, `task_name`, or `fork_turns`.
 
-Pass only: objective, acceptance, exclusive write/read paths, evidence pointers, validation command, stop condition, mapped `model` + `effort` if the runtime supports them. Do not paste full files, diffs, or prior transcripts.
+Missing, malformed, false, extra-key, unknown, indirect, or mixed bindings
+return `BLOCKED` with no spawn. `functions.collaboration.spawn_agent`,
+`functions.exec`, `exec_command`, `tools.*`, shell, Python, Node, JavaScript,
+and nested tool bindings are not direct bindings. There is no schema probing,
+post-READY translation, fallback, or dual dispatch.
+
+READY proves packet-valid plus selected direct-binding-attested preflight only;
+it does not prove host acceptance, child start, supervision, or completion.
+For V1: Invoke the direct collaboration.spawn_agent tool exactly once with
+READY.spawn; do not use functions.exec, exec_command, shell, JavaScript, or a
+nested tool binding. For V2: Invoke the direct multi_agent_v1__spawn_agent tool
+exactly once with READY.spawn; do not translate fields, retry, or use
+functions.exec, exec_command, shell, JavaScript, or a nested tool binding.
+
+Top-level `binding` and deterministic `dispatch_id` are correlation metadata,
+never host payload or execution proof. A successful V2 response must provide
+authoritative `agent_id`; `nickname` is informational. Missing, rejected,
+timed-out, or ambiguous responses are no execution evidence and permit no
+automatic retry. Receipts, timing, admission decisions, and other removed
+ceremony remain outside this lean formatter.
+
+## Roles and concurrency
+
+Use canonical role cards under `core/roles/`. Keep at most two ordinary
+specialists active, with one writer per file and no nested delegation. Lead
+owns status and routes a handoff to the next related role. Code Reviewer, Test
+Engineer, and Gatekeeper are independent risk-triggered roles; mutation
+invalidates only evidence affected by the changed bytes.
+
+## Watchdog
+
+Run `scripts/stuck-watchdog.py` only around a real background command. It emits
+internal completion, failure, or timeout status and never retries, selects a
+role/model, approves, or advances a task. A watchdog status is not a handoff.
+
+## Installation
+
+`scripts/check-install.py` verifies the installed root, links, platform, and
+required entrypoints. `ACTIVE` means those bindings are present; `INACTIVE`
+means revalidation or activation is needed. Neither status proves execution,
+product validation, or release readiness.

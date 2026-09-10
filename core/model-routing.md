@@ -1,123 +1,76 @@
-# Model routing (abstract tiers)
+# Model routing
 
-Lead classifies **task nature**, then assigns the **lowest-cost capable** tier. Tiers are **non-binding guidance**: record `planned → actual | not available` in the brief or performance log; never block start on model identity.
-
-Host-specific model slugs live only in the install-time file `model-pool.map.md` (see adapter / docs). **This file has no host slugs.**
-
-## One-line rule
-
-Premium models decide. Eco models build. Cheap models search and document. Human gate controls irreversible risk. Contradictor challenges before build when required. Gatekeeper accepts only after evidence.
-
-## Capability tiers
-
-| Tier | Use | Capability intent |
-|---|---|---|
-| **0** | N0 lookup, Docs | Cheapest capable utility |
-| **1 build** | N1 / post-plan implement | Eco implementer |
-| **1 validate** | N3 / Test Engineer | Careful validator |
-| **2** | Advisor, Contradictor, Gatekeeper, Lead plan | Premium plan / debate / review |
-| **3** | N5; Adv vs Con deadlock on high risk | Max-risk judgment |
-
-Prefer a **different model family** for Contradictor vs Advisor, and Gatekeeper vs implementer, when the pool has multiple families. On a single-family pool, differentiate with **effort + independent subagent** and record that substitution.
-
-## Role capacity defaults (non-binding)
-
-Map via `model-pool.map.md` after install — these are intents, not host slugs:
-
-| Role / cell | Prefer tier | Notes |
-|---|---|---|
-| Investigator; low-risk Frontend Builder; eligible support cells | **0** | Cheap utility (often Luna-class on Codex) |
-| Frontend Builder (complex UI); Test Engineer | **1 build** / **1 validate** | Everyday implement / careful validate |
-| System Architect; Backend; Frontend/UX Lead; Docs (deep); PM; Advisor; Domain Advisor; Contradictor; Gatekeeper; Lead plan | **2** | Premium plan / debate / review |
-| N5 judgment; Adv↔Con deadlock | **3** | Max-risk only |
-
-Escalate Tier 0 → 1 when evidence conflicts, cross-module/stateful complexity, validation failure, or a11y/security/privacy/public-contract impact appears. Escalate to Tier 2/3 only under the recorded triggers below.
-
-## Nature → route
-
-| Nature | Delegate | Tier | Advisor | Contradictor | Gatekeeper |
-|---|---|---|---|---|---|
-| **N0** Map/fact | Investigator | 0 (1 if cross-file) | No | No | No (unless fact feeds N5) |
-| **N1** Bounded build | Backend / Frontend Builder / TE if test-heavy | 1 build | No unless hidden risk | No unless hidden risk | **Batch** TE→GK after integrate; skip only pure N0/docs |
-| **N2** Contract/UX/integration | Inv → (PM/domain if ambiguous) → System Architect for shared technical contract → Adv? → Con? → builders → TE → GK | 2 plan/critique; 1 build; 2 GK if material | Yes if direction non-obvious | **Required** if shared public contract, migration, auth/privacy, or multi-owner integration; else optional | Yes for material contract |
-| **N3** Validate/classify | Investigator / TE; Adv if release-impacting | 1 validate; 2 if architecture/security/release | Only if major decision | Only if disputed | If release-impacting |
-| **N4** Independent decide | Advisor; Contradictor when conflict/expensive; GK only post-implement | 2; 3 if irreversible | Yes | Yes when conflict / expensive reverse | After implement or completed packet |
-| **N5** High-risk | Inv → PM? → Domain Advisor? → Adv → Con → **human gate** → eco build → TE → GK | 3 judgment; 1 build after approval | Yes | **Yes** | Yes |
-| **Consult** | Product Manager **and/or** Domain Advisor (peers); optional technical Advisor | 2 medium | Optional strategic | Optional if expensive misdirection | No unless consult becomes implement |
-| **Docs** | Docs Steward | 0 (1 if deep synthesis) | No | No | If docs describe public contract / compliance / security |
-
-On Consult / N5 when specialty judgment is needed and **domain is not named**: Lead asks the human for the domain, then instantiates `{domain}-advisor` per [domain-advisors.md](domain-advisors.md). Do not default to Talent or any product-specific domain.
-
-For triggered **N1/N2/N5** user-facing workflows, input parsing or matching, AI extraction, or public-contract work, insert a conditional pre-build Test Engineer scenario-design task after product/domain decisions and before builders. This freezes design input only; retain a fresh post-integration Test Engineer for final evidence before Gatekeeper.
-
-## Role separation (non-negotiable)
-
-| Role | Answers | Timing |
-|---|---|---|
-| **Advisor** | What should we do technically? | Before implement |
-| **Contradictor** | Why might this be wrong? | Before implement |
-| **Domain Advisor** | What does the named domain say? | Consult (peer to PM) |
-| **Gatekeeper** | Can this be accepted as done? | After implement + evidence |
-| **Product Manager** | Product scope / acceptance | Consult |
-| **System Architect** | Backbone, framework, API, data, and cross-cutting technical contract | Before builders; writes one contract only; FIO assembles |
-
-## Lean concern routing
-
-Do not convene every advisory role for each concern. Lead starts with the
-single accountable role and the smallest evidence packet, then adds at most one
-role at a time only when a distinct, decision-changing question remains:
-
-1. Route product scope to Product Manager, named-domain meaning to the
-   applicable Domain Advisor instance, technical direction to Advisor, and
-   validation sufficiency to Test Engineer.
-2. Add Contradictor only for material conflict, costly reversal, shared/public
-   contracts, security/privacy, or an explicit challenge request.
-3. Expand only when the current role cannot own the unresolved domain; record
-   the trigger and expected decision artifact.
-4. Stop once evidence is sufficient. Never call a standing brainstorm team or
-   load all roles/skills by default.
-
-This escalation remains serial and under WIP ≤2. A Domain Advisor is a peer to
-Product Manager, not a replacement for it.
-
-### Concern method router
-
-Choose the smallest method that fits: evidence-checked `5 Whys` for a known or
-recurring defect; a hypothesis tree/causal map for unclear or multi-causal root
-cause; a three-option decision matrix for product choice; a stakeholder-lens
-matrix for trust/fairness/consent/domain meaning; ADR trade-offs for
-architecture; a time-boxed pre-mortem for release risk; and time-boxed
-brainwriting with at most two relevant roles for open ideation. `5 Whys` is not
-a universal default.
-
-Each method returns: concern, evidence, hypotheses/options, affected
-stakeholders, recommended decision, validation experiment, and stop/escalation
-condition. Record material dissent; unresolved policy/value trade-offs go to
-the human gate.
-
-Debate for N2 (when Contradictor required), N4 (when required), N5: **serial** (Inv → Adv → Con → Lead resolve → build → TE → GK). Never three concurrent debate agents. WIP ≤ 2 still applies ([concurrency.md](concurrency.md)).
-
-## Escalation (recorded triggers only)
-
-- Tier 0→1: cross-file / behavior trace / edits needed
-- Tier 1→2: contract, architecture, security/privacy/auth/migration/release, conflict, Advisor/Contradictor required, Tier 1 fails **twice**
-- Tier 2→3: irreversible, high production/public/migration/security impact, Adv vs Con material disagreement on high risk, two serious attempts failed
-
-**Not** escalation: first PARTIAL, context overflow (same tier, shrink packet).
-
-## Anti-burn
-
-- No Tier 3 for routine implementation or boilerplate
-- No premium models for long mechanical edits
-- Focused evidence packets; log Tier 2/3 in a performance entry
-- Target mix: ~70–80% Tier 0/1, ~15–25% Tier 2, ~0–5% Tier 3
-
-## Lead resolution (after debate)
+Use premium reasoning for decisions and economical models for bounded execution.
 
 ```text
-## Advisor Position
-## Contradictor Position
-## Lead Resolution: Proceed | Modify | Reject | More evidence
-## Reason
-## Final Implementation Instruction
+premium think → eco build → evidence when needed
 ```
+
+Model choice is guidance, never a workflow prerequisite. Record the actual model
+when the host exposes it; do not block work when it does not.
+
+## Codex owner profile
+
+This optional Codex profile is explicit host metadata. Use it only when the
+exact route is available; record planned and actual identity separately.
+
+| Work | Primary / effort | Fallback / effort |
+|---|---|---|
+| Premium decision | `gpt-6-astra` / high | `claude-opus-5` / high |
+| Frontend UX or visual work | `OR-GLM` / high | `claude-opus-5` / high |
+| Frontend Builder | `OR-Laguna` / medium | `claude-sonnet-5` / medium |
+| Backend Engineer build | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
+| System Architect — standard risk | `claude-opus-5` / high | `gpt-6-astra` / high |
+| System Architect — high risk | `claude-fable-5-1` / high | `gpt-6-astra` / high |
+| Code Reviewer | `gpt-5.6-luna` / high | `gpt-6-astra` / high |
+| Test Engineer planning / scenario design | `claude-sonnet-5` / high | `gpt-6-astra` / high |
+| Test Engineer implementation | `gpt-5.6-luna` / medium | `claude-sonnet-5` / medium |
+| Gatekeeper after frontend work | `gpt-6-astra` / high | `claude-opus-5` / high |
+| Gatekeeper after backend work — standard risk | `claude-opus-5` / high | `gpt-6-astra` / high |
+| Gatekeeper after backend work — high risk | `claude-fable-5-1` / high | `gpt-6-astra` / high |
+
+`gpt-5.6-sol` and `gpt-5.5` are excluded from this profile. `OR-Laguna` and
+`claude-fable-5-1` require those exact configured routes. Do not substitute
+Laguna XS, an alias, or another Fable version; route unavailability returns to
+Lead for the named fallback on a new authorized route, never automatic retry.
+
+System Architect and backend Gatekeeper packets must declare `risk` as
+`standard` or `high`. Standard risk selects Opus; high risk selects Fable. The
+Astra fallback is metadata for a new authorized dispatch only, never an
+automatic retry, model switch, or standard-risk Fable fallback.
+
+## Role routing
+
+| Work | Role | Capability |
+|---|---|---|
+| Fact finding | Investigator | economical |
+| Product decision | Product Manager | premium |
+| Shared contract | System Architect | premium |
+| Technical direction or challenge | Advisor / Contradictor | premium |
+| Implementation | Backend Engineer / Frontend Builder | economical capable builder |
+| UX contract / visual judgment | Frontend UX Lead | premium when ambiguous, otherwise economical |
+| Built UI/API inspect evidence | Frontend UX Lead / System Architect inspect phase | economical |
+| Code inspection | Code Reviewer | careful validator |
+| Runtime evidence | Test Engineer | careful validator |
+| Final material acceptance | Gatekeeper | mapped judgment; cheap slug writes artifacts from that verdict |
+| Documentation | Docs Steward | economical |
+
+Choose the lowest-cost capable model. Escalate only when evidence conflicts,
+the task crosses a material contract, or risk justifies stronger judgment.
+Never retry by hopping models without changing the task or evidence. Writing
+the task handoff stays in the same role and thread on the cheapest capable
+slug; do not open a new Task only to change model. Gatekeeper's
+`review-decision.md` is that same wrap-up from the origin verdict; the cheap
+slug does not remake the call. `gatekeeper:small` is unchanged.
+Built-vs-contract inspect is a different phase: use the inspect slug, not the
+contract-role premium slug.
+
+`risk: standard` or `risk: high` on Architect or backend Gatekeeper packets
+selects the mapped model. It does not skip Frontend UX Lead or System Architect
+on the built UI/API, and it does not create a required quality-role chain.
+
+## Related-role rule
+
+Start with the single accountable role. Add another role only for one unresolved
+question that can change the result. A filename, framework label, or preferred
+model tier does not create a role requirement.

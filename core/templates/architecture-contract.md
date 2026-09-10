@@ -43,7 +43,10 @@
 - **Exclusive writer and file/path boundary per builder:**
 - **Integration order and FIO seam checks:**
 - **Material drift route:** **FIO → Lead → System Architect**
-- **TE → Gatekeeper remains sequential; WIP ≤2:**
+- **Built vs contract:** Architect re-enters after build for fidelity or named
+  drift; FIO seam check is not Test Engineer evidence or Gatekeeper acceptance
+- **WIP ≤2:** quality roles remain risk-triggered, not a required TE → Gatekeeper
+  chain
 
 ## Acceptance boundary
 

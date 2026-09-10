@@ -24,7 +24,7 @@
 
 ## Risks & gates
 
-- **Known N5 / irreversible items:**
+- **Known high-risk / irreversible items:**
 - **Human gates expected:**
 - **Open questions for human:**
 
@@ -35,5 +35,5 @@
 
 ## Done when
 
-- [ ] All admitted batches Gatekeeper-APPROVED or explicitly dropped
+- [ ] All admitted batches closed by the risk-proportionate route, or explicitly dropped
 - [ ] Final report filed

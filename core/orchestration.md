@@ -1,251 +1,164 @@
 # Orchestration
 
-Platform-agnostic coding-team flow. An **adapter** binds this core to a specific runtime; do not treat any IDE or agent host as the source of policy.
-
-**One-line:** Lead (high reasoning) classifies nature, then orchestrates, plans, and delegates; specialists execute only that brief and tier; keep concurrency at ≤2 tool-using runs with Test Engineer → Gatekeeper sequential — never trial-error model hops or raising WIP to skip a causal chain.
-
-## Lean / Agile nest (vocabulary only)
-
-Standard Lean/Kanban/Agile names the management ideas; this framework remains the **agent runtime**. Do not replace Sprint→Batch→Task, role cards, model routing, or human gates with textbook Scrum/SAFe ceremonies.
-
-| Our term | Lean / Agile cousin | Meaning here |
-|---|---|---|
-| WIP ≤2 | Kanban WIP limit | ≤2 concurrent tool-using runs — accelerate by smaller queued work + proven-disjoint parallels, never by raising the cap |
-| Batch | Small batch | One integrable slice with known acceptance |
-| Task | Work item / story slice | Spec-ready brief with stop condition |
-| Sprint | Cadence / planning box | Coordination window — not story-point theater |
-| PDCA + experiments + performance log | Kaizen | Root cause + named PIC → plan → observe → re-evaluate → **consolidate** (bake or close) |
-| Gatekeeper after TE | Quality gate / Definition of Done | Evidence first; TE → Gatekeeper sequential |
-| Human gates | Pull / stop-the-line | Irreversible actions need explicit human approval |
-
-## Hierarchy
+Coding Team uses one default flow:
 
 ```text
-Sprint  →  Batch  →  Task
+Input → Process → Handoff → related role
 ```
 
-| Level | Owns | Typical artifact |
-|---|---|---|
-| **Sprint** | Outcome theme, batch order, success criteria | `templates/sprint-brief.md` (≤ **600** words) |
-| **Batch** | Integrated deliverable, owned files, validation plan | `templates/batch-brief.md` (≤ **450** words) |
-| **Task** | Single role, exclusive scope, one handoff | `templates/task-brief.md` + run prompt (≤ **250** words) |
+The Lead routes work. One accountable role performs each task. A handoff is the
+single semantic record of the result. Tools support the work; they do not create
+a second workflow.
 
-Encode Sprint ID, Batch ID, and task alias in each brief. Batch by dependency or shared contract — not role convenience. Detail only the first batch at sprint admission; keep later batches provisional until upstream evidence stabilizes.
+## Input
 
-## Lead authority
+A task needs only:
 
-The **Lead** (parent orchestrator) is the only role that:
+- accountable role;
+- objective and acceptance;
+- owned write paths and relevant read paths;
+- focused check;
+- stop condition.
 
-- Classifies **nature** (N0–N5 / Consult / Docs) and assigns **model tier**
-- Opens/closes batches, admits tasks, and enforces WIP / gates
-- Resolves Advisor vs Contradictor debates
-- Synthesizes PM, Domain Advisor, System Architect, and specialist input into
-  one recorded decision, owner, acceptance artifact, and next gate
-- Routes defects to the classified owner as corrected briefs
-- Does **not** implement product code or invent new roles
+If product meaning or an irreversible decision is missing, ask for it. Otherwise
+the Lead routes the task without a separate admission ceremony.
 
-Incomplete or non-APPROVE outputs → **stop for human** ([human-gates.md](human-gates.md)).
+## Process
 
-### Lead cost discipline — emit judgment, not volume
+The assigned role performs the work directly.
 
-The Lead runs the most expensive context in the system. Its output is classification, briefs, routing, verdicts on evidence, and short reports — never implementation code.
+- One owner per task and one writer per file.
+- Use the smallest useful skill and check.
+- Do not spawn another role from inside a specialist task.
+- Split only when concerns, owners, or write paths genuinely conflict.
+- Prefer a fresh specialist context so Lead instructions do not become worker
+  behavior.
 
-- **No typing lane:** a code block longer than an interface signature or a few illustrative lines is an undelegated spec — stop and delegate it to the owning builder.
-- **Defects go back as briefs:** never hand-fix a builder's bug. Classify the failure and send a **corrected brief** to that owner.
-- **Reason once, then hand off:** capture architecture/hypothesis thinking in the brief; do not re-derive it across turns.
-- **Spec-readiness test:** a run prompt you cannot finish writing (objective, files, interfaces, constraints, verification) means the decision is not made yet. That is Lead/Advisor work — never delegate the ambiguity to a cheaper tier.
+WIP of two ordinary specialists is a planning default, not a reason to block a
+ready single task.
 
-### Architecture-contract lane
+## Handoff
 
-Before allocating builders, the Lead dispatches `system-architect` when a
-change establishes a shared multi-owner contract or crosses two or more of
-FE, API, BE, and DB layers. The Architect freezes one named contract; the Lead
-then allocates exclusive work and names the FIO. Builders implement against the
-frozen contract, TE validates, and Gatekeeper decides. Material drift routes
-**FIO → Lead → System Architect**. The Architect does not allocate, assemble,
-implement, validate, or accept.
+The handoff is the task record. It states:
 
-## Canonical role IDs
+- status and conclusion;
+- changed artifacts or decision;
+- evidence from the focused check;
+- residual risk or blocker;
+- recommended next role or action.
 
-Use only these IDs (see `roles/`):
+No machine log or host formatter replaces the handoff.
 
-| ID | Role |
+After the accountable role finishes, the same task and thread writes the short
+`templates/handoff.md` record. Use the cheapest capable mapped slug for that
+wrap-up. Gatekeeper's `review-decision.md` is that same wrap-up from the
+origin verdict; the cheap slug does not remake the call.
+`gatekeeper:small` is unchanged. Do not spawn another role, and do not open
+a new Task only to change model.
+
+Docs Steward writes only a named durable documentation artifact others will
+reuse. It does not write ordinary task records.
+
+Lead may write the handoff from the worker's facts without a spawn, then route
+from that record. A hard stop does not reset by hopping models.
+
+## Related-role routing
+
+The Lead chooses only the next role that answers an unresolved question.
+
+| Need | Related role |
 |---|---|
-| `lead` | Lead |
-| `product-manager` | Product Manager |
-| `system-architect` | System Architect |
-| `advisor` | Advisor (technical, pre-build) |
-| `contradictor` | Contradictor |
-| `domain-advisor` | Domain Expert **template** → instances `{domain}-advisor` (see [domain-advisors.md](domain-advisors.md)) |
-| `investigator` | Investigator |
-| `backend-engineer` | Backend Engineer |
-| `frontend-ux-lead` | Frontend UX Lead |
-| `frontend-builder` | Frontend Builder |
-| `test-engineer` | Test Engineer |
-| `docs-steward` | Docs Steward |
-| `gatekeeper` | Gatekeeper |
+| Product scope or acceptance | `product-manager` |
+| Shared technical contract | `system-architect` |
+| Technical direction | `advisor` |
+| Material challenge | `contradictor` |
+| Repository facts | `investigator` |
+| Server, API, or persistence work | `backend-engineer` |
+| Journey or UX contract | `frontend-ux-lead` |
+| UI implementation | `frontend-builder` |
+| Built UI vs named UX contract | `frontend-ux-lead` |
+| Built API/data vs frozen architecture contract | `system-architect` |
+| Integration of a frozen contract | named builder as FIO (hat, not a role) |
+| Independent code inspection | `code-reviewer` |
+| Executable behavior evidence | `test-engineer` |
+| Durable documentation | `docs-steward` |
+| Material final acceptance or release | `gatekeeper` |
 
-Never invent a new role **family**. Instantiating `[Domain]-Advisor` from the `domain-advisor` template (after the human names the domain) is allowed and required when domain consult is needed.
+Code Reviewer, Test Engineer, and Gatekeeper are independent capabilities, not a
+mandatory chain for every task. Use each only when its question exists.
 
-### Alias normalization (do not invent role families)
+Do not merge these three questions: contract (before build), built vs contract
+(after build, when a named UX or architecture contract existed), and material
+accept/release (Gatekeeper). Gatekeeper does not replace Frontend UX Lead or
+System Architect on the running UI or API.
 
-| Incoming label | Route to |
-|---|---|
-| Explorer | `investigator` |
-| Inspector — repository/config/artifact facts | `investigator` |
-| Inspector — test or validation evidence | `test-engineer` |
-| Inspector — final independent decision | `gatekeeper` |
-| Reviewer — final independent review | `gatekeeper` |
-| Reviewer — non-final domain/UX/code feedback | Existing accountable functional owner |
-| Pre-build technical judgment | `advisor` |
-| Backbone, framework, API, data, or shared-contract ownership | `system-architect` |
-| Pre-build challenge | `contradictor` |
-| Talent / Talent-Career / employment-domain consult | `talent-advisor` (Domain Advisor instance) — or **ask** if domain unclear |
-| Strategic / strategy consult | `strategic-advisor` — or **ask** |
-| “Domain expert” / “specialty advisor” with no domain | **Ask human** for domain → `{domain}-advisor` |
+FIO is a temporary hat on one builder after Architect froze a contract, not a
+role ID. Frontend Builder owns a frontend seam; Backend Engineer owns an
+API/data seam. Drift routes **FIO → Lead → System Architect**.
 
-If no predefined role or Domain Advisor instance can safely own the task → `HUMAN_DECISION_REQUIRED`.
+## Risk
 
-## Context caps (hard)
+Lead records `small`, `standard`, or `high` on the Input only when it changes
+the route. Risk omits or adds questions; it never skips the contract owner.
 
-| Artifact | Max words |
-|---|---|
-| Sprint brief | **600** |
-| Batch brief | **450** |
-| Task run prompt | **250** |
-| Handoff | **150** |
-| Batch checkpoint | **300** |
+| Risk | Built vs contract | Reviewer / Test Engineer | Gatekeeper |
+|---|---|---|---|
+| `small` — single-owner, no named UX/API contract | Skip | Skip when the focused check proves the outcome | Skip |
+| `standard` — named UX or architecture contract | Same owner reviews the built UI/API | Only if bytes or behavior remain unproven | Only if this is still a material accept/release |
+| `high` — security, privacy, migration, public contract, 2+ layers, mutation/state, or costly reversal | Same owner reviews the built UI/API | Usually yes | Yes |
 
-Prefer path/line evidence pointers over pasted dumps. Shrink the packet before escalating tier. Default each specialist run to a **fresh** session; continue only for one immediate follow-up that depends on unpersisted local reasoning and still fits the cap.
+`risk: high` on an Architect or backend Gatekeeper packet selects a stronger
+model. It is not Builder → Gatekeeper and not a reason to drop UX or Architect.
 
-## Task-size metric: when to split instead of waiting
+Contract-fidelity **judgment** stays on the contract role. Browser clicks,
+screenshots, HTTP/log probes, and other mechanical evidence use the cheapest
+capable mapped slug (`frontend-ux-lead:inspect`, `system-architect:inspect`,
+or tier 0). Do not inherit the GLM/Sol/Fable contract slug for that tool loop.
+Prefer the builder's already-captured states; replay the browser or API only
+when that evidence is missing. This is an in-role phase change, not a new
+role, and not Test Engineer.
 
-“Long” is an operational threshold, not a feeling. Measure from role start to
-the first complete artifact or stop reason (excluding human approval or queue
-wait). A Task is **too long** when it is expected to exceed the 120-second
-target, reaches 180 seconds without a complete artifact, or needs a second
-follow-up after its one permitted immediate handoff. At 240 seconds it is
-`BLOCKED` and must stop.
+## Lead responsibility
 
-A Task is **too wide** when any of these is true:
+The Lead:
 
-- it has more than one accountable role or more than one independent concern;
-- it needs non-disjoint writers, crosses an unstable shared contract, or has no
-  single acceptance artifact;
-- its run prompt would exceed 250 words, its handoff would exceed 150 words,
-  or the stop condition cannot be stated in one sentence.
+1. converts the request into one clear Input;
+2. routes it to the accountable role;
+3. reads the Handoff;
+4. resolves or routes the remaining question;
+5. stops when the requested outcome is proven.
 
-Before starting, split a too-long/too-wide Task into dependency-safe slices
-with exclusive files, one owner, one acceptance artifact, and one stop
-condition. During a run, emit a checkpoint at 180 seconds or when a metric is
-crossed: completed work, evidence, unresolved question, and exactly one next
-bounded Task. The Lead hands that slice off; it does not silently extend the
-context, retry the same mutation loop, or leave the original Task frozen.
+A failed or partial task returns to Lead for the smallest correction or
+rerouting. It does not automatically require a new gate, model change, or
+workflow restart.
 
-## Skill loading
+## Completion truth
 
-- **Start with none.** Load skills only when the task brief names them (or the role card’s “load when” trigger matches).
-- Paths are relative to this repo: `skills/engineering/…`, `skills/quality/…`, `skills/process/…`, `skills/design/…`.
-- One primary skill per task; a second requires a separately recorded unresolved question.
-- Do not auto-load every skill because Lead or multi-agent work is happening.
+Mark work `complete` only when the requested outcome is actually true and its
+named acceptance evidence exists. A proposal, policy document, packet `READY`,
+installed symlink, or passing narrow check is not completion unless it proves
+the requested behavior. State any unavailable route, inherited host default,
+missing execution identity, unrun check, or remaining approval as `PARTIAL` or
+`BLOCKED`; never hide it behind a completion claim.
 
-### Skill overrides
+## Optional execution support
 
-Brief triggers override upstream skill “When to Activate” / auto-discovery language. Do not rewrite upstream skill bodies wholesale.
+- Use the watchdog only for a real background or long-running command that needs
+  a deadline and cancellation.
+- Use additional QA evidence tooling only when a named release, security,
+  privacy, migration, or audit requirement demands it.
+- Host adapters may format native spawn calls, but host-schema checks are not
+  core policy and never prove worker completion.
+- Install checks prove activation only; they never prove task execution.
 
-1. **`context-engineering`** — Load **only** when the brief trigger is: create/revise a context packet, bounded investigation, or cross-role synthesis. Never auto-load because Lead, Advisor, multi-agent, or debate work is happening.
-2. **`sequential-thinking`** — If host MCP reasoning tools are unavailable: structured written steps in the handoff still satisfy the second-failure skill; do not invent MCP tools.
-3. **`problem-solving`** — Exception-only after known root cause or genuine design deadlock; never replace `debugging` for concrete failures.
+## Human gates
 
-Advisor / Contradictor default primary skill is `none`. Model tier assignment is orthogonal to skill load.
+Human approval is required for destructive operations, production deployment,
+secrets, new dependencies or services, public-contract breaks, and material
+scope expansion. Ordinary in-scope implementation, correction, focused tests,
+and role routing proceed without repeated approval.
 
-## Cheap-utility cost tier (pool-mapped)
+## Platform boundary
 
-Prefer the host’s **Tier 0** mapped slug (Codex often maps this to a Luna-class model) for cost-sensitive, high-volume `S0`/`S1` work with an explicit output, bounded evidence or file boundary, and a named stronger owner for synthesis or escalation.
-
-**Default cheap-utility roles / cells:** Investigator; low-risk single-boundary Frontend Builder; eligible temporary support cells (evidence/citation collection, request classification, assumption inventory, stakeholder-lens extraction, dependency/status aggregation, synthetic fixtures, focused test support, failure-log triage).
-
-**Do not** use cheap-utility as the accountable default for Lead, PM, Backend, Frontend/UX contract ownership, Test Engineer validation synthesis, Docs Steward governed docs, or Gatekeeper. Escalate Tier 0 → Tier 1 build/validate when evidence conflicts, scope crosses modules, behavior is statefully complex, validation fails, or accessibility/security/privacy/public-contract implications appear. Escalate to Tier 2/3 only under recorded high-risk triggers in [model-routing.md](model-routing.md).
-
-## Functional Integration Owner (FIO)
-
-Each batch names one **Functional Integration Owner**: the role accountable for the integrated behavior after individual tasks land (usually Backend or Frontend Builder for that surface). FIO:
-
-- Owns cross-task seams inside the batch
-- Does not replace Test Engineer evidence or Gatekeeper accept/block
-- Surfaces integration gaps in the checkpoint before TE runs
-- Does not manage teammates, expand scope, or issue Gatekeeper decisions
-
-## Default batch shape
-
-1. Brief + nature/tier classification
-2. Triggered concern method + consult: choose the smallest fitting method, start with one accountable role, and add one decision-changing specialist at a time (per [model-routing.md](model-routing.md)); use the bounded meeting rules in [meeting-policy.md](meeting-policy.md) for material defects, state risks, or cross-role conflicts
-3. Conditional acceptance design: PM `user-stories`/`pre-mortem` when triggered + Domain Advisor input → pre-build Test Engineer scenario matrix
-4. Human gate when required ([human-gates.md](human-gates.md))
-5. Builders (WIP ≤ 2; exclusive files — [concurrency.md](concurrency.md))
-6. **Test Engineer** evidence in a fresh post-integration context
-7. **Gatekeeper** accept / revise / block
-8. Docs Steward if durable docs are in scope
-
-Use acceptance design for user-facing workflows, input parsing/matching, AI
-extraction, public contracts, or materially ambiguous acceptance. PM supplies
-user outcomes, personas, and acceptance criteria; a Domain Advisor supplies
-named-domain meaning only when triggered. Test Engineer freezes an observable
-scenario matrix before builders. It is implementation input, not final TE
-evidence. For suitable deterministic unit, contract, or component cases,
-builder briefs require selective red-green-refactor; do not force E2E-first.
-
-### Corrective batch loop
-
-Each Test Engineer or Gatekeeper pass collects all in-scope findings before
-issuing its result; Lead does not dispatch fixes mid-pass. Human approval
-enumerates correction scope; new defects or scope expansion require a new gate.
-Cluster findings by demonstrated root cause, never symptom similarity. Keep a
-corrective Batch one integrable slice; queue cross-contract findings as
-provisional Batches. Preserve or add one failing regression per finding where
-feasible, reintegrate once, then run targeted checks, affected regressions,
-independent negative/adversarial cases, and Batch acceptance. A fresh Test
-Engineer validates before one sequential Gatekeeper re-review. Final TE
-`FAIL`/`BLOCKED`, insufficient fresh evidence, or a Gatekeeper verdict outside
-`APPROVE`/`APPROVE_WITH_NOTES` stops for the human gate.
-
-For the full participant, artifact, and PDCA rules, use
-[meeting-policy.md](meeting-policy.md). “Test all” means the complete frozen
-Batch matrix, not an unbounded repository-wide rerun.
-
-## WIP, rotation, and context economy
-
-Default WIP:
-
-- one `ACTIVE` sprint
-- one `ACTIVE` implementation batch and one next `READY` batch
-- ≤2 concurrent tool-using specialists total (including Investigator)
-- one active write task per role; one writer per file
-- no reserved “support lane” that bypasses the task list
-
-Parallel tasks require satisfied dependencies, stable contracts, disjoint files, own acceptance, and known integration order. Fake parallel is a Lead planning defect.
-
-Do not create standing coordinators, shadows, helpers, or consolidation agents. Every contributor owns a normal task-list item with exclusive deliverable and stop condition. When queueing blocks the critical path, re-sequence or split — optionally use cheap-utility temporary cells under the same WIP cap with one accountable synthesizer.
-
-If a task is too wide for one bounded run, split it into small dependency-safe
-Tasks with exclusive files, explicit acceptance, and a stop condition. Hand off
-the completed slice with evidence, unresolved questions, and the next bounded
-Task. Do not leave an oversized task frozen, silently extend its context, or
-restart it without a checkpoint.
-
-Urgent work uses an explicit **expedite batch** after checkpointing the active batch — never silent injection.
-
-## Time budget and semantic status
-
-- Target ~120s when practical
-- At ~180s → `PARTIAL` with evidence, unresolved question, next bounded step
-- At ~240s → cancel or split rather than waiting out the provider
-- Bounded QA uses a 120s target / 240s hard stop. A timed-out validation
-  records `BLOCKED` evidence and one next action; Lead hands off one smaller
-  follow-up Task instead of leaving the batch frozen. It never auto-retries or
-  starts Gatekeeper.
-- Transport `completed` with empty/malformed/timeout content → `FAILED_TRANSIENT` (not accepted work)
-
-## Adapter note
-
-Runtime wiring (how tasks are spawned, which model pool is used, how approvals are collected) lives under `adapters/`. **Adapter binds runtime** — core policy here stays host-independent.
+Core remains host-neutral. Host-specific spawning, cancellation, and model
+options belong under `adapters/<host>/`.

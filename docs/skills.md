@@ -16,16 +16,19 @@ skills/
                  qa-evidence-enforcement,
                  sequential-thinking, problem-solving
   process/       context-engineering, pm-execution, docs-seeker
-  design/        hallmark, awesome-design-md, frontend-design, aesthetic,
-                 ui-ux-pro-max, design-md-index.md
+  design/        design-router.md, anti-ui-slop, hallmark, awesome-design-md,
+                 frontend-design, aesthetic, ui-ux-pro-max, design-md-index.md
 ```
 
-## Design pairing (preferred)
+## Design routing
 
-1. **Hallmark** — anti-AI-slop structure and visual discipline for greenfield / redesign / audit.
-2. **awesome-design-md** — named brand `DESIGN.md` references via [`skills/design/design-md-index.md`](../skills/design/design-md-index.md).
-3. Rules: open the index first; at most **one primary + one comparison**; extract **principles only**; never clone branding, fonts, or logos; project tokens/specs still win when present.
-4. When both Hallmark and `frontend-design` / `aesthetic` / `ui-ux-pro-max` could apply, **Hallmark wins** unless the brief names a narrower trigger.
+Start at [`design-router.md`](../skills/design/design-router.md). It selects
+exactly one primary generator per surface: `anti-ui-slop` for operational,
+refinement, and usability-audit work; Hallmark plus exactly one named
+`awesome-design-md` principle reference for `brand_web`; or `frontend-design`
+alone for expressive work. Hallmark and `frontend-design` never generate the
+same task. `aesthetic` is always a non-authoritative finish lens. Material UI
+completion requires rendered inspection, not a source-only check.
 
 ## Role → skill coverage
 
@@ -38,8 +41,9 @@ skills/
 | Investigator | `context-engineering` for bounded investigation |
 | System Architect | `engineering/system-architecture` only for the cross-layer/shared-contract trigger; add another named skill only for a distinct unresolved question |
 | Backend Engineer | `backend-development`, `databases`, `debugging`, `web-frameworks` |
-| Frontend/UX Lead | `hallmark`, `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
-| Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
+| Frontend/UX Lead | `design-router`; its one selected generator; one named `awesome-design-md` reference only for `brand_web`; `aesthetic` as finish lens |
+| Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, the contract's selected design generator/resources, `react-next-performance` |
+| Code Reviewer | `code-review` (bounded, read-only diff/evidence review) |
 | Test Engineer | `web-testing`, `qa-evidence-enforcement` (bounded evidence only), `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
 | Docs Steward | `docs-seeker`, `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
 | Gatekeeper | `code-review` (read-only) |

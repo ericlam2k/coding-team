@@ -1,6 +1,6 @@
 ---
 name: coding-team
-description: Platform-independent Sprint → Batch → Task coding team. Use for multi-role delivery under Cursor. Lead classifies nature, maps tiers from model-pool.map.md, delegates via Task agents.
+description: Lean Input → Process → Handoff coding team for Cursor.
 ---
 
 # Coding Team (Cursor)
@@ -16,14 +16,20 @@ Parent Agent is **Lead**. Never spawn a Lead subagent.
 
 ## Hard constraints
 
-- WIP ≤ 2; TE → Gatekeeper sequential
-- Incomplete / non-APPROVE → stop for human
-- Oversized or timed-out work → split into a bounded Task and hand off the
-  checkpoint; do not leave it frozen or silently extend the run.
-- Lead cost discipline — briefs, not implementation code
+- WIP ≤ 2 ordinary tool-using Tasks; Lead owns status and there is no supervisor
+  lane
+- Code Reviewer, Test Engineer, and Gatekeeper are independent risk triggers
+- If a named UX or architecture contract was used, that owner reviews the built
+  result before Gatekeeper; small patches skip that bounce; high risk does not
+  skip the contract owner
+- Built-vs-contract inspect uses `frontend-ux-lead:inspect` or
+  `system-architect:inspect` (cheap slug). Do not inherit GLM/Sol/Fable for
+  browser or HTTP tool loops
+- Gatekeeper writes `review-decision.md` from the origin verdict on the
+  cheapest capable slug; do not remake the call. `gatekeeper:small` is
+  unchanged
+- Incomplete work returns to Lead for correction or rerouting
+- Lead writes briefs and routes handoffs, never implementation code
 - PM Lean addon default OFF; enable it only for an explicit PM task
-- When `qa_required=true` or `qa_mode=bounded`, Test Engineer runs the
-  QA evidence validator before Gatekeeper. Bounded passes use a 120-second
-  target / 240-second hard stop; timeout returns `BLOCKED` without auto-retry.
 
 See `$CODING_TEAM_ROOT/adapters/cursor/runtime.md`.

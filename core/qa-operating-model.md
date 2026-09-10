@@ -1,82 +1,47 @@
-# QA Operating Model
+# QA operating model
 
-This is the active Coding Team QA policy. The previous layered operating model
-is archived at
-`docs/archive/qa-operating-model-archive-29311de.md`; do not load it by
-default.
+QA is proportional to the unresolved risk. It supports the default flow; it is
+not a parallel workflow.
 
-Use the smallest flow that gives reliable evidence. Keep WIP ≤2, disjoint write
-scopes, and Test Engineer (TE) → Gatekeeper (GK) sequential. Do not create a
-standing QA meeting or a second router.
+## Default
 
-## Mode selection
+1. The accountable role performs the task.
+2. The role runs the focused check named in the Input.
+3. The role hands off the result and evidence.
+4. The Lead decides whether another quality role has a real question to answer.
 
-Use **Normal** mode by default. Escalate to **Risky** mode when any of these
-are present: mutation or state transition, replay/currentness, unclear user or
-domain meaning, shared contract, external integration, auth/privacy/security,
-migration/rollback, material regression risk, repeated failure, or a second
-failed fix attempt.
+## When to use each role
 
-If a normal task hits the same failure twice or reveals one of those triggers,
-stop the normal loop and restart it as a Risky batch. Do not keep patching
-forward.
+- **Frontend UX Lead / System Architect after build:** the named contract owner
+  checks that the built UI or API still matches. This is not a quality role and
+  is not Gatekeeper.
+- **Code Reviewer:** independent inspection is valuable for non-trivial code,
+  contract, security, or maintainability risk.
+- **Test Engineer:** acceptance depends on executable behavior that the
+  implementer evidence does not independently prove.
+- **Gatekeeper:** material final acceptance, release, migration, security, or
+  another explicitly governed decision. Gatekeeper does not answer contract
+  fidelity.
 
-## Normal changes
+These roles are not mandatory for small deterministic work. When several are
+needed, evidence dependencies make them sequential. Do not treat Test Engineer
+then Gatekeeper as a required chain, and do not send a builder to Gatekeeper
+while a named UX or architecture contract is still unreviewed on the built
+result.
 
-1. Agree the expected behavior and scope.
-2. Define key user-observable test cases, including the important negative or
-   edge case.
-3. Implement or fix the smallest boundary.
-4. Run the selected tests.
-5. Log each defect with expected/actual result and evidence.
-6. Retest the corrected case.
-7. Run suitable affected regression, not the whole repository by default.
-8. For a material batch, obtain fresh TE evidence, then one sequential GK
-   decision. Low-risk local work may close with its recorded check when the
-   batch does not require independent TE/GK review.
+## Evidence
 
-PM, Domain Advisor, Architect, or Contradictor input is conditional: consult
-only when that decision can change the expected behavior, contract, or risk.
+Evidence identifies the candidate, focused check, result, defects, and residual
+risk. A handoff carries this evidence. Separate QA receipts or validators are
+used only when an external audit or release contract explicitly requires them.
 
-## Risky or confusing changes
+Candidate mutation invalidates only evidence affected by the changed bytes or
+behavior. Rerun the smallest relevant checks and roles; do not restart an
+unrelated full chain.
 
-1. Freeze the test batch before implementation. Resolve user/domain meaning
-   first; select only the affected test layers and cases.
-2. Run the complete frozen batch once before patching. Do not dispatch a fix
-   while that validation pass is active.
-3. Log all failures with scenario, expected/actual result, evidence, and
-   classification.
-4. Correlate findings once. Group only failures with a demonstrated shared
-   cause; do not cluster by symptom wording alone.
-5. Admit one controlled corrective Batch with exclusive files.
-6. Run a fresh TE pass for failed cases, affected regression, and relevant
-   negative/adversarial cases.
-7. Promote only with complete evidence and TE → GK approval. Human approval
-   remains required for production, irreversible, privacy/legal, or other
-   human-gated actions.
+## Failure route
 
-## Timebox and stop rules
-
-For Risky batches, target 120 seconds and hard-stop at 240 seconds. At the
-target, stop scheduling new cases. At 180 seconds without a complete artifact,
-emit a checkpoint; at the hard stop, cancel the active command and record
-`BLOCKED` with the timeout reason, evidence collected, and one next action. A
-Task is too wide when it has multiple owners/independent concerns, non-disjoint
-writes, no single acceptance artifact, or cannot fit the 250-word run-prompt /
-150-word handoff caps. If the remaining work is too wide or long, hand off one
-smaller dependency-safe Task with the checkpoint and next action. Do not
-auto-retry, patch during the pass, leave the work frozen, or start GK on
-incomplete evidence.
-
-`FAIL`, `BLOCKED`, stale evidence, dirty-tree evidence, commit mismatch, or GK
-non-approval stops promotion and returns control to Lead/human decision.
-
-## Minimum evidence
-
-Normal mode records: expected behavior, selected cases, commands/results,
-defects, retest result, affected regression result, and next action or stop
-reason.
-
-Risky mode additionally records: frozen baseline, selected layers/cases, all
-findings, correlation/root cause, corrective Batch, fresh TE result, regression
-result, exact validated commit, and GK decision.
+A failure returns to the Lead. The Lead sends the complete finding set to the
+accountable owner, applies the smallest correction, and reruns affected checks.
+Ask the human only when the correction changes scope, authority, product meaning,
+or an irreversible action.

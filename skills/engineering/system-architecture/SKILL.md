@@ -36,7 +36,7 @@ does not create another runtime, agents, or approval authority.
 - Label material claims `verified`, `reasoned-not-tested`, or `not-verified`.
 - Record planned → actual model capability and any `full`, `reduced`,
   `read-only`, or `planning-only` downshift.
-- Return one named contract plus a ≤150-word handoff with evidence labels,
+- Return one named contract plus a handoff with evidence labels,
   unresolved gates, residual risk, and next owner.
 ```
 
@@ -50,7 +50,10 @@ does not create another runtime, agents, or approval authority.
 - Add Advisor for non-obvious or high-leverage direction. Add Contradictor
   after Advisor for material conflict, shared/public contracts,
   security/privacy, costly reversal, or explicit challenge. Keep debate serial.
-- Keep WIP ≤2, disjoint writes, and Test Engineer → Gatekeeper sequential.
+- Keep WIP ≤2, disjoint writes, and risk-triggered Code Reviewer / Test
+  Engineer / Gatekeeper use under `core/qa-operating-model.md`. Do not treat
+  those roles as a required sequence. After build, contract fidelity returns to
+  this Architect (or FIO seam check first); Gatekeeper does not replace that.
 - Stop for human approval on production identity, privacy/legal decisions,
   destructive or irreversible migrations, new dependencies/services,
   external providers, deployment, or real personal data.

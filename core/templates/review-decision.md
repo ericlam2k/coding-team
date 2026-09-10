@@ -1,5 +1,9 @@
 # Review decision (Gatekeeper)
 
+Write this in the same Gatekeeper task on the cheapest capable mapped slug,
+from the origin verdict. Do not remake the accept/release call.
+`gatekeeper:small` is unchanged.
+
 ## Identity
 
 - **Batch ID:**

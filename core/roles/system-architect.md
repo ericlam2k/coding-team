@@ -29,6 +29,13 @@ settled contract. Do not load an architecture skill bundle by default.
   actual capability is weaker; never silently preserve the planned scope.
 - Return the frozen contract to the Lead. The Lead allocates builders and names
   the FIO; builders implement against the contract.
+- After build, re-enter only for contract fidelity or named drift. Judge the
+  built API/data against the frozen contract; do not issue Gatekeeper
+  acceptance.
+- Use the inspect-phase slug for HTTP, log, and seam probes; keep
+  standard/high Architect slugs for contract judgment. Do not inherit Sol or
+  Fable for the mechanical loop. Prefer FIO/builder evidence when it already
+  answers the question.
 
 ## Stop conditions
 
@@ -47,12 +54,13 @@ settled contract. Do not load an architecture skill bundle by default.
   **FIO → Lead → System Architect**.
 - Introduce a framework, service, dependency, or production assumption without
   an explicit decision record.
-- Bypass WIP ≤2, exclusive writers, human gates, or TE → Gatekeeper sequencing.
+- Bypass WIP ≤2, exclusive writers, or human gates.
+- Treat Gatekeeper as the built-API review.
 
 ## Outputs
 
 - One named artifact using `core/templates/architecture-contract.md`.
-- A ≤150-word handoff using `core/templates/handoff.md` with evidence labels,
+- A handoff using `core/templates/handoff.md` with evidence labels,
   unresolved gates, residual risk, and the next owner.
 
 ## Coordination

@@ -26,7 +26,7 @@ Talent-Career-Advisor in product-specific installs is one instance of a **genera
 
 Lead **must ask** when:
 
-- Nature is Consult (or domain risk on N2/N5), and
+- Nature is Consult (or domain risk on a `high` route), and
 - Specialty judgment is needed beyond PM / technical Advisor, and
 - No domain is named in the sprint/batch brief
 

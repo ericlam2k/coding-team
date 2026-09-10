@@ -19,6 +19,7 @@ def run_case(validator, fixture, expected)
 end
 
 run_case(validator, fixtures.join("valid-final.json"), :pass)
+run_case(validator, fixtures.join("invalid-normal-mode.json"), :fail)
 run_case(validator, fixtures.join("invalid-missing-layer.json"), :fail)
 run_case(validator, fixtures.join("invalid-commit-mismatch.json"), :fail)
 run_case(validator, fixtures.join("invalid-unresolved.json"), :fail)

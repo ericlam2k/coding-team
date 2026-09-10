@@ -6,7 +6,7 @@
 
 - **Batch ID / Sprint ID:**
 - **Updated:**
-- **Phase:** pre-build | build | TE | GK | closed
+- **Phase:** pre-build | build | contract-check | TE | GK | closed
 
 ## WIP (≤2)
 
@@ -19,8 +19,9 @@
 
 - **Completed tasks:**
 - **FIO integration status:**
-- **TE evidence:** missing | draft | accepted
-- **Gatekeeper:** not started | APPROVE | REVISE | BLOCK
+- **Built vs contract:** skipped (`small`) | pending | done
+- **TE evidence:** missing | draft | accepted | not required
+- **Gatekeeper:** not started | APPROVE | REVISE | BLOCK | not required
 
 ## Gates
 

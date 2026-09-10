@@ -2,14 +2,6 @@
 
 Paste this into a consumer project’s `AGENTS.md` (or run `./bin/ct project <path>`).
 
-## Public repository boundary
-
-This checkout is the public Coding Team framework and the source for a fresh
-install. Keep updates generic and customer-neutral. Do not copy or sync a
-private in-house lab, product code, customer data, internal evidence, secrets,
-or local project overlay into this repository. Private projects may consume
-this framework, but they do not become part of it.
-
 ## Coding Team (Codex)
 
 This project may use the **coding-team** orchestration skill for Sprint → Batch → Task multi-role work.
@@ -36,9 +28,29 @@ This project may use the **coding-team** orchestration skill for Sprint → Batc
 
 - Resolve `CODING_TEAM_ROOT` (env, or parent of `adapters/` when the skill is a symlink to `adapters/codex`).
 - Read `core/model-routing.md`, concurrency/human-gates when present, role cards under `core/roles/`, and the approved local `model-pool.map.md` only when explicitly configured.
-- **WIP ≤ 2** concurrent tool-using subagents.
-- **Test Engineer → Gatekeeper** sequential only.
-- Incomplete / non-APPROVE → **ask the human**; do not invent acceptance.
-- Design: pair **hallmark** with **awesome-design-md** under `$CODING_TEAM_ROOT/skills/design/`.
+- Keep at most two ordinary specialists active, with one accountable owner per
+  task. There is no supervisor lane.
+- Code Reviewer, Test Engineer, and Gatekeeper are independent risk-triggered
+  roles; use only the role that answers a real unresolved question.
+- If a named UX or architecture contract was used, that owner reviews the built
+  result before Gatekeeper. Small single-owner patches skip that bounce. High
+  risk adds proof and ship; it does not skip the contract owner.
+- Built-vs-contract inspect uses the cheapest capable slug; do not inherit the
+  contract-role premium model for browser or HTTP tool loops.
+- Incomplete work returns to Lead for correction or rerouting; do not invent
+  acceptance.
+- Handoffs follow `core/templates/handoff.md`. Length is not a routing rule.
+- Gatekeeper writes the verdict form from the origin call on the cheapest
+  capable slug; it does not remake the call. `gatekeeper:small` is unchanged.
+- Design: start at `$CODING_TEAM_ROOT/skills/design/design-router.md`; it
+  selects one primary generator and requires rendered inspection before a
+  material UI completion claim.
 
 Codex, Cursor, and Cline are host adapters. The core remains host-neutral.
+
+### Host-neutral rule
+
+Any change to `core/` or shared surfaces must remain host-neutral. Host-specific
+commands, models, and runtime live only under `adapters/<host>/`. Codex-bound
+features (watchdog, checkpoint, flow) are being rolled to host-neutral on the
+roadmap.

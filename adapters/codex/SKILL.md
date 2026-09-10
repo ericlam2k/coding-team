@@ -1,68 +1,76 @@
 ---
 name: coding-team
-description: Orchestrate Sprint → Batch → Task multi-role delivery under Codex. Use for implementation, refactoring, testing, debugging, or cross-file development when the user wants a coding team with Lead, advisors, builders, Test Engineer, and Gatekeeper.
+description: Lean Coding Team workflow for Codex.
 metadata:
-  short-description: Multi-role coding-team Lead for Codex
+  short-description: Input to Process to Handoff routing for Codex
 ---
 
 # Coding Team (Codex)
 
-Parent agent is **Lead**. Do not invent roles. Delegate only predefined roles from `core/roles/` via Codex subagents (see [runtime.md](runtime.md)).
+Lead is the workflow owner. The canonical flow is:
 
-**One-line:** Lead classifies nature, then orchestrates, plans, and delegates; specialists execute only that brief and tier; WIP ≤ 2 with Test Engineer → Gatekeeper sequential — never trial-error model hops or raising WIP to skip a causal chain.
-
-## Resolve root and policy
-
-1. Resolve **`CODING_TEAM_ROOT`**:
-   - Use `$CODING_TEAM_ROOT` if set; else
-   - If this skill is a symlink to `<repo>/adapters/codex`, the repo root is the parent of `adapters/`; else
-   - Ask the human to set `CODING_TEAM_ROOT` to their coding-team checkout.
-2. **Read** (do not guess):
-   - `$CODING_TEAM_ROOT/core/orchestration.md`
-   - `$CODING_TEAM_ROOT/core/model-routing.md`
-   - `$CODING_TEAM_ROOT/core/concurrency.md`
-   - `$CODING_TEAM_ROOT/core/human-gates.md`
-   - This skill’s approved local **`model-pool.map.md`**, when configured
-   - Role cards under `$CODING_TEAM_ROOT/core/roles/` as needed
-3. Design work: pair **hallmark** with **awesome-design-md** when the brief calls for UI/visual craft (see `skills/design/design-md-index.md`).
-
-## Hard constraints
-
-- **WIP ≤ 2** concurrent tool-using subagents; prefer a queue of small Tasks over raising the cap
-- **Test Engineer → Gatekeeper** sequential (never simultaneous)
-- Incomplete / non-APPROVE → **stop and ask the human** (no auto-chain)
-- Shared-contract or 2+ layer change → dispatch `system-architect` before builders; it writes one named contract only, then FIO assembles against it.
-- Oversized or timed-out work → split into a bounded Task and hand off the
-  checkpoint; do not leave it frozen or silently extend the run.
-- **Lead cost discipline:** emit judgment and briefs — not implementation code; defects return as corrected briefs; apply the **spec-readiness test** before dispatch
-- Human gates for commit, push, Production deploy, destructive ops, new dependencies
-- Model tiers are **non-binding**: look up planned → actual in `model-pool.map.md`; never block start on a missing slug; record substitutions
-- Model tiers are **non-binding**: use only an **approved** `model-pool.map.md` (written after install suggestion + human approve). Record planned → actual; never block start on a missing slug
-- Skills start at `none`; honor **skill overrides** in `core/orchestration.md`
-- When `qa_required=true` or `qa_mode=bounded`, load
-  `$CODING_TEAM_ROOT/skills/quality/qa-evidence-enforcement/` after TE
-  execution and run the evidence validator before Gatekeeper. Bounded TE
-  passes use a 120-second target / 240-second hard stop; timeout returns
-  `BLOCKED` and queues one smaller next step rather than retrying.
-- **PM Lean addon default OFF:** do **not** load `pm-lean` unless explicitly enabled (`./bin/ct enable pm-lean`) or the human asks. It lives under `$CODING_TEAM_ROOT/addons/` and is never injected into core briefs
-- Platform independence: core has no host slugs; this file is the Codex adapter only
-
-## Cheap-utility defaults (Codex)
-
-Prefer the Tier **0** mapped slug (usually `gpt-5.6-luna`) for Investigator, low-risk Frontend Builder, and eligible support cells. Do not use it as the accountable default for Lead, PM, Backend, Frontend/UX Lead, Test Engineer synthesis, Docs Steward, or Gatekeeper. Escalate per `core/model-routing.md`.
-
-## Lead loop (short)
-
-1. Classify **nature** (N0–N5 / Consult / Docs)
-2. Assign lowest capable **tier**; resolve a slug from the approved local map when configured
-3. Normalize aliases (Explorer→Investigator, etc.); never invent roles
-4. Create/update the batch task list; delegate one role per task via [runtime.md](runtime.md)
-5. Integrate → Test Engineer → bounded QA evidence validation when triggered → Gatekeeper
-6. On incomplete output: ask human; do not invent an APPROVE
-
-## Optional model map
-
-```bash
-./bin/ct map propose --platform codex
-./bin/ct map approve --platform codex
+```text
+Input → Process → Handoff → related role
 ```
+
+Read `core/orchestration.md`, `core/model-routing.md`, `core/concurrency.md`,
+and `core/human-gates.md`, then read only the role card needed for the current
+task. Keep WIP at two ordinary specialists or fewer; there is no supervisor
+lane. A specialist owns its task and does not spawn another role.
+
+Code Reviewer, Test Engineer, and Gatekeeper are independent, risk-triggered
+capabilities. Use the smallest one that answers the unresolved question, and
+rerun only evidence affected by a mutation. A handoff is the single semantic
+task record; it states status, conclusion, changed artifacts, focused evidence,
+residual risk, and the recommended next role or action.
+
+## Native host formatting
+
+`adapters/codex/scripts/prepare-dispatch.py` uses one bounded selector for two
+verified direct schemas. Attest exactly one visible binding with
+`mode=direct_tool_call`, `available_to_caller=true`, and no extra keys:
+
+```json
+{"tool":"collaboration.spawn_agent","mode":"direct_tool_call","available_to_caller":true}
+{"tool":"multi_agent_v1__spawn_agent","mode":"direct_tool_call","available_to_caller":true}
+```
+
+Historical V1 `collaboration.spawn_agent` emits exactly `task_name`,
+`agent_type`, `fork_turns`, `message`, `model`, and `reasoning_effort`. Current
+V2 `multi_agent_v1__spawn_agent` emits `agent_type`, `fork_context`, and
+`message`; `model` and `reasoning_effort` appear only when explicitly supplied.
+V2 emits `fork_context=false` for a fresh specialist and rejects caller-supplied
+`fork_context`, `task_name`, or `fork_turns`.
+
+Missing, malformed, false, extra-key, unknown, indirect, or mixed bindings
+return `BLOCKED` with no spawn. Reject `functions.collaboration.spawn_agent`,
+`functions.exec`, `exec_command`, `tools.*`, shell, Python, Node, JavaScript,
+and nested tool bindings. Never probe, translate between bindings, fall back,
+or dual-dispatch.
+
+READY proves packet-valid plus selected direct-binding-attested preflight only;
+it does not prove host acceptance, child start, supervision, or completion.
+For V1: Invoke the direct collaboration.spawn_agent tool exactly once with
+READY.spawn; do not use functions.exec, exec_command, shell, JavaScript, or a
+nested tool binding. For V2: Invoke the direct multi_agent_v1__spawn_agent tool
+exactly once with READY.spawn; do not translate fields, retry, or use
+functions.exec, exec_command, shell, JavaScript, or a nested tool binding.
+
+Top-level `binding` and deterministic `dispatch_id` are correlation metadata,
+not host payload or execution proof. A successful V2 response requires
+authoritative `agent_id`; `nickname` is informational. Missing, rejected,
+timed-out, or ambiguous responses permit no automatic retry. The handoff
+remains the workflow record; removed admission, timing, supervisor, and receipt
+ceremony stays outside this lean formatter.
+
+## Watchdog
+
+Use `stuck-watchdog.py` only for a real background command that needs a bound.
+Its status is an internal completion, failure, or timeout log; it never routes,
+retries, approves, or creates workflow authority.
+
+## Installation
+
+`check-install.py` verifies the installed root, links, platform, and required
+entrypoints. It reports `ACTIVE` or `INACTIVE`; activation is not task or
+product acceptance. Product validation remains the consumer project's job.

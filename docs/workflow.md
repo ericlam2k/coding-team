@@ -5,17 +5,15 @@
 ```text
 Human goal
   → Lead classifies natures + proposes Sprint
-  → Admit Batch READY (freeze validation + ownership)
-  → PM/domain decisions → TE scenario matrix
-  → Delegate Tasks (WIP ≤ 2)
-  → Integrate → complete TE pass → correlate → one corrective Batch if needed
-  → fresh Test Engineer → Gatekeeper
+  → PM/domain decisions when needed
+  → Delegate one accountable Task (WIP ≤ 2 ordinary specialists)
+  → Focused check → Handoff → related role when needed
   → Checkpoint / next Batch or Sprint close
 ```
 
 Incomplete or non-`APPROVE` output → **stop and ask the human**. Do not auto-chain.
 
-Lead applies **cost discipline** and the **spec-readiness test** before dispatch ([orchestration.md](../core/orchestration.md)).
+Lead applies the smallest useful scope before dispatch ([orchestration.md](../core/orchestration.md)).
 
 ## Sprint
 
@@ -36,14 +34,18 @@ Template: [`core/templates/task-brief.md`](../core/templates/task-brief.md).
 ## Review chain
 
 1. Owner self-check
-2. Fresh **Test Engineer** validation (evidence)
-3. Independent **Gatekeeper** decision
+2. Deterministic checks and independent **Code Reviewer** risk route ([role card](../core/roles/code-reviewer.md), [review template](../core/templates/code-review.md))
+3. **Test Engineer** only when executable evidence remains unproven
+4. **Gatekeeper** only for a material final decision or release
 
-TE and Gatekeeper stay **sequential** for the same batch ([concurrency.md](../core/concurrency.md)).
+These roles are independent risk triggers; when several are needed, run them
+sequentially against the affected evidence ([concurrency.md](../core/concurrency.md)).
 
 ## Debate (when required)
 
-`Investigator → Advisor → Contradictor → Lead resolve → eco build → TE → GK`
+`Investigator → Advisor → Contradictor → Lead resolve → build`
+
+Quality roles remain optional and answer only unresolved questions.
 
 Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.md).
 
@@ -54,7 +56,7 @@ Lead resolution format lives in [`core/model-routing.md`](../core/model-routing.
 | Sprint brief | 600 words |
 | Batch packet | 450 |
 | Run prompt | 250 |
-| Handoff | 150 |
+| Handoff | sufficient context; no word cap |
 | Checkpoint | 300 |
 
 On context pressure: checkpoint ≤300 words → shrink → fresh session → reload checkpoint + brief + named paths only.

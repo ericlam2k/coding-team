@@ -80,6 +80,9 @@ qa_required = manifest["qa_required"]
 errors << "qa_required must be boolean" unless qa_required == true || qa_required == false
 qa_mode = manifest["qa_mode"]
 errors << "qa_mode must be standard or bounded" unless %w[standard bounded].include?(qa_mode)
+if qa_required != true && qa_mode != "bounded"
+  errors << "QA evidence validator requires qa_required=true or qa_mode=bounded"
+end
 required_string(manifest, "batch_id", errors)
 state = required_string(manifest, "state", errors)
 errors << "invalid state: #{state}" unless STATES.include?(state)

@@ -13,21 +13,27 @@
 
 ## Skills
 
-Load when the brief names them:
+Read the accepted UX contract first. Load only its named design route; do not
+load all design skill bodies or choose a competing generator. For product UI,
+the route is defined by `skills/design/design-router.md`.
+
+Engineering and quality skills load when the brief names them:
 
 - `skills/engineering/frontend-development/`
 - `skills/engineering/web-frameworks/`
 - `skills/engineering/ui-styling/`
 - `skills/engineering/react-next-performance/` — when performance is in scope
-- `skills/design/hallmark/` + `skills/design/awesome-design-md/` — when brief requires design-skill execution (paired)
-- `skills/design/ui-ux-pro-max/` — when named
 - `skills/quality/web-testing/` / `skills/quality/debugging/` — as needed for owned tests/fixes
 
 ## Duties
 
 - Build to the admitted UX contract; smallest diff; a11y basics for interactive controls
 - No silent product/UX reinterpretation — escalate ambiguity
+- Render and inspect material UI changes at the contract's representative
+  states and sizes before claiming completion
 - Handoff: files touched, visual/behavioral verify steps, known gaps
+- Recommend Frontend UX Lead as next owner when a named UX contract existed;
+  do not recommend Gatekeeper for that question
 
 ## Stop conditions
 
@@ -42,7 +48,7 @@ Load when the brief names them:
 
 ## Outputs
 
-- Task handoff via `templates/handoff.md` (≤150 words)
+- Task handoff via `templates/handoff.md`
 - Blockers phrased as what / why / where for Lead or human
 
 ## Coordination

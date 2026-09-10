@@ -2,17 +2,20 @@
 
 Host-independent coding-team policy. Adapters under `adapters/` bind this core to a runtime (**adapter binds runtime** — core does not favor any IDE or agent host).
 
+Quality roles are independent risk-triggered capabilities; use only the role
+that answers the current unresolved question.
+
 ## Index
 
 | Path | Purpose |
 |---|---|
-| [orchestration.md](orchestration.md) | Sprint → Batch → Task; Lead authority; role IDs; context caps; skill loading; FIO |
-| [model-routing.md](model-routing.md) | Abstract tiers 0 / 1build / 1validate / 2 / 3 + nature table (no host slugs) |
+| [orchestration.md](orchestration.md) | Input → Process → Handoff; related-role routing; risk; FIO hat |
+| [model-routing.md](model-routing.md) | Capability guidance and host profiles; model choice is not workflow authority |
 | [meeting-policy.md](meeting-policy.md) | Lean concern meeting, PM/domain → TE scenario design, PDCA correlation, and no-mutation correction loop |
-| [qa-operating-model.md](qa-operating-model.md) | Normal/Risky QA flow, selected layers, evidence, and promotion gates |
+| [qa-operating-model.md](qa-operating-model.md) | Risk-triggered quality roles, contract fidelity, evidence, and failure route |
 | [../docs/archive/qa-operating-model-archive-29311de.md](../docs/archive/qa-operating-model-archive-29311de.md) | Archived prior QA policy; reference only |
 | [domain-advisors.md](domain-advisors.md) | Domain Expert → `[Domain]-Advisor` / `{domain}-advisor` |
-| [concurrency.md](concurrency.md) | WIP ≤ 2; TE → Gatekeeper sequential; parallel rules |
+| [concurrency.md](concurrency.md) | WIP ≤ 2 ordinary specialists and ownership rules |
 | [human-gates.md](human-gates.md) | Approval before implement/ops; incomplete → stop; silence ≠ approval |
 | [roles/](roles/) | Canonical role cards |
 | [templates/](templates/) | Sprint / batch / task / handoff / checkpoint / review / report / perf |
@@ -31,6 +34,7 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
 | [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |
 | [roles/frontend-builder.md](roles/frontend-builder.md) | `frontend-builder` |
+| [roles/code-reviewer.md](roles/code-reviewer.md) | `code-reviewer` — independent diff-first review and evidence routing |
 | [roles/test-engineer.md](roles/test-engineer.md) | `test-engineer` |
 | [roles/docs-steward.md](roles/docs-steward.md) | `docs-steward` |
 | [roles/gatekeeper.md](roles/gatekeeper.md) | `gatekeeper` |
@@ -42,9 +46,10 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | [templates/sprint-brief.md](templates/sprint-brief.md) | Sprint (≤600w) |
 | [templates/batch-brief.md](templates/batch-brief.md) | Batch (≤450w) |
 | [templates/task-brief.md](templates/task-brief.md) | Task + run prompt (≤250w) |
-| [templates/handoff.md](templates/handoff.md) | Role handoff (≤150w) |
+| [templates/handoff.md](templates/handoff.md) | Role handoff |
 | [templates/batch-checkpoint.md](templates/batch-checkpoint.md) | Batch checkpoint (≤300w) |
 | [templates/qa-evidence.json](templates/qa-evidence.json) | Machine-readable QA evidence and promotion manifest |
+| [templates/code-review.md](templates/code-review.md) | Code Reviewer findings, verdict, and conditional validation route |
 | [templates/review-decision.md](templates/review-decision.md) | Gatekeeper decision |
 | [templates/final-report.md](templates/final-report.md) | Sprint/batch close report |
 | [templates/performance-entry.md](templates/performance-entry.md) | Tier 2/3 / substitution log |
@@ -57,10 +62,11 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 | `skills/engineering/` | Backend, frontend, system architecture, frameworks, performance, styling, data, devops |
 | `skills/quality/` | Testing, review, debugging, bounded QA evidence, problem-solving, sequential thinking |
 | `skills/process/` | Context engineering, docs seeker, PM execution |
-| `skills/design/` | Hallmark + awesome-design-md (paired), ui-ux-pro-max, aesthetic, frontend-design |
+| `skills/design/` | Scenario router; anti-ui-slop, Hallmark + named design reference, frontend-design, aesthetic, ui-ux-pro-max |
 
 ## Install note
 
 Optionally map abstract tiers to your host’s model pool with the explicit local
-`model-pool.map.md` flow. Lead classifies **nature**, assigns a **tier**, then
-looks up the mapped slug when one is approved and available.
+`model-pool.map.md` flow. Lead records **risk** (`small` / `standard` / `high`)
+when it changes the route, then looks up the mapped slug when one is approved
+and available. Risk does not skip the contract owner.
