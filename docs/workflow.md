@@ -2,6 +2,11 @@
 
 ## Flow
 
+In plain terms: you state the goal, the Lead makes it small enough to steer and
+hands the pieces to the right roles, builders do the work, an independent check
+proves it, and a human decides before anything irreversible happens. The
+technical flow below uses the framework's own terms.
+
 ```text
 Human goal
   → Lead classifies natures + proposes Sprint

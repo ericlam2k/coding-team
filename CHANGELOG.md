@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `plain-task-start` process skill: turn one plain-English request into a
+  four-line **Goal, Scope, Proof, Stop** card before any file is changed. Ships
+  in-tree under `skills/process/` and loads from `CODING_TEAM_ROOT`.
+
 ### Documentation
 
 - Mark Normal QA as `AVAILABLE` and Risky QA as `EXPERIMENTAL` while its
