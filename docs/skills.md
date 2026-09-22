@@ -15,7 +15,8 @@ skills/
   quality/       debugging (+ sub-skills), code-review, web-testing,
                  qa-evidence-enforcement,
                  sequential-thinking, problem-solving
-  process/       context-engineering, pm-execution, docs-seeker
+  process/       plain-task-start, context-engineering, pm-execution,
+                 docs-seeker, stakeholder-update
   design/        hallmark, awesome-design-md, frontend-design, aesthetic,
                  ui-ux-pro-max, design-md-index.md
 ```
@@ -81,6 +82,15 @@ trigger applies.
 
 PM Lean is default OFF and explicit-only: use at most one PM Lean skill per
 Product Manager task; it adds no routing, agents, or approval authority.
+
+## Process pack entry skill
+
+`plain-task-start` is the public entry skill: it turns one plain-English request
+into a four-line card (Goal, Scope, Proof, Stop) before any file is changed.
+It ships in-tree at [`skills/process/plain-task-start/`](../skills/process/plain-task-start/SKILL.md)
+and loads from `CODING_TEAM_ROOT`, so it needs no separate install step. The card
+is planning input only — it does not implement, approve, or replace the human
+review step.
 
 ## Not bundled (add per project)
 

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Plain Task Start"
+  short_description: "Turn one request into a reviewable task card"
+  default_prompt: "Use $plain-task-start to turn this request into a Goal, Scope, Proof, Stop card."
+policy:
+  allow_implicit_invocation: false

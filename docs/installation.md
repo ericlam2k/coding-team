@@ -97,6 +97,13 @@ Check an existing install without changing it:
 
 Set CODEX_HOME when Codex uses a different home directory.
 
+## Process skills
+
+The bundled process skills, including `plain-task-start`, ship inside the
+repository under `skills/process/` and load from `CODING_TEAM_ROOT`. There is no
+install flag for them: point your agent at the skill path, for example
+`skills/process/plain-task-start/`. See [Skills](skills.md).
+
 ## Optional addon
 
 PM Lean is off by default:
