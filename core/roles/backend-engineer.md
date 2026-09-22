@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them (start none):
+Dedicated skill (auto-loads on role spawn): `skills/engineering/backend-development/`
+
+Others load when the brief names them (start none):
 
 - `skills/engineering/backend-development/`
 - `skills/engineering/web-frameworks/`

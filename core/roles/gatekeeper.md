@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (auto-loads on role spawn): `skills/quality/code-review/`
+
+Others load when the brief names them:
 
 - `skills/quality/code-review/`
 - `skills/quality/web-testing/` — to interpret TE evidence, not to re-run as owner by default

@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (auto-loads on role spawn): `skills/process/pm-execution/create-prd/`
+
+Others load when the brief names them:
 
 - `skills/process/pm-execution/` — default for scoped PM consults
 - `skills/process/context-engineering/` — only if packet/synthesis trigger is named

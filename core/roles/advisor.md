@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (auto-loads on role spawn): `skills/process/context-engineering/`
+
+Others load when the brief names them:
 
 - `skills/process/context-engineering/` — packet/synthesis triggers
 - `skills/quality/problem-solving/` — exception-only after known design deadlock

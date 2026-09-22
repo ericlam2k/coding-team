@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Each specialist role card names one **dedicated skill** that is ready when
+  that role joins; the rest of the card's skill list waits until the task names
+  it. Lead and Domain Advisor keep no dedicated skill.
+- Nine bundled skills are normalized into standalone skills (valid
+  `SKILL.md` metadata; `skills/engineering/frontend-development/` now matches
+  its `name`). No skill bodies were rewritten.
+- `docs/examples/assets/coding-team-role-skills.svg` illustrative diagram.
+
+### Changed
+
+- `docs/skills.md` coverage table and `core/README.md` role index now show the
+  dedicated skill per role.
+
 ### Documentation
 
 - Mark Normal QA as `AVAILABLE` and Risky QA as `EXPERIMENTAL` while its

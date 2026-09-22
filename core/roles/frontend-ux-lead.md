@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (auto-loads on role spawn): `skills/design/hallmark/`
+
+Others load when the brief names them:
 
 - `skills/design/hallmark/` **and** `skills/design/awesome-design-md/` — paired for greenfield/audit/redesign
 - `skills/design/ui-ux-pro-max/` — structured UX/UI reference when named

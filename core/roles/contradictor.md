@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (auto-loads on role spawn): `skills/process/context-engineering/`
+
+Others load when the brief names them:
 
 - `skills/process/context-engineering/` — when challenging a synthesized packet
 - `skills/quality/problem-solving/` — expensive-misdirection / deadlock cases
