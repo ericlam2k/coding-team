@@ -34,6 +34,20 @@ die() {
   exit 1
 }
 
+# One dedicated skill per specialist role (see core/roles/*.md). Linked
+# default-ON so a role and its primary skill activate together.
+ROLE_SKILL_DIRS=(
+  "skills/process/context-engineering"
+  "skills/engineering/backend-development"
+  "skills/process/docs-seeker"
+  "skills/engineering/frontend-development"
+  "skills/design/hallmark"
+  "skills/quality/web-testing"
+  "skills/quality/code-review"
+  "skills/engineering/system-architecture"
+  "skills/process/pm-execution/create-prd"
+)
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --platform)
@@ -67,14 +81,19 @@ QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
 [[ -f "$ADAPTER_SRC/SKILL.md" ]] || die "missing adapter skill: $ADAPTER_SRC/SKILL.md"
 [[ -f "$QA_SKILL_SRC/SKILL.md" ]] || die "missing QA skill: $QA_SKILL_SRC/SKILL.md"
 [[ -f "$ROOT/core/qa-operating-model.md" ]] || die "missing QA policy: $ROOT/core/qa-operating-model.md"
+for dir in "${ROLE_SKILL_DIRS[@]}"; do
+  [[ -f "$ROOT/$dir/SKILL.md" ]] || die "missing role skill: $ROOT/$dir/SKILL.md"
+done
 
 if [[ "$PLATFORM" == "codex" ]]; then
   ADAPTER_DST="$CODEX_HOME/skills/coding-team"
   QA_SKILL_DST="$CODEX_HOME/skills/qa-evidence-enforcement"
+  SKILLS_DST="$CODEX_HOME/skills"
 else
   INSTALL_ROOT="$ROOT/.${PLATFORM}-install"
   ADAPTER_DST="$INSTALL_ROOT/coding-team"
   QA_SKILL_DST="$INSTALL_ROOT/qa-evidence-enforcement"
+  SKILLS_DST="$INSTALL_ROOT"
 fi
 
 link_path() {
@@ -157,6 +176,10 @@ check_links() {
   [[ -f "$ADAPTER_DST/SKILL.md" ]] || die "adapter is not active: $ADAPTER_DST"
   [[ -f "$QA_SKILL_DST/SKILL.md" ]] || die "QA skill is not active: $QA_SKILL_DST"
   [[ -f "$ROOT/core/qa-operating-model.md" ]] || die "QA policy is missing: $ROOT/core/qa-operating-model.md"
+  for dir in "${ROLE_SKILL_DIRS[@]}"; do
+    name="$(basename "$dir")"
+    [[ -f "$SKILLS_DST/$name/SKILL.md" ]] || die "role skill is not active: $SKILLS_DST/$name"
+  done
   echo "activation check: PASS ($PLATFORM)"
 }
 
@@ -167,7 +190,10 @@ fi
 
 link_path "$ADAPTER_SRC" "$ADAPTER_DST"
 link_path "$QA_SKILL_SRC" "$QA_SKILL_DST"
-echo "Canonical install active: adapter + conditional QA support."
+for dir in "${ROLE_SKILL_DIRS[@]}"; do
+  link_path "$ROOT/$dir" "$SKILLS_DST/$(basename "$dir")"
+done
+echo "Canonical install active: adapter + conditional QA support + 9 role skills."
 
 check_links
 cat <<NEXT
