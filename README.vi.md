@@ -2,225 +2,173 @@
 
 **Ngôn ngữ:** [English](README.md) · **Tiếng Việt**
 
-**Vibe-code, nhưng đừng xây mù.** Biến một ý tưởng kể bằng lời đơn giản thành
-một thay đổi nhỏ, có thể xem lại, với phạm vi rõ ràng, bằng chứng hữu ích, và
-quyết định cuối cùng vẫn là của bạn.
+**Vibe-code thỏa thích, nhưng đừng code mất kiểm soát.** Biến một ý tưởng nói bằng ngôn ngữ tự nhiên thành một thay đổi nhỏ gọn, dễ kiểm tra, khoanh vùng rõ ràng, có bằng chứng chạy thử thực tế và bạn luôn là người ra quyết định cuối cùng.
 
-`coding-team` là một framework công khai, độc lập, phiên bản "lite". Nó cung
-cấp các thẻ vai trò (role cards), công việc có giới hạn, quy tắc bằng chứng và
-các cổng phê duyệt của con người, có thể dùng cho một dự án mà không cần truy
-cập sản phẩm riêng hay dịch vụ lưu trữ.
+`coding-team` là một framework mã nguồn mở, gọn nhẹ (lite) và hoàn toàn độc lập. Framework này cung cấp: các thẻ vai trò (role cards), quy tắc khoanh vùng công việc, kiểm tra bằng chứng thực tế và các chốt duyệt bởi con người — giúp dự án của bạn làm việc hiệu quả với AI mà không cần phụ thuộc vào dịch vụ đám mây trả phí hay công cụ nội bộ riêng biệt.
 
-[Cài đặt](docs/installation.md) · [Phạm vi dự án](docs/project-scope.md) · [Xem luồng công việc](docs/workflow.md) · [Các vai trò](docs/roles.md) · [Thử ví dụ](docs/examples/validation-scenario.md) · [Định nghĩa](docs/definitions.md) · [Skills](docs/skills.md) · [Addons](docs/addons.md) · [Model pool](docs/model-pool-mapping.md) · [Adapters](docs/adapters.md)
+[Cài đặt](docs/installation.md) · [Phạm vi dự án](docs/project-scope.md) · [Xem luồng công việc](docs/workflow.md) · [Các vai trò](docs/roles.md) · [Thử ví dụ mẫu](docs/examples/validation-scenario.md) · [Thuật ngữ & Định nghĩa](docs/definitions.md) · [Kỹ năng (Skills)](docs/skills.md) · [Addon mở rộng](docs/addons.md) · [Bảng chọn Model](docs/model-pool-mapping.md) · [Bộ kết nối (Adapters)](docs/adapters.md)
 
-> Bản tiếng Việt này là bản dịch giúp bạn đọc nhanh. Bản tiếng Anh
-> ([README.md](README.md)) là bản gốc chính thức; nếu có khác biệt, hãy theo
-> bản tiếng Anh.
+> Bản tiếng Việt này được tinh chỉnh thân thiện, dễ đọc cho người làm sản phẩm và cộng đồng vibe-coding. Bạn có thể tham chiếu bản gốc [English](README.md) bất cứ lúc nào.
 
-## Tại sao nó giúp ích
+## Vì sao framework này giúp ích cho bạn?
 
-Viết code bằng AI thì nhanh. Phần khó là biết agent đang thay đổi gì, khi nào
-công việc đủ nhỏ để xem lại, thực tế đã kiểm tra những gì, và liệu nó đã sẵn
-sàng để ship.
+Dùng AI viết code thì cực nhanh. Nhưng điều đau đầu nhất là:
 
-coding-team làm cho những quyết định đó trở nên nhìn thấy được:
+- Không biết AI đang âm thầm chỉnh sửa những file nào?
+- Khối lượng việc đã đủ nhỏ gọn để bạn kiểm tra (review) chưa, hay AI đang làm một lèo cả đống thứ?
+- AI đã kiểm tra chạy thử thật chưa, hay chỉ "chém gió" là đã xong?
+- Code này đã thực sự ổn định để bạn tự tin đưa lên chạy (ship) hay chưa?
 
-- **Sprint → Batch → Task** giữ một mục tiêu lớn đủ nhỏ để điều khiển.
-- **Thẻ vai trò** làm rõ ai sở hữu và giới hạn ở đâu.
-- **Tối đa hai task cùng lúc** giữ công việc song song đủ nhỏ để xem lại (tài
-  liệu gọi giới hạn này là WIP ≤ 2).
-- **Cổng con người** bảo vệ các hành động không thể hoàn tác.
-- **Test Engineer → Gatekeeper** đặt bằng chứng độc lập lên trước khi chấp
-  nhận cuối cùng.
+`coding-team` giúp mọi thứ minh bạch và bạn luôn nắm quyền kiểm soát:
 
-Kết quả là một con đường nhìn thấy được từ yêu cầu đến thay đổi đã xem lại —
-không phải lời hứa tự chủ nhiều hơn. Quyết định cuối cùng vẫn thuộc về bạn.
+- **Sprint → Batch → Task:** Chia nhỏ mục tiêu lớn thành từng việc tí hon để bạn dễ lái theo ý mình.
+- **Thẻ vai trò (Role cards):** Phân chia rạch ròi AI nào làm việc nấy, không dẫm chân lên nhau.
+- **Tối đa 2 việc cùng lúc (WIP ≤ 2):** Giữ lượng việc song song luôn trong tầm mắt, không lo bị quá tải khi cần duyệt lại.
+- **Con người chốt duyệt (Human gates):** Những hành động quan trọng (commit, push/merge, release...) bắt buộc bạn phải đồng ý, AI không được tự ý thực hiện.
+- **Kiểm thử độc lập trước khi nghiệm thu (Test Engineer → Gatekeeper):** Phải có bằng chứng chạy thử thực tế mới được tính là xong việc.
 
-## Xem trong một phút
+Kết quả: Bạn có một lộ trình rõ ràng từ ý tưởng ban đầu đến sản phẩm đã được kiểm tra cẩn thận — không phải là để AI tự tung tự tác. Bạn luôn là người quyết định cuối cùng!
 
-Bắt đầu bằng một yêu cầu. Làm rõ giới hạn của nó, chạy kiểm tra tập trung, và
-tạm dừng để bạn quyết định khi bằng chứng đã sẵn sàng hoặc chưa đầy đủ.
+## Hiểu nhanh trong 1 phút
 
-![Hình minh họa: một mục tiêu bằng lời đơn giản đi qua công việc có giới hạn, bằng chứng và quyết định ship của con người.](docs/examples/assets/coding-team-lite-loop.svg)
+Mọi thứ bắt đầu bằng một yêu cầu của bạn: Khoanh vùng các file cần chạm vào, chạy thử kiểm tra đúng phần đó, rồi tạm dừng chờ bạn gật đầu khi bằng chứng đã rõ ràng (hoặc báo lại nếu chưa đạt).
 
-Hình minh họa này cho thấy vòng lặp công khai: yêu cầu → công việc có giới
-hạn → bằng chứng → quyết định của bạn. [Hướng dẫn giao tiếp](docs/communication-style.md)
-giữ ngôn ngữ rõ ràng mà không thay đổi các ràng buộc hay yêu cầu bằng chứng.
+![Hình minh họa: Mục tiêu bằng ngôn ngữ tự nhiên đi qua các bước khoanh vùng, kiểm tra lấy bằng chứng và chờ con người quyết định ship.](docs/examples/assets/coding-team-lite-loop.svg)
 
-## Điều phối multiagent hoạt động thế nào
+Sơ đồ trên mô tả vòng lặp cốt lõi: **Yêu cầu → Khoanh vùng làm việc → Bằng chứng chạy thử → Bạn quyết định**. [Hướng dẫn giao tiếp](docs/communication-style.md) giúp giữ cách nói chuyện luôn ngắn gọn, dễ hiểu mà vẫn đảm bảo tính chặt chẽ.
 
-Framework có một **Lead**. Lead kiểm tra mục tiêu trước, xem độ lớn của công
-việc và cái gì sẽ chứng minh nó xong. Sau đó Lead giao các task nhỏ cho các vai
-trò phù hợp.
+## Đội ngũ AI Agent phối hợp với nhau như thế nào?
+
+Cả team luôn có một AI đóng vai trò **Trưởng nhóm (Lead)**. Lead sẽ xem kỹ yêu cầu của bạn, đánh giá độ lớn của việc cần làm, xác định cần kiểm tra gì để chứng minh là xong, sau đó mới chia việc cho đúng người đúng vai.
 
 <picture>
   <source media="(max-width: 640px)" srcset="docs/examples/assets/coding-team-multiagent-mobile.svg">
-  <img src="docs/examples/assets/coding-team-multiagent.svg" alt="Luồng vai trò Coding Team: bạn đưa ra mục tiêu, Lead kiểm tra độ lớn và giao việc, các builder thực hiện, Test Engineer kiểm tra công việc quan trọng, Gatekeeper quyết định và bạn phê duyệt việc xuất bản.">
+  <img src="docs/examples/assets/coding-team-multiagent.svg" alt="Luồng phối hợp Coding Team: Bạn đưa ra mục tiêu, Lead phân tích và chia việc, Builder viết code, Test Engineer kiểm thử độc lập, Gatekeeper nghiệm thu, và Bạn phê duyệt xuất bản.">
 </picture>
 
-- **Bạn đưa ra mục tiêu:** kết quả, các giới hạn và những quyết định phải giữ
-  lại cho bạn.
-- **Lead kiểm tra trước khi giao:** Task đã rõ chưa? Một vai trò có thể sở hữu
-  nó không? Nó đủ nhỏ không? Kiểm tra nào sẽ chứng minh nó hoạt động? Nếu chưa,
-  Lead hỏi nhóm hoặc chia nhỏ công việc thành Sprint → Batch → Task.
-- **Nhóm tham gia là tùy chọn:** Product Manager, System Architect, Advisor,
-  Contradictor hoặc một Domain Advisor chỉ tham gia khi câu trả lời của họ có
-  thể làm thay đổi task.
-- **Các builder thực hiện:** Backend Engineer và Frontend Builder chỉ có thể
-  làm cùng lúc khi file và dependency của họ không xung đột.
-- **Kiểm tra theo mức rủi ro:** các builder chạy kiểm tra tập trung. Với công
-  việc quan trọng hoặc rủi ro cao, Test Engineer kiểm tra kết quả, sau đó
-  Gatekeeper chấp nhận, yêu cầu sửa hoặc chặn nó.
-- **Cổng con người:** commit, push/merge, release và xuất bản công khai đều
-  cần một lời "yes" rõ ràng. Sự im lặng, tin nhắn "đã phê duyệt" của agent, hay
-  một test chạy qua — đều không phải là phê duyệt.
+- **Bạn đưa ra mục tiêu:** Muốn kết quả thế nào, giới hạn ra sao và những quyết định nào bắt buộc phải hỏi bạn.
+- **Lead thẩm định trước khi giao:** Việc đã rõ ràng chưa? Một vai trò có thể làm trọn vẹn không? Việc có đủ nhỏ gọn không? Kiểm tra bằng cách nào để biết là chạy được? Nếu chưa rõ, Lead sẽ hỏi thêm hoặc tự động chẻ nhỏ việc ra thành từng phần (Sprint → Batch → Task).
+- **Các vai trò tư vấn chỉ tham gia khi cần:** Product Manager (PM), Kiến trúc sư hệ thống (System Architect), Cố vấn kỹ thuật (Advisor), Người phản biện (Contradictor) hay Chuyên gia chuyên ngành (Domain Advisor) chỉ xuất hiện khi ý kiến của họ thực sự giúp định hình giải pháp.
+- **Builder viết code:** Backend Engineer và Frontend Builder chỉ làm việc song song khi không đụng chạm chung file hoặc thư viện của nhau.
+- **Kiểm thử theo mức độ rủi ro:** Người viết code tự chạy kiểm tra cơ bản. Với các thay đổi quan trọng hoặc rủi ro cao, Test Engineer sẽ vào cuộc để kiểm tra độc lập, sau đó Gatekeeper sẽ quyết định: duyệt, yêu cầu sửa tiếp hay chặn lại.
+- **Con người chốt duyệt:** Các thao tác quan trọng như commit, push/merge lên Git, release ra ngoài... bắt buộc phải có cái gật đầu ("yes") rõ ràng từ bạn. Sự im lặng của bạn, lời tự khen "em làm xong rồi" của AI, hay kể cả test xanh — đều không được tính là bạn đã duyệt!
 
-### Lead ước lượng độ lớn task thế nào
+### Cách Lead ước lượng độ lớn công việc
 
-Framework công khai dùng một kiểm tra theo quy tắc, không phải một bộ ước lượng
-tự động. Trước khi giao việc, Lead kiểm tra xem có đúng một người sở hữu, một
-mối quan tâm, một kết quả và một lần chạy ngắn với điểm dừng rõ ràng. Nếu công
-việc tương tự đã hoàn thành có thời gian đo được, Lead có thể dùng nó làm ước
-lượng. Nếu không, Lead nói rằng ước lượng chưa biết và chia nhỏ task hoặc chạy
-một bước tìm hiểu nhỏ. Sau khi task xong, ghi lại thời gian thực tế, kết quả và
-vướng mắc để lần ước lượng sau có bằng chứng.
+Framework không đoán mò thời gian. Trước khi giao việc, Lead kiểm tra 4 yếu tố: đúng 1 người phụ trách, đúng 1 mối quan tâm chính, đúng 1 kết quả cụ thể, và hoàn thành nhanh với điểm dừng rõ ràng. Nếu các việc tương tự trước đây từng ghi nhận thời gian, Lead sẽ dùng làm mốc ước lượng. Nếu chưa có số liệu, Lead sẽ thẳng thắn báo là chưa rõ thời gian và chia nhỏ việc ra hoặc làm một bước thăm dò nhanh. Khi làm xong, hệ thống lưu lại thời gian và kết quả thực tế để lần sau ước lượng chuẩn xác hơn.
 
-## Mức độ QA
+## Các mức độ kiểm thử (QA)
 
-| Đường QA | Trạng thái công khai | Khi nào dùng |
-|---|---|---|
-| **Normal QA** | `AVAILABLE` | Mặc định cho các thay đổi nhỏ, có giới hạn |
-| **Risky QA** | `EXPERIMENTAL` | Bắt buộc khi một trigger rủi ro cao đã có hiệu lực |
+| Chế độ QA | Trạng thái | Khi nào nên dùng |
+| --- | --- | --- |
+| **Normal QA** (Thông thường) | `AVAILABLE` (Sẵn sàng) | Mặc định cho các thay đổi nhỏ, đã khoanh vùng rõ ràng |
+| **Risky QA** (Nâng cao cho việc rủi ro) | `EXPERIMENTAL` (Thử nghiệm) | Bắt buộc khi đụng chạm vào phần nhạy cảm, rủi ro cao |
 
-Risky QA đã được thực hiện và có sẵn để dùng thử cẩn thận. Hướng dẫn công khai
-của nó vẫn đang được đánh giá. Nó không tự động chuyển về Normal QA khi một
-trigger rủi ro xuất hiện, và nó không làm thay đổi các cổng phê duyệt của con
-người. Xem [ví dụ cơ bản](docs/examples/risky-qa-trial.md).
+Risky QA đã sẵn sàng để bạn dùng thử thận trọng. Khi gặp tác vụ rủi ro, hệ thống sẽ không tự ý hạ cấp về Normal QA, và các chốt duyệt của con người vẫn giữ nguyên 100%. Xem [ví dụ cơ bản](docs/examples/risky-qa-trial.md).
 
-## Một task có giới hạn đầu tiên
+## Thử ngay một task mẫu đầu tiên
 
 ```text
-Goal: thêm một tính năng nhỏ
-Boundary: chỉ chạm vào các file đã chỉ định
-Proof: chạy kiểm tra tập trung và báo cáo các đường dẫn đã thay đổi
-Stop: tạm dừng để xem lại trước khi commit hoặc release
+Mục tiêu (Goal): Thêm một tính năng nhỏ gọn
+Phạm vi (Boundary): Chỉ sửa đúng các file được chỉ định
+Bằng chứng (Proof): Chạy lệnh kiểm tra tính năng đó và liệt kê các file đã đổi
+Dừng lại (Stop): Dừng lại chờ bạn xem xét trước khi commit hay release
 ```
 
-Cài đặt adapter cho host của bạn, bắt đầu với một task có giới hạn và điều
-chỉnh framework cho dự án của bạn. Phần core vẫn trung lập với host; các bản
-gắn kết Codex, Cursor và Cline nằm trong `adapters/`. Xem [Phạm vi dự án](docs/project-scope.md)
-để biết giới hạn của bản phát hành công khai.
+Chỉ cần cài adapter cho công cụ bạn đang dùng (Codex, Cursor hay Cline), bắt đầu bằng một task nhỏ như trên và áp dụng dần vào dự án của bạn. Phần core hoàn toàn độc lập với công cụ; adapter kết nối nằm trong thư mục `adapters/`. Xem [Phạm vi dự án](docs/project-scope.md) để biết thêm chi tiết.
 
 ---
 
-## Cài đặt bằng một lệnh
+## Cài đặt bằng 1 dòng lệnh
 
-Với hầu hết mọi người, lệnh nhập thân thiện sẽ tự phát hiện host có sẵn và có
-thể chuẩn bị một dự án đầu tiên (tùy chọn). Nhấn Enter để bỏ qua câu hỏi về dự
-án:
+Với đa số người dùng, chỉ cần chạy script cài đặt tự động — nó sẽ tự nhận diện bạn đang dùng Codex, Cursor hay Cline và hỏi bạn có muốn liên kết luôn vào dự án nào không (nhấn Enter nếu muốn bỏ qua):
 
 ```bash
 ./install.sh
 ```
 
-Nó cũng có thể thêm một con trỏ đến dự án đầu tiên của bạn (tùy chọn):
+Nếu muốn gắn sẵn vào thư mục dự án của bạn ngay từ đầu:
 
 ```bash
-./install.sh --project /path/to/your/project
+./install.sh --project /duong-dan/toi/du-an-cua-ban
 ```
 
-Nếu thư mục đó không tồn tại hoặc không thể cập nhật, quá trình cài đặt vẫn
-hoàn tất và lệnh sẽ giải thích cách chuẩn bị nó sau.
+Nếu thư mục chưa có hoặc chưa cấp quyền ghi, quá trình cài đặt vẫn hoàn tất và sẽ hướng dẫn bạn cách thiết lập sau.
 
-Dành cho CI, script hoặc thiết lập hoàn toàn tường minh, bỏ qua mọi câu hỏi:
+Dành cho môi trường CI, script tự động hoặc khi muốn bỏ qua mọi câu hỏi:
 
 ```bash
 ./install.sh --platform codex --no-questionnaire
 ```
 
-## Bắt đầu một task từ chat của bạn
+## Bắt đầu một task ngay trong khung chat
 
-Framework đóng gói một **process pack** nhỏ gồm các skill. Skill đầu vào công
-khai là `plain-task-start`: nó biến một yêu cầu bằng lời đơn giản thành một thẻ
-bốn dòng — **Goal (Mục tiêu), Scope (Phạm vi), Proof (Bằng chứng), Stop (Dừng)**
-— trước khi bất kỳ file nào bị thay đổi.
+Framework tích hợp sẵn một bộ kỹ năng quy trình nhỏ gọn. Kỹ năng mở đầu dễ dùng nhất là `plain-task-start`: nó giúp chuyển bất kỳ câu lệnh nào bạn chat thành một thẻ công việc 4 dòng rõ ràng — **Mục tiêu (Goal), Phạm vi (Scope), Bằng chứng (Proof), Điểm dừng (Stop)** — **trước khi AI kịp đụng vào bất kỳ file code nào!**
 
-Nó nằm sẵn trong repository tại `skills/process/plain-task-start/` và được nạp
-từ `CODING_TEAM_ROOT` của bạn, nên không cần cài thêm gì. Chỉ cho agent đến
-đường dẫn của skill:
+Kỹ năng này nằm sẵn trong thư mục `skills/process/plain-task-start/` và tự nạp qua biến `CODING_TEAM_ROOT`, bạn không cần cài thêm gì cả. Chỉ cần nhắn cho AI trong cửa sổ chat:
 
 ```text
-Dùng skills/process/plain-task-start/ để chuyển yêu cầu này thành một task card:
-Thêm công tắc dark-mode vào trang cài đặt
+Dùng skills/process/plain-task-start/ để tạo task card cho yêu cầu này:
+Thêm nút bật/tắt dark mode vào trang cài đặt (settings)
 ```
 
-Agent trả lời bằng thẻ trong cùng cuộc chat, rồi dừng để bạn xem lại.
+AI sẽ trả lời ngay bằng một thẻ tóm tắt và dừng lại chờ bạn duyệt:
 
 ```text
-Goal: thêm công tắc dark-mode vào trang cài đặt
-Scope: chỉ src/settings/*
-Proof: công tắc đổi màu xem trước trên /settings
-Stop: sau khi kiểm tra xem trước, trước khi commit
+Goal: Thêm nút bật/tắt dark mode vào trang cài đặt
+Scope: Chỉ chỉnh sửa trong thư mục src/settings/*
+Proof: Bấm nút đổi được màu xem trước trên trang /settings
+Stop: Dừng lại ngay sau khi kiểm tra xong giao diện, trước khi làm bất kỳ thao tác commit nào
 ```
 
-Thẻ chỉ là dữ liệu đầu vào để lập kế hoạch — nó không thực hiện, không phê
-duyệt và không thay thế việc xem lại của con người. Xem [Skills](docs/skills.md)
-cho toàn bộ pack.
+Thẻ này chỉ dùng để chốt kế hoạch trước khi làm — nó chưa sửa code, không tự duyệt và không thay thế bạn. Xem [Skills](docs/skills.md) để khám phá thêm các bộ kỹ năng khác.
 
-## Cài đặt nâng cao và phần mở rộng tường minh
+## Cài đặt nâng cao và các phần mở rộng
 
-Bộ cài chuẩn liên kết adapter đã chọn và hỗ trợ QA có điều kiện:
+Script cài đặt chuẩn giúp tạo liên kết (symlink) cho adapter và bộ hỗ trợ QA:
 
 ```bash
 ./scripts/install-coding-team.sh --platform codex
 ```
 
-Chỉ có một đường dẫn cài đặt công khai. Model map và addon là các phần mở rộng
-tường minh; xem [Cài đặt](docs/installation.md).
+Dự án chỉ có một luồng cài đặt chuẩn duy nhất. Các bảng cấu hình model (model maps) và addon là các phần mở rộng tùy chọn; xem thêm tại [Hướng dẫn cài đặt](docs/installation.md).
 
-## Đây là cái gì
+## Cấu trúc của Framework gồm những gì?
 
-| Lớp | Nó làm gì |
-|---|---|
-| **Core** | Các vai trò, cổng và giới hạn hoạt động giống nhau trên Codex, Cursor hoặc Cline |
-| **Skills** | Các pack engineering / quality / process / design đi kèm |
-| **Adapters** | Gắn kết runtime cho Codex, Cursor, Cline |
-| **Addons** | Hỗ trợ ra quyết định PM Lean — mặc định TẮT, chỉ khi được gọi rõ |
+| Tầng | Vai trò & Chức năng |
+| --- | --- |
+| **Core** | Bộ quy tắc chung: vai trò, chốt duyệt, giới hạn — hoạt động y hệt nhau trên Codex, Cursor hay Cline |
+| **Skills** | Các gói kỹ năng dựng sẵn: kỹ thuật (engineering), chất lượng (quality), quy trình (process), thiết kế (design) |
+| **Adapters** | Cầu nối giúp tích hợp mượt mà vào runtime của Codex, Cursor hoặc Cline |
+| **Addons** | Bộ hỗ trợ phân tích sản phẩm (PM Lean) — mặc định TẮT, chỉ bật khi bạn cần |
 
-## Định tuyến hoạt động thế nào
+## Cơ chế điều phối Model (Routing)
 
-Định tuyến quyết định model nào làm task nào. Nói đơn giản: sắp xếp task theo
-loại, chọn năng lực mà loại đó cần, rồi dùng model mà host của bạn đã phê duyệt
-cho năng lực đó. Luồng kỹ thuật dùng đúng các thuật ngữ của framework, được định
-nghĩa bên dưới.
+Điều phối (Routing) là cách phân công xem loại việc nào nên giao cho model AI nào làm để vừa tiết kiệm chi phí vừa đạt kết quả tốt nhất.
 
-1. Lead sắp xếp mỗi task theo loại (framework gọi đây là **nature**: một tra cứu
-   chỉ-đọc, một bản xây có giới hạn, một thay đổi rủi ro cao cần con người trước,
-   v.v. — bộ đầy đủ là N0–N5 cộng thêm Consult và Docs; xem [Định nghĩa](docs/definitions.md)).
-2. Loại đó chọn một **tier**: năng lực cần thiết, chẳng hạn tra cứu rẻ, builder
-   ổn định hoặc đánh giá cao cấp. Một tier là ý định, không phải một model hay
-   một nhà cung cấp.
-3. Lead dùng định danh model (gọi là **slug**) mà host của bạn đã phê duyệt
-   trong `model-pool.map.md` khi có tồn tại.
-4. Thiếu slug → lấy cái tốt nhất tiếp theo; ghi lại `planned → actual` (không
-   bao giờ chặn việc bắt đầu).
+Nói một cách dân dã nhất: **Phân loại việc → Chọn năng lực phù hợp → Dùng model mà bạn đã cấp quyền.**
 
-Một dòng: **Cao cấp ra quyết định. Tiết kiệm xây dựng. Rẻ cho tìm kiếm/tài liệu. Cổng con người cho rủi ro không thể hoàn tác.**
+1. **Phân loại tác vụ (Nature):** Lead xếp việc vào các nhóm (từ việc nhẹ như tra cứu đọc file, viết code thông thường, đến việc nặng rủi ro cao cần hỏi con người trước — framework chia thành N0–N5 kèm nhóm Consult và Docs; xem [Định nghĩa](docs/definitions.md)).
+2. **Chọn cấp độ năng lực (Tier):** Mỗi loại việc cần một năng lực tương ứng: ví dụ việc đơn giản chỉ cần model giá rẻ, việc code cần model ổn định, việc đánh giá kiến trúc cần model thông minh nhất (tier premium). Tier chỉ mức năng lực mong muốn, không chỉ định cứng một hãng AI nào.
+3. **Gọi đúng Model (Slug):** Lead sẽ lấy tên model (slug) tương ứng mà bạn đã cấu hình trong file `model-pool.map.md`.
+4. **Không có model chỉ định sẵn?** Lead tự động dùng model tốt nhất kế tiếp và ghi lại đối chiếu (không bao giờ làm tắc nghẽn công việc).
 
-## Chuyên gia tên miền (`[Domain]-Advisor`)
+Tóm tắt trong một câu:
+> **Model xịn nhất (Premium) để ra quyết định khó · Model cân bằng (Eco) để viết code · Model giá rẻ (Cheap) để tìm kiếm và đọc tài liệu · Con người tự tay duyệt những việc rủi ro không thể đảo ngược.**
 
-Không có vai trò Talent-Care cố định. Khi cần đánh giá chuyên môn, Lead **hỏi
-tên miền (domain)**, rồi ánh xạ:
+## Chuyên gia chuyên ngành (`[Domain]-Advisor`)
 
-| Hiển thị | Instance ID |
-|---|---|
-| Talent-Advisor | `talent-advisor` |
-| Strategic-Advisor | `strategic-advisor` |
-| Security-Advisor | `security-advisor` |
+Framework không gắn cứng một vai trò ngành dọc nào (như Cố vấn Nhân sự, Tài chính...). Khi gặp bài toán cần kiến thức chuyên sâu của một ngành cụ thể, Lead sẽ **xác định lĩnh vực chuyên môn (domain)** cần thiết và tự động ánh xạ vai trò:
+
+| Tên hiển thị | Mã định danh (Instance ID) |
+| --- | --- |
+| Cố vấn Nhân sự (Talent-Advisor) | `talent-advisor` |
+| Cố vấn Chiến lược (Strategic-Advisor) | `strategic-advisor` |
+| Cố vấn Bảo mật (Security-Advisor) | `security-advisor` |
 | … | `{domain}-advisor` |
 
-Bản mẫu: `core/roles/domain-advisor.md` · Quy tắc: `core/domain-advisors.md` · Tài liệu vai trò: [docs/roles.md](docs/roles.md).
+File mẫu: `core/roles/domain-advisor.md` · Bộ quy tắc: `core/domain-advisors.md` · Tài liệu các vai trò: [docs/roles.md](docs/roles.md).
 
-## Giấy phép
+## Giấy phép (License)
 
-MIT cho các file của framework. Thông báo bên thứ ba: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Mã nguồn framework phát hành theo giấy phép MIT. Thông báo về các thư viện bên thứ ba: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
