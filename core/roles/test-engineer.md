@@ -11,7 +11,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/quality/web-testing/`
+Dedicated skill (ready when this role joins): `skills/quality/web-testing/`
 
 Others load when the brief names them:
 

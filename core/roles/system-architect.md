@@ -13,9 +13,9 @@ changes a shared multi-owner contract.
 
 ## Skill
 
-Dedicated skill (auto-loads on role spawn): `skills/engineering/system-architecture/`
+Dedicated skill (ready when this role joins): `skills/engineering/system-architecture/`
 
-Load it only for the architecture trigger above. Start with no skill for a
+Load it only for the architecture work above. Start with no skill for a
 single-layer change or an already settled contract. Do not load an
 architecture skill bundle by default.
 

@@ -38,7 +38,7 @@
     <text class="ink note" x="26" y="100">It is set up from the first reply:</text>
     <text class="ink note" x="26" y="130">backend-engineer  →  backend-development</text>
     <text class="ink note" x="26" y="156">test-engineer  →  web-testing</text>
-    <text class="muted" x="26" y="182">hallmark → frontend-ux-lead, and so on</text>
+    <text class="muted" x="26" y="182">frontend-ux-lead  →  hallmark</text>
   </g>
   <path class="arrow" d="M756 230H782" />
 

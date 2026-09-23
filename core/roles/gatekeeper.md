@@ -11,7 +11,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/quality/code-review/`
+Dedicated skill (ready when this role joins): `skills/quality/code-review/`
 
 Others load when the brief names them:
 

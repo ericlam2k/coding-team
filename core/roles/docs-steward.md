@@ -11,7 +11,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/process/docs-seeker/`
+Dedicated skill (ready when this role joins): `skills/process/docs-seeker/`
 
 Others load when the brief names them:
 

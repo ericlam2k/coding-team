@@ -11,7 +11,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/process/context-engineering/`
+Dedicated skill (ready when this role joins): `skills/process/context-engineering/`
 
 Others load when the brief names them:
 

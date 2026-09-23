@@ -13,7 +13,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/engineering/frontend-development/`
+Dedicated skill (ready when this role joins): `skills/engineering/frontend-development/`
 
 Others load when the brief names them:
 

@@ -11,7 +11,7 @@
 
 ## Skills
 
-Dedicated skill (auto-loads on role spawn): `skills/process/pm-execution/create-prd/`
+Dedicated skill (ready when this role joins): `skills/process/pm-execution/create-prd/`
 
 Others load when the brief names them:
 

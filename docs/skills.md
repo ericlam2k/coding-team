@@ -30,14 +30,14 @@ skills/
 
 ## Role → skill coverage
 
-| Role | Dedicated skill (auto-loads) | Typical skills (on trigger) |
+| Role | Dedicated skill (ready when the role joins) | Typical skills (when the task names them) |
 |---|---|
 | Lead | — (parent agent) | `context-engineering` (packets only), `code-review` (handoff check) |
 | Product Manager | `pm-execution/create-prd` | `pm-execution`, `context-engineering` |
 | Advisor / Contradictor | `context-engineering` | usually `none` (+ packet if assigned) |
 | Domain Advisor | — (supplied evidence) | `context-engineering` only for a named multi-source packet; one project-domain skill only when named |
 | Investigator | `context-engineering` | `context-engineering` for bounded investigation |
-| System Architect | `engineering/system-architecture` | only for the cross-layer/shared-contract trigger; add another named skill only for a distinct unresolved question |
+| System Architect | `engineering/system-architecture` | only for cross-layer/shared-contract work; add another named skill only for a distinct unresolved question |
 | Backend Engineer | `backend-development` | `databases`, `debugging`, `web-frameworks` |
 | Frontend/UX Lead | `hallmark` | `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
 | Frontend Builder | `frontend-development` | `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
