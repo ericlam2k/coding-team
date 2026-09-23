@@ -21,9 +21,10 @@ This is a conversation-level prompt, not a persisted user setting.
   how they should be addressed. Ask for their preference instead.
 - Report incomplete or impossible work as `FAIL` or `BLOCKED`, with evidence;
   never label missing coverage `PASS`.
-- Keep public language warm and approachable. ASD-STE100-style practices can
-  help internal prompts and handoffs, but they are not a public brand claim or
-  a replacement for natural language.
+- Keep public language warm and approachable. Controlled-vocabulary habits
+  — short sentences, one meaning per word, and a literal phrase in place of
+  idiom — can help internal prompts and handoffs, but they are not a public
+  brand claim or a replacement for natural language.
 
 ## What is public today
 

@@ -20,7 +20,8 @@ coding-team makes those decisions visible:
 
 - **Sprint → Batch → Task** keeps a big goal small enough to steer.
 - **Role cards** make ownership and boundaries explicit.
-- **WIP ≤ 2** limits concurrent tool-using work.
+- **At most two tasks at once** keeps concurrent work small enough to
+  review (the docs call this limit WIP ≤ 2).
 - **Human gates** protect irreversible actions.
 - **Test Engineer → Gatekeeper** puts independent evidence before final acceptance.
 
@@ -140,6 +141,33 @@ For CI, scripts, or a fully explicit setup, skip all prompts:
 ./install.sh --platform codex --no-questionnaire
 ```
 
+## Start a task from your chat
+
+The framework bundles a small **process pack** of skills. The public entry skill
+is `plain-task-start`: it turns one plain-English request into a four-line card
+— **Goal, Scope, Proof, Stop** — before any file is changed.
+
+It ships inside the repository at `skills/process/plain-task-start/` and loads
+from your `CODING_TEAM_ROOT`, so there is nothing extra to install. Point your
+agent at the skill path:
+
+```text
+Use skills/process/plain-task-start/ to turn this into a task card:
+Add a dark-mode toggle to the settings page
+```
+
+The agent replies with the card in the same chat, then stops for your review.
+
+```text
+Goal: add a dark-mode toggle to the settings page
+Scope: src/settings/* only
+Proof: toggle switches the preview colors on /settings
+Stop: after the preview check, before any commit
+```
+
+The card is planning input only — it does not implement, approve, or replace
+human review. See [Skills](docs/skills.md) for the full pack.
+
 ## Advanced install and explicit extensions
 
 The canonical installer links the selected adapter and conditional QA support:
@@ -155,16 +183,27 @@ extensions; see [Installation](docs/installation.md).
 
 | Layer | What it does |
 |---|---|
-| **Core** | Host-agnostic policy: roles, gates, WIP ≤ 2, nature → tier |
+| **Core** | Roles, gates, and limits that work the same on Codex, Cursor, or Cline |
 | **Skills** | Bundled engineering / quality / process / design packs |
 | **Adapters** | Codex, Cursor, Cline runtime binding |
 | **Addons** | PM Lean decision support — default OFF, explicit-only |
 
 ## How routing works
 
-1. Lead classifies **nature** (N0–N5 / Consult / Docs).
-2. Nature selects an abstract **tier**.
-3. Lead uses a host-local approved `model-pool.map.md` slug when one exists.
+Routing decides which model does which task. In plain terms: sort the task by
+kind, pick the capability that kind needs, then use the model your host has
+approved for that capability. The technical flow uses the framework's own terms,
+defined below.
+
+1. Lead sorts each task by kind (the framework calls this its **nature**: a
+   read-only lookup, a bounded build, a high-risk change that needs a human
+   first, and so on — the full set is N0–N5 plus Consult and Docs; see
+   [Definitions](docs/definitions.md)).
+2. The kind selects a **tier**: the capability needed, such as cheap lookup,
+   steady builder, or premium judgment. A tier is intent, not a model or a
+   vendor.
+3. Lead uses the model identifier (the **slug**) your host approved in its
+   `model-pool.map.md` when one exists.
 4. Missing slug → next best; record `planned → actual` (never block start).
 
 One-liner: **Premium decide. Eco build. Cheap search/docs. Human gate for irreversible risk.**
