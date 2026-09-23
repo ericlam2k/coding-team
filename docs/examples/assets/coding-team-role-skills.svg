@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 460" role="img" aria-labelledby="title desc">
+  <title id="title">Each role starts with one skill ready</title>
+  <desc id="desc">When a specialist role joins the work, one skill is ready from the first reply. The other skills wait and arrive only when the task names them.</desc>
+  <style>
+    .bg { fill: #f7f4ed; }
+    .card { fill: #fffdf8; stroke: #17324d; stroke-width: 3; }
+    .standby { fill: #fffdf8; stroke: #17324d; stroke-width: 3; stroke-dasharray: 7 6; }
+    .accent { fill: #f0b44d; }
+    .ink { fill: #17324d; font-family: Arial, sans-serif; }
+    .label { font-size: 25px; font-weight: 700; }
+    .note { font-size: 16px; }
+    .muted { fill: #5b6b7a; font-size: 16px; font-family: Arial, sans-serif; }
+    .arrow { fill: none; stroke: #d56b42; stroke-width: 5; marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#d56b42" />
+    </marker>
+  </defs>
+  <rect class="bg" width="1300" height="460" rx="24" />
+  <text class="ink label" x="50" y="55">Each role starts with one skill ready</text>
+  <text class="muted" x="50" y="84">The other skills arrive only when the task names them.</text>
+
+  <g transform="translate(50 135)">
+    <rect class="card" width="240" height="190" rx="18" />
+    <rect class="accent" width="240" height="12" rx="6" />
+    <text class="ink label" x="24" y="60">A role joins</text>
+    <text class="ink note" x="24" y="100">Lead hands one small</text>
+    <text class="ink note" x="24" y="128">task to the role that</text>
+    <text class="ink note" x="24" y="156">owns it</text>
+  </g>
+  <path class="arrow" d="M290 230H316" />
+
+  <g transform="translate(316 135)">
+    <rect class="card" width="440" height="190" rx="18" />
+    <rect class="accent" width="440" height="12" rx="6" />
+    <text class="ink label" x="26" y="60">One skill ready</text>
+    <text class="ink note" x="26" y="100">It is set up from the first reply:</text>
+    <text class="ink note" x="26" y="130">backend-engineer  →  backend-development</text>
+    <text class="ink note" x="26" y="156">test-engineer  →  web-testing</text>
+    <text class="muted" x="26" y="182">frontend-ux-lead  →  hallmark</text>
+  </g>
+  <path class="arrow" d="M756 230H782" />
+
+  <g transform="translate(782 135)">
+    <rect class="standby" width="468" height="190" rx="18" />
+    <text class="ink label" x="26" y="60">Other skills wait</text>
+    <text class="ink note" x="26" y="100">They arrive only when the task</text>
+    <text class="ink note" x="26" y="128">names them.</text>
+    <text class="muted" x="26" y="162">Nothing else changes: same rules,</text>
+    <text class="muted" x="26" y="186">same human approvals to ship.</text>
+  </g>
+
+  <text class="muted" x="50" y="385">Install connects each role with its ready skill by name; the other</text>
+  <text class="muted" x="50" y="411">skills stay in the folder until the task names them.</text>
+</svg>

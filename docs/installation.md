@@ -97,6 +97,22 @@ Check an existing install without changing it:
 
 Set CODEX_HOME when Codex uses a different home directory.
 
+## Role skills (linked by default)
+
+The install links the adapter, QA support, and **nine role-dedicated skills** —
+one per specialist role — alongside each other:
+
+```text
+context-engineering, backend-development, docs-seeker, frontend-development,
+hallmark, web-testing, code-review, system-architecture, create-prd
+```
+
+Each linked skill resolves by name, so a role and its primary skill activate
+together; every other bundled skill stays in-tree and loads only when the task
+names it. `./bin/ct status` lists the linked role skills, and
+`./scripts/install-coding-team.sh --check` verifies them without changing
+anything.
+
 ## Process skills
 
 The bundled process skills, including `plain-task-start`, ship inside the

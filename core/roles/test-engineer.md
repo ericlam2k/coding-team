@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (ready when this role joins): `skills/quality/web-testing/`
+
+Others load when the brief names them:
 
 - `skills/quality/web-testing/`
 - `skills/quality/qa-evidence-enforcement/` — bounded QA evidence and promotion-readiness validation after execution

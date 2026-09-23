@@ -19,21 +19,25 @@ Host-independent coding-team policy. Adapters under `adapters/` bind this core t
 
 ## Roles
 
-| File | Role ID |
-|---|---|
-| [roles/lead.md](roles/lead.md) | `lead` |
-| [roles/product-manager.md](roles/product-manager.md) | `product-manager` |
-| [roles/advisor.md](roles/advisor.md) | `advisor` |
-| [roles/contradictor.md](roles/contradictor.md) | `contradictor` |
-| [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` |
-| [roles/investigator.md](roles/investigator.md) | `investigator` |
-| [roles/system-architect.md](roles/system-architect.md) | `system-architect` |
-| [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` |
-| [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` |
-| [roles/frontend-builder.md](roles/frontend-builder.md) | `frontend-builder` |
-| [roles/test-engineer.md](roles/test-engineer.md) | `test-engineer` |
-| [roles/docs-steward.md](roles/docs-steward.md) | `docs-steward` |
-| [roles/gatekeeper.md](roles/gatekeeper.md) | `gatekeeper` |
+| File | Role ID | Dedicated skill |
+|---|---|---|
+| [roles/lead.md](roles/lead.md) | `lead` | — (parent agent) |
+| [roles/product-manager.md](roles/product-manager.md) | `product-manager` | `pm-execution/create-prd` |
+| [roles/advisor.md](roles/advisor.md) | `advisor` | `context-engineering` |
+| [roles/contradictor.md](roles/contradictor.md) | `contradictor` | `context-engineering` |
+| [roles/domain-advisor.md](roles/domain-advisor.md) | `domain-advisor` → `{domain}-advisor` | — (supplied evidence) |
+| [roles/investigator.md](roles/investigator.md) | `investigator` | `context-engineering` |
+| [roles/system-architect.md](roles/system-architect.md) | `system-architect` | `engineering/system-architecture` |
+| [roles/backend-engineer.md](roles/backend-engineer.md) | `backend-engineer` | `backend-development` |
+| [roles/frontend-ux-lead.md](roles/frontend-ux-lead.md) | `frontend-ux-lead` | `hallmark` |
+| [roles/frontend-builder.md](roles/frontend-builder.md) | `frontend-builder` | `frontend-development` |
+| [roles/test-engineer.md](roles/test-engineer.md) | `test-engineer` | `web-testing` |
+| [roles/docs-steward.md](roles/docs-steward.md) | `docs-steward` | `docs-seeker` |
+| [roles/gatekeeper.md](roles/gatekeeper.md) | `gatekeeper` | `code-review` |
+
+Each specialist role card names one skill that is set up and ready when that
+role joins; every other skill on the card waits until the task names it. Lead
+and Domain Advisor keep no ready skill.
 
 ## Templates
 

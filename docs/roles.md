@@ -44,4 +44,9 @@ before Lead allocation. Material drift returns FIO → Lead → System Architect
 
 ## Skill pointers (by role)
 
-See the coverage matrix in [skills.md](skills.md). Cards name exact paths under `skills/`.
+![Illustrative diagram: a role joins the work, one skill is ready from the first reply, and the other skills wait until the task names them.](examples/assets/coding-team-role-skills.svg)
+
+Each specialist card names **one** skill that is set up and ready when that role
+joins; the rest of the card's skills arrive only when the task names them. See
+the coverage matrix in [skills.md](skills.md). Cards name exact paths under
+`skills/`.

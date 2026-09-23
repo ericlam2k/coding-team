@@ -11,7 +11,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (ready when this role joins): `skills/process/docs-seeker/`
+
+Others load when the brief names them:
 
 - `skills/process/docs-seeker/` — locate and normalize sources
 - `skills/process/context-engineering/` — when synthesizing a docs packet is named

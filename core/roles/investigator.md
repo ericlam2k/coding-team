@@ -13,7 +13,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (ready when this role joins): `skills/process/context-engineering/`
+
+Others load when the brief names them:
 
 - `skills/process/context-engineering/` — bounded investigation / packet trigger
 - `skills/process/docs-seeker/` — when locating docs is the question

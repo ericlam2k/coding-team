@@ -12,6 +12,20 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROPOSE="$ROOT/scripts/propose-model-map.py"
 QA_SKILL_SRC="$ROOT/skills/quality/qa-evidence-enforcement"
 QA_VALIDATOR="$ROOT/scripts/validate-qa-evidence.rb"
+
+# One dedicated skill per specialist role (see core/roles/*.md), linked
+# default-ON so a role and its primary skill activate together.
+ROLE_SKILL_DIRS=(
+  "skills/process/context-engineering"
+  "skills/engineering/backend-development"
+  "skills/process/docs-seeker"
+  "skills/engineering/frontend-development"
+  "skills/design/hallmark"
+  "skills/quality/web-testing"
+  "skills/quality/code-review"
+  "skills/engineering/system-architecture"
+  "skills/process/pm-execution/create-prd"
+)
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 CODEX_HOME="${CODEX_HOME/#\~/$HOME}"
 
@@ -90,17 +104,27 @@ unlink_path() {
   fi
 }
 
+link_role_skills() {
+  local dst_root="$1" dir
+  for dir in "${ROLE_SKILL_DIRS[@]}"; do
+    link_path "$ROOT/$dir" "$dst_root/$(basename "$dir")"
+  done
+  echo "role skills: ${#ROLE_SKILL_DIRS[@]} linked (one per specialist role)"
+}
+
 install_adapter() {
   local platform="$1"
   case "$platform" in
     codex)
       link_path "$ROOT/adapters/codex" "$CODEX_HOME/skills/coding-team"
       link_path "$QA_SKILL_SRC" "$CODEX_HOME/skills/qa-evidence-enforcement"
+      link_role_skills "$CODEX_HOME/skills"
       ;;
     cursor)
       mkdir -p "$ROOT/.cursor-install"
       link_path "$ROOT/adapters/cursor" "$ROOT/.cursor-install/coding-team"
       link_path "$QA_SKILL_SRC" "$ROOT/.cursor-install/qa-evidence-enforcement"
+      link_role_skills "$ROOT/.cursor-install"
       echo "Cursor: symlink ready at $ROOT/.cursor-install/coding-team"
       echo "Copy/link into your project: .cursor/skills/coding-team → that path"
       echo "  or: ln -s \"$ROOT/adapters/cursor\" \"/path/to/project/.cursor/skills/coding-team\""
@@ -109,6 +133,7 @@ install_adapter() {
       mkdir -p "$ROOT/.cline-install"
       link_path "$ROOT/adapters/cline" "$ROOT/.cline-install/coding-team"
       link_path "$QA_SKILL_SRC" "$ROOT/.cline-install/qa-evidence-enforcement"
+      link_role_skills "$ROOT/.cline-install"
       echo "Cline: symlink ready at $ROOT/.cline-install/coding-team"
       echo "Point Cline skills/rules at CODING_TEAM_ROOT=$ROOT"
       ;;
@@ -205,6 +230,16 @@ cmd_status() {
       echo "  Codex $name → $(readlink "$p")"
     fi
   done
+  local role_found=0
+  for dir in "${ROLE_SKILL_DIRS[@]}"; do
+    name="$(basename "$dir")"
+    local p="$CODEX_HOME/skills/$name"
+    if [[ -L "$p" ]]; then
+      role_found=1
+      echo "  role skill $name → $(readlink "$p")"
+    fi
+  done
+  [[ "$role_found" -eq 1 ]] || echo "  role skills: none linked (run ./bin/ct init)"
   echo "  QA validator: $QA_VALIDATOR"
   for p in \
     "$ROOT/adapters/codex/model-pool.map.md" \

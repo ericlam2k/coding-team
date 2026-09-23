@@ -78,6 +78,17 @@ Lead may use it as an estimate. If not, Lead says the estimate is unknown and
 splits the task or runs a small fact-finding step. After the task, record the
 actual time, outcome, and blocker so the next estimate has evidence.
 
+## One ready skill per role
+
+Each specialist role comes with **one** skill set up and ready, so the role can
+work from its first reply. The role's other skills wait and arrive only when the
+task names them.
+
+![Illustrative diagram: a role joins the work, one skill is ready from the first reply, and the other skills wait until the task names them.](docs/examples/assets/coding-team-role-skills.svg)
+
+The rules and the human approvals are unchanged. See [Roles](docs/roles.md) and
+[Skills](docs/skills.md).
+
 ## QA maturity
 
 | QA path | Public status | When to use it |

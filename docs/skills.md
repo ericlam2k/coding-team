@@ -30,20 +30,28 @@ skills/
 
 ## Role → skill coverage
 
-| Role | Typical skills (on trigger) |
+| Role | Dedicated skill (ready when the role joins) | Typical skills (when the task names them) |
 |---|---|
-| Lead | `context-engineering` (packets only), `code-review` (handoff check) |
-| Product Manager | `pm-execution`, `context-engineering` |
-| Advisor / Contradictor | usually `none` (+ packet if assigned) |
-| Domain Advisor | supplied domain evidence; `context-engineering` only for a named multi-source packet; one project-domain skill only when named |
-| Investigator | `context-engineering` for bounded investigation |
-| System Architect | `engineering/system-architecture` only for the cross-layer/shared-contract trigger; add another named skill only for a distinct unresolved question |
-| Backend Engineer | `backend-development`, `databases`, `debugging`, `web-frameworks` |
-| Frontend/UX Lead | `hallmark`, `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
-| Frontend Builder | `frontend-development`, `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
-| Test Engineer | `web-testing`, `qa-evidence-enforcement` (bounded evidence only), `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
-| Docs Steward | `docs-seeker`, `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
-| Gatekeeper | `code-review` (read-only) |
+| Lead | — (parent agent) | `context-engineering` (packets only), `code-review` (handoff check) |
+| Product Manager | `pm-execution/create-prd` | `pm-execution`, `context-engineering` |
+| Advisor / Contradictor | `context-engineering` | usually `none` (+ packet if assigned) |
+| Domain Advisor | — (supplied evidence) | `context-engineering` only for a named multi-source packet; one project-domain skill only when named |
+| Investigator | `context-engineering` | `context-engineering` for bounded investigation |
+| System Architect | `engineering/system-architecture` | only for cross-layer/shared-contract work; add another named skill only for a distinct unresolved question |
+| Backend Engineer | `backend-development` | `databases`, `debugging`, `web-frameworks` |
+| Frontend/UX Lead | `hallmark` | `awesome-design-md` (via index), `frontend-design`, `ui-ux-pro-max` |
+| Frontend Builder | `frontend-development` | `ui-styling`, `web-frameworks`, `hallmark` when assigned, `react-next-performance` |
+| Test Engineer | `web-testing` | `qa-evidence-enforcement` (bounded evidence only), `debugging`, `doc-reader-test` (explicit-only), `pm-execution/test-scenarios` (pre-build only) |
+| Docs Steward | `docs-seeker` | `stakeholder-update` (explicit-only), `artifact-theme` (non-product artifacts only) |
+| Gatekeeper | `code-review` | `web-testing` to interpret TE evidence (read-only) |
+
+## One ready skill per role
+
+Each specialist role card names **one** skill that is set up and ready when that
+role joins, so the role can work from its first reply. Every other skill on the
+card waits and arrives only when the task names it — the one-skill-at-a-time
+rule and the human approvals are unchanged. Lead and Domain Advisor keep no
+ready skill.
 
 ## Pre-build test-case development chain
 

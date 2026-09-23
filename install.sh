@@ -29,6 +29,9 @@ Helpful options:
   --global            Accepted for compatibility; the default is global where supported
 
 The normal path is one command: ./install.sh
+
+The install links the adapter, QA support, and the nine role-dedicated skills
+(one per specialist role) so each role and its primary skill activate together.
 USAGE
 }
 

@@ -13,7 +13,9 @@
 
 ## Skills
 
-Load when the brief names them:
+Dedicated skill (ready when this role joins): `skills/engineering/frontend-development/`
+
+Others load when the brief names them:
 
 - `skills/engineering/frontend-development/`
 - `skills/engineering/web-frameworks/`

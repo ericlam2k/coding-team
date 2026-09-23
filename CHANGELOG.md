@@ -9,9 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Each specialist role card names one **dedicated skill** that is ready when
+  that role joins; the rest of the card's skill list waits until the task names
+  it. Lead and Domain Advisor keep no dedicated skill.
+- Nine bundled skills are normalized into standalone skills (valid
+  `SKILL.md` metadata; `skills/engineering/frontend-development/` now matches
+  its `name`). No skill bodies were rewritten.
+- `docs/examples/assets/coding-team-role-skills.svg` illustrative diagram.
+- The base install now links the nine **role-dedicated skills** (one per
+  specialist role) into the host skill directory by default — no flag. Each
+  skill resolves by name, so a role and its primary skill activate together.
+- `./bin/ct status` lists the linked role skills; `./bin/ct init` links them
+  on every platform. `--check` verifies them without changing anything.
 - `plain-task-start` process skill: turn one plain-English request into a
   four-line **Goal, Scope, Proof, Stop** card before any file is changed. Ships
   in-tree under `skills/process/` and loads from `CODING_TEAM_ROOT`.
+
+### Changed
+
+- `docs/skills.md` coverage table and `core/README.md` role index now show the
+  dedicated skill per role.
 
 ### Documentation
 
